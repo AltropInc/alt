@@ -23,7 +23,8 @@ TEST_CASE( "RingBufferTest", "[RingBufferTest]" )
     read_buffer[read_len] = '\0';
     REQUIRE(alt::StrRefInLength(read_buffer, read_len)=="cdefghijklmn");
 
-    struct iovec iov[2];
+    struct iovec iov_arr[2];
+    std::span<iovec,2> iov(iov_arr);
     read_len = buffer.fetch(iov,  10);
     REQUIRE(alt::StrRefInLength((const char*)iov[0].iov_base, iov[0].iov_len)=="opqrstuv");
     REQUIRE(alt::StrRefInLength((const char*)iov[1].iov_base, iov[1].iov_len)=="wx");

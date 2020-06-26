@@ -3,6 +3,7 @@
 #include <util/numeric/Intrinsics.h>
 #include <util/ipc/SharedMemory.h>
 #include <util/system/SysConfig.h>
+#include <util/types/Span.h>
 #include <sys/uio.h>
 #include <atomic>
 #include <stdlib.h>
@@ -74,7 +75,7 @@ class ALT_UTIL_PUBLIC RingBuffer
     /// \return the length of the unread bytes given in io vector
     /// \note fetched bytes are not copied. io vector conatins positions only. commitRead
     /// must be called after the fetched data are processed to free space for the writer.
-	size_t fetchAll(struct iovec* iov);
+	size_t fetchAll(std::span<iovec,2>& iov);
 
     /// \brief fetch n unread bytes in the buffer into iov
     /// \param iov io vector to give the positions and length in the ring buffer
@@ -83,7 +84,7 @@ class ALT_UTIL_PUBLIC RingBuffer
     /// contains bytes less than n
     /// \note fetched bytes are not copied. io vector conatins positions only. commitRead
     /// must be called after the fetched data are processed to free space for the writer.
-	size_t fetch(struct iovec* iov,  size_t n);
+	size_t fetch(std::span<iovec,2>& iov,  size_t n);
 
     /// \brief continue to fetch n unread and unfetched bytes in the buffer into iov
     /// \param iov io vector to give the positions and length in the ring buffer
@@ -91,7 +92,7 @@ class ALT_UTIL_PUBLIC RingBuffer
     /// \return the length of the bytes given in io vector. zero if the buffer
     /// contains bytes less than n
     /// \note commitRead must be called after the all fetchs are done.
-    size_t fetchNext(struct iovec* iov,  size_t n);
+    size_t fetchNext(std::span<iovec,2>& iov,  size_t n);
 
     /// \brief commit read after fetch. Read position will be advanced to discard commited bytes.
     /// \param uncommited numberof bytes uncommited in fetch
@@ -108,7 +109,7 @@ class ALT_UTIL_PUBLIC RingBuffer
     /// \brief get free space for write
     /// \param iov vector to holds the free spaces in the buffer. If the buffer is empty,
     /// both write_pos_ and read_pos_ will be reset to 0.
-    size_t fetchFreeSpace(struct iovec* iov);
+    size_t fetchFreeSpace(std::span<iovec,2>& iov);
 
     /// \brief commite the written bytes after calling fetchFreeSpace
     /// \param commited number of bytes written.
@@ -131,7 +132,7 @@ class ALT_UTIL_PUBLIC RingBuffer
     RingBuffer(RingBuffer &&) = delete;
     RingBuffer& operator =(RingBuffer const &) = delete;
     RingBuffer& operator =(RingBuffer const &&) = delete;
-    size_t fetch_i(struct iovec* iov,  size_t len, size_t read_pos);
+    size_t fetch_i(std::span<iovec,2>& iov,  size_t len, size_t read_pos);
 
     // In shared memeory, the buffer header and the buffer must be allocated
     // in the same memoery block.
@@ -192,7 +193,7 @@ class RingMsgBuffer: public RingBuffer
     /// \param iov the iovec containing the payload
     /// \param vec_num number of entries in iov
     /// \param total_length total length of payload
-    bool write(struct iovec* iov, size_t vec_num, MsgSizeType total_length)
+    bool write(std::span<iovec,2>& iov, size_t vec_num, MsgSizeType total_length)
     {
         if (!hasFreeSpace(sizeof(MsgSizeType), total_length))
         {
@@ -212,7 +213,8 @@ class RingMsgBuffer: public RingBuffer
     /// zero if the buffer contains bytes less than the size the complete message
     MsgSizeType read(char* payload)
     {
-        struct iovec iov[2];
+        iovec iov_arr[2];
+        std::span<iovec,2> iov(iov_arr);
         size_t len = RingBuffer::fetch(iov, sizeof(MsgSizeType));
         if (len==0) return 0;
         size_t payload_len = *(reinterpret_cast<MsgSizeType*>(iov[0].iov_base));
@@ -232,9 +234,10 @@ class RingMsgBuffer: public RingBuffer
     /// zero if the buffer contains bytes less than the size the complete message.
     /// \note commitRead must be called after the fetched data are processed to free
     ///space for the writer.
-    size_t fetch(struct iovec* iov)
+    size_t fetch(std::span<iovec,2>& iov)
     {
-        struct iovec length_iov[2];
+        iovec iov_arr[2];
+        std::span<iovec,2> length_iov(iov_arr);
         size_t len = RingBuffer::fetch(length_iov, sizeof(MsgSizeType));
         if (len==0) return 0;
         size_t msg_length = *(reinterpret_cast<MsgSizeType*>(length_iov[0].iov_base));
@@ -283,7 +286,8 @@ class RingTypedMsgBuffer: public RingBuffer
     /// contains bytes less than the size the message
     bool read(MsgSizeType& msg_length, char* payload)
     {
-        struct iovec iov[2];
+        iovec iov_arr[2];
+        std::span<iovec,2> iov(iov_arr);
         size_t len = RingBuffer::fetch(iov, sizeof(MsgSizeType));
         if (len==0) return false;
         msg_length = *(reinterpret_cast<MsgSizeType*>(iov[0].iov_base));
@@ -304,7 +308,8 @@ class RingTypedMsgBuffer: public RingBuffer
     ///space for the writer.
     MsgHeaderT* fetch()
     {
-        struct iovec iov[2];
+        iovec iov_arr[2];
+        std::span<iovec,2> iov(iov_arr);
         size_t len = RingBuffer::fetch(iov, sizeof(MsgSizeType));
         if (len==0) return nullptr;
         MsgSizeType msg_length;
@@ -313,7 +318,8 @@ class RingTypedMsgBuffer: public RingBuffer
         {
             msg_length -= sizeof(MsgSizeType);
         }
-        struct iovec payload_iov[2];
+        iovec iov_payload_arr[2];
+        std::span<iovec,2> payload_iov(iov_payload_arr);
         size_t payload_len = RingBuffer::fetchNext(payload_iov, msg_length);
         if (payload_len==0) return nullptr;
         return iov[0].iov_base;
