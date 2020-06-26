@@ -10,7 +10,7 @@
 
 #include "StrBuffer.h"
 
-#include <util/sysinfo/Platform.h>
+#include <util/system/Platform.h>
 #include <util/types/EnumSet.h>
 
 #include <stddef.h>
@@ -18,12 +18,13 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <functional>
 
 namespace alt
 {
 /**
  * \class ScanBuffer
- * \ingroup util
+ * \ingroup StringUtils
  * \brief A buffer pointer to string to be scanned 
  */
 struct ScanBuffer
@@ -130,10 +131,37 @@ public:
     StrScan(const StrScan &oth) = default;
 
     const char *c_str() const { return scan_buffer_.str_; }
+    const char *nextScanStr() const { return scan_buffer_.str_ + scan_buffer_.pos(); }
     size_t length() const { return scan_buffer_.length_; }
     bool empty() const { return scan_buffer_.empty(); }
     bool done() const { return scan_buffer_.atEnd(); }
     size_t pos() const { return scan_buffer_.pos(); }
+
+    char skipWhiteSpace();
+    char nextNonWhiteSpace();
+    void advance() { scan_buffer_.advance(); }
+    void advance(size_t steps) {scan_buffer_.advance(steps); }
+    void back() { scan_buffer_.back(); }
+    void back(size_t steps) {scan_buffer_.back(steps); }
+    char curChar() const { return scan_buffer_.curChar(); }
+    char nextChar() { return scan_buffer_.nextChar(); }
+
+    /// \brief get a substring from the current position until the terminator
+    /// end_ch or to the null terminator, or to a whitespace if stop_at_ws is
+    /// true
+    /// \note if stop_at_ws is false, substring will include whitespaces in the
+    /// midle or at the end. The caller is responsible to remove trailing
+    // whitespaces if it is desired. Leading whitespace is skipped anyway.
+    char getSubstring(char end_ch, std::string& substring, bool stop_at_ws);
+
+    /// \brief get a substring from the current position until the terminator
+    /// listed in end_list or to the null terminator
+    char getSubstring(const char* end_list, std::string& substring);
+
+    /// \brief get a substring either quoted or terminated by the end_ch from the
+    /// current position
+    char getSubstringQuoted(char end_ch, std::string& substring);
+
 
     enum ErrorStatus
     {
@@ -156,7 +184,7 @@ public:
     {
         ValueType vt_;
         union {
-            char32_t char_;
+            alt_char_t char_;
             int64_t integer_;
             double double_;
         };
@@ -177,6 +205,7 @@ public:
 
         size_t scannedLength() const { return size_t(end_pos_ - start_pos_); }
         const char *scannedStart() const { return start_pos_; }
+        const char *scannedEnd() const { return end_pos_; }
 
         template <int N>
         bool scanned(const char *str) const
@@ -251,6 +280,8 @@ public:
     size_t scannedLength() const { return tv_.scannedLength(); }
     const char* scannedStart() const { return tv_.scannedStart(); }
     bool scanned(char ch) const { return tv_.scanned(ch); }
+    size_t scannedStartPos() const { return  size_t(tv_.scannedStart()-scan_buffer_.head()); }
+    size_t scannedEndPos() const { return  size_t(tv_.scannedEnd()-scan_buffer_.head()); }
 
     ValueType scannedValueType() const { return tv_.vt_; }
     bool isNumber() const { return tv_.isNumber(); }
@@ -258,14 +289,20 @@ public:
     int64_t geScannedInteger() const { return tv_.getInteger(); }
     std::string const &  getScannedString() const
     { static std::string empty_string; return tv_.vt_ == STRING ? tv_.string_ : empty_string; }
-    char32_t  getScannedChar() const
+    alt_char_t  getScannedChar() const
     { return tv_.vt_ == CHAR ? tv_.char_ : 0; }
 
+    void processScanned (std::function<void(const char*)> f)
+    {
+        GetScannedString scanned_str (tv_);
+        f(scanned_str.c_str());
+    }
+    
     void fetchScanned (std::string& val) { val.append(tv_.scannedStart(), tv_.scannedLength()); }
     bool fetchValue (std::string& val) { tv_.string_.swap(val); return tv_.vt_ == STRING; }
     bool fetchValue (double& val) { val=tv_.double_; return tv_.vt_ == DOUBLE; }
     bool fetchValue (int64_t& val) { val=tv_.integer_; return tv_.vt_ == INT; }
-    bool fetchValue (char32_t& val) { val=tv_.char_; return tv_.vt_ == CHAR; }
+    bool fetchValue (alt_char_t& val) { val=tv_.char_; return tv_.vt_ == CHAR; }
 
     uint64_t getUnsigned();
     int64_t getInteger();
@@ -299,6 +336,19 @@ protected:
     ErrorStatus err_;
 };
 
+inline char StrScan::skipWhiteSpace()
+{
+    char ch = scan_buffer_.curChar();
+    while (isspace(ch)) ch = scan_buffer_.nextChar();
+    return ch;
+}
+
+inline char StrScan::nextNonWhiteSpace()
+{
+    char ch = scan_buffer_.nextChar();
+    while (isspace(ch)) ch = scan_buffer_.nextChar();
+    return ch;
+}
 
 /**
  * \class StrParser
@@ -336,7 +386,7 @@ public:
     double toDouble();
     bool toBool();
     char toChar();
-    char32_t toWChar();
+    alt_char_t toWChar();
 
     StrRefInLength toStrRefInLength();
 
@@ -372,7 +422,7 @@ public:
         skipSeparator();
         return *this;
     };
-    StrParser &operator>>(char32_t &n)
+    StrParser &operator>>(alt_char_t &n)
     {
         n = toWChar();
         skipSeparator();
@@ -465,8 +515,8 @@ public:
     char getTerminator() const { return terminator_; }
     void setSplitSeparator(char ch) { splitSeparator_ = ch; }
     char getSplitSeparator() const { return splitSeparator_; }
-    void setSkipLeadingSp(bool ch) { skipLeadingSp_ = ch; }
-    void setSkipTrailingSp(bool ch) { skipTrailingSp_ = ch; }
+    void setSkipLeadingSp(bool skip) { skipLeadingSp_ = skip; }
+    void setSkipTrailingSp(bool skip) { skipTrailingSp_ = skip; }
     bool getSkipLeadingSp() const { return skipLeadingSp_; }
     bool getSkipTrailingSp() const { return skipTrailingSp_; }
 

@@ -1,5 +1,6 @@
 #include "RingBuffer.h"
-#include <util/sysinfo/SysConfig.h>
+#include <util/system/SysConfig.h>
+#include <assert.h>
 
 namespace alt
 {
@@ -67,6 +68,13 @@ RingBuffer* RingBuffer::create(char* addr,  const MemoryAttrs& attrs, size_t cap
         rbuff = reinterpret_cast<RingBuffer*>(addr);
     }
     return rbuff;
+}
+
+bool RingBuffer::empty() const
+{
+    // called from writer
+    size_t read_pos = header_.read_pos_.load(std::memory_order_acquire);
+    return read_pos == header_.write_pos_.load(std::memory_order_relaxed);
 }
 
 bool RingBuffer::hasFreeSpace(size_t required_non_split_space, size_t required_space) const
@@ -141,11 +149,59 @@ bool RingBuffer::write (const char* buff, size_t len, bool split)
     return true;
 }
 
+size_t RingBuffer::fetchFreeSpace(struct iovec* iov)
+{
+    size_t read_pos = header_.read_pos_.load(std::memory_order_acquire);
+    size_t write_pos = header_.write_pos_.load(std::memory_order_relaxed);
+    if (write_pos - read_pos >= header_.capacity_)
+    {
+        return 0;
+    }
+    size_t rp = read_pos & header_.mod_mask_;
+    size_t wp = write_pos & header_.mod_mask_;
+    size_t data_size;
+    if (wp < rp)
+    {
+        data_size =  rp - wp;
+        iov[0].iov_base =header_.buffer_ + wp;
+        iov[0].iov_len = data_size;
+        iov[1].iov_len = 0;
+    }
+    else if (wp > rp)
+    {
+        // data is wrapped
+        iov[0].iov_base = header_.buffer_ + wp;
+        iov[0].iov_len = header_.capacity_ - wp;;
+        iov[1].iov_base = header_.buffer_;
+        iov[1].iov_len = rp;
+        data_size = iov[0].iov_len + iov[1].iov_len;
+    }
+    else
+    {
+        // reset write_pos_ first to prevent reading process from reading any
+        // garbage 
+        header_.write_pos_.store(0, std::memory_order_release);
+        header_.read_pos_.store(0, std::memory_order_release);
+        data_size = header_.capacity_;
+        iov[0].iov_base = header_.buffer_;
+        iov[0].iov_len = header_.capacity_;
+        iov[1].iov_len = 0;
+    }
+    return data_size;
+}
+
+void RingBuffer::commitWrite(size_t commited)
+{
+    size_t write_pos = header_.write_pos_.load(std::memory_order_relaxed);
+    assert(write_pos - header_.read_pos_.load(std::memory_order_acquire) < header_.capacity_ - commited);
+    header_.write_pos_.store(write_pos + commited, std::memory_order_release);
+}
+
 size_t RingBuffer::fetchAll(struct iovec* iov)
 {
     size_t read_pos = header_.read_pos_.load(std::memory_order_relaxed);
     size_t write_pos = header_.write_pos_.load(std::memory_order_acquire);
-    if (write_pos==read_pos)
+    if (write_pos<=read_pos)
     {
         iov[0].iov_len = 0;
         iov[1].iov_len = 0;
@@ -265,9 +321,9 @@ size_t RingBuffer::fetch_i(struct iovec* iov,  size_t len, size_t read_pos)
     return len;
 }
 
-void RingBuffer::commitRead()
+void RingBuffer::commitRead(size_t uncommited)
 {
-    header_.read_pos_.store(header_.commit_pos_, std::memory_order_release);
+    header_.read_pos_.store(header_.commit_pos_ - uncommited, std::memory_order_release);
 }
 
 size_t RingBuffer::read(char* buf, size_t len)

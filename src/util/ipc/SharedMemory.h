@@ -1,6 +1,7 @@
 #pragma once
 
-#include <util/sysinfo/Platform.h>
+#include <util/system/Platform.h>
+#include <util/Defs.h>              // for ALT_UTIL_PUBLIC
 #include <util/types/Enum.h>
 #include <string>
 #include <errno.h>
@@ -37,7 +38,7 @@ struct MemoryAttrs
  * \note Only the owner can use SM_CreateOnly or SM_OpenOrCreate mode.
  * 
  */
-class ALT_CORE_PUBLIC SharedMemory
+class ALT_UTIL_PUBLIC SharedMemory
 {
 public:
 
@@ -65,7 +66,7 @@ public:
                  std::size_t size);
     void release ();
 
-    /// Set the ready falg by the owner to indicate the memory is ready
+    /// Set the ready flag by the owner to indicate the memory is ready
     /// for clients to read
     void setReady(bool ready);
 
@@ -96,7 +97,7 @@ private:
     bool           is_new_;
 };
 
-class ALT_CORE_PUBLIC LocalMemory
+class ALT_UTIL_PUBLIC LocalMemory
 {
 public:
 	LocalMemory(const std::string& name, bool is_master);
@@ -140,7 +141,7 @@ private:
 };
 
 template <class StorageT, class ContainerT>
-class ALT_CORE_PUBLIC SharedContainer
+class ALT_UTIL_PUBLIC SharedContainer
 {
     StorageT            storage_;
     ContainerT*         container_;

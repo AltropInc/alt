@@ -42,7 +42,7 @@ TEST_CASE( "NamedNodeTest", "[NamedNode]" )
     //std::cout << "NamedNodeTest create chd1" << std::endl;
     alt::MyNamedNode*  chd1 = alt::PooledTreeNode::create<alt::MyNamedNode>
         ("chd1", root, false, "CHD1");
-    //std::cout << "NamedNodeTest create chd2" << std::endl;
+    //::cout << "NamedNodeTest create chd2" << std::endl;
     alt::MyNamedNode*  chd2 = alt::PooledTreeNode::create<alt::MyNamedNode>
         ("chd2", root, false, "CHD2");
     //std::cout << "NamedNodeTest create chd3" << std::endl;

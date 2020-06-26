@@ -8,7 +8,7 @@
  * $Id: $
  */
 
-#include <util/sysinfo/Platform.h>
+#include <util/system/Platform.h>
 
 #include <atomic>           // For atomic
 

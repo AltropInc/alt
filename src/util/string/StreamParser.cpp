@@ -1,5 +1,6 @@
 #include "StreamParser.h"
 #include "StrUtils.h"
+#include <sstream>
 
 using namespace alt;
 
@@ -8,6 +9,11 @@ using namespace alt;
 //==============================================================================
 ParserStream::ParserStream(std::istream * input)
     : input_stream_(input)
+{}
+
+ParserStream::ParserStream(const char * input)
+    : input_stream_(new std::stringstream(input, std::ios_base::in))
+    , owns_stream_(true)
 {}
 
 ParserStream::~ParserStream()
@@ -31,6 +37,12 @@ ParserStream* ParserStream::createFileStream (const char* file_path)
     }
     delete file_stream;
     return nullptr;
+}
+
+void ParserStream::registerError(const char* err, size_t pos)
+{
+    errors_.emplace_back(ErrorInfo{err, line_, pos});
+    std::cout << "Error: " << err << " at line " << line_ << ", pos " << pos << std::endl;
 }
 
 //==============================================================================
@@ -72,6 +84,134 @@ StreamParser::StreamParser(ParserStreamContext& context, std::istream * input_st
 {
     context_.current_stream_ = new ParserStream(input_stream);
     context_.current_parser_ = this;
+}
+
+char StreamParser::skipWhiteSpace()
+{
+    char ch = scan_buffer_.curChar();
+    while (!ch || isspace(ch))
+    {
+        if (!ch)
+        {
+            if (!context_.nextLine())
+            {
+                return '\0';
+            }
+            ch = scan_buffer_.curChar();
+        }
+        else
+        {
+            ch = scan_buffer_.nextChar();
+        }
+    }
+    return ch;
+}
+
+char StreamParser::skipWhiteSpace(std::string& text_scanned)
+{
+    char ch = scan_buffer_.curChar();
+    while (!ch || isspace(ch))
+    {
+        if (!ch)
+        {
+            if (!context_.nextLine())
+            {
+                return '\0';
+            }
+            text_scanned.push_back('\n');
+            ch = scan_buffer_.curChar();
+        }
+        else
+        {
+            text_scanned.push_back(ch);
+            ch = scan_buffer_.nextChar();
+        }
+    }
+    return ch;
+}
+
+char StreamParser::curChar()
+{
+    char ch = scan_buffer_.curChar();
+    if (!ch)
+    {
+        if (!context_.nextLine())
+        {
+            return '\0';
+        }
+        return scan_buffer_.curChar();
+    }
+    return ch;
+}
+
+char StreamParser::curChar(std::string& text_scanned)
+{
+    char ch = scan_buffer_.curChar();
+    if (!ch || ch=='\r')
+    {
+        if (!context_.nextLine())
+        {
+            return '\0';
+        }
+        text_scanned.push_back('\n');
+        return scan_buffer_.curChar();
+    }
+    return ch;
+}
+
+char StreamParser::nextChar(std::string& text_scanned)
+{
+    char ch = scan_buffer_.nextChar();
+    if (!ch)
+    {
+        if (!context_.nextLine())
+        {
+            return '\0';
+        }
+        text_scanned.push_back('\n');
+        return '\n';
+    }
+    return ch;
+}
+
+char StreamParser::nextChar(bool skip_white_space)
+{
+    char ch = scan_buffer_.nextChar();
+    while (!ch)
+    {
+        if (!context_.nextLine())
+        {
+            return '\0';
+        }
+        ch = scan_buffer_.curChar();
+        if (skip_white_space && isspace(ch))
+        {
+            ch = skipWhiteSpace();
+        }
+    }
+    return ch;
+}
+
+char StreamParser::skipToChar(char target)
+{
+    char ch = scan_buffer_.curChar();
+    while (!ch || ch!=target)
+    {
+        if (!ch)
+        {
+            if (!context_.nextLine())
+            {
+                return '\0';
+            }
+            ch = scan_buffer_.curChar();
+        }
+        else
+        {
+            ch = scan_buffer_.nextChar();
+        }
+        ch = scan_buffer_.curChar();
+    }
+    return ch;
 }
 
 //==============================================================================
@@ -158,20 +298,27 @@ bool ParserStreamContext::pushStream (ParserStream * stream)
         return false;
     }
 
-    stream_context_.push_back(StreamContext());
-    StreamContext& context = stream_context_.back();
-
-    // Save unsacnned in scan_buffer_ only when we have input_stream_
-    if (current_stream_->input_stream_ && !current_parser_->scan_buffer_.atEnd())
+    if (current_stream_)
     {
-        context.scan_pos_ = current_parser_->saveUnscanned(
-            context.stream_line_buffer_saved_
-        );
-    }
+        stream_context_.push_back(StreamContext());
+        StreamContext& context = stream_context_.back();
 
-    context.stream_ = current_stream_;
+        // Save unsacnned in scan_buffer_ only when we have input_stream_
+        if ( current_parser_ &&
+             current_stream_->input_stream_ &&
+             !current_parser_->scan_buffer_.atEnd())
+        {
+            context.scan_pos_ = current_parser_->saveUnscanned(
+                context.stream_line_buffer_saved_
+            );
+        }
+        context.stream_ = current_stream_;
+    }
     current_stream_ = stream;
-    current_parser_->scan_buffer_.reset();
+    if (current_parser_)
+    {
+        current_parser_->scan_buffer_.reset();
+    }
     return true;
 }
 
@@ -193,6 +340,7 @@ bool ParserStreamContext::popStream ()
     delete current_stream_;
     current_stream_ = context.stream_;
     stream_context_.pop_back();
+    return true;
 }
 
 bool ParserStreamContext::pushFileStream (const char* file_path)
@@ -210,15 +358,68 @@ bool ParserStreamContext::pushStream (std::istream * stream)
     return pushStream(new ParserStream(stream));
 }
 
+bool ParserStreamContext::pushStream (const char * input)
+{
+    return pushStream(new ParserStream(input));
+}
+
 bool ParserStreamContext::pushParser (StreamParser * parser)
 {
-    parser_context_.push_back(ParserContext());
-    ParserContext& context = parser_context_.back();
-    parser->scan_buffer_ = current_parser_->scan_buffer_;
-    context.parser_ = current_parser_;
+    if (current_parser_)
+    {
+        parser_context_.push_back(ParserContext());
+        ParserContext& context = parser_context_.back();
+        parser->scan_buffer_ = current_parser_->scan_buffer_;
+        context.parser_ = current_parser_;
+    }
     current_parser_ = parser;
+    nextLine();
     return true;
 };
+
+bool ParserStreamContext::pushParser(StreamParser * parser, std::istream * str)
+{
+    if (!pushStream(str))
+    {
+        return false;
+    }
+    return pushParser(parser);
+}
+
+bool ParserStreamContext::pushParser(StreamParser * parser, const char * str)
+{
+    if (!pushStream(str))
+    {
+        return false;
+    }
+    return pushParser(parser);
+}
+
+bool ParserStreamContext::pushFileParser(StreamParser * parser, const char * file_path)
+{
+    if (!pushFileStream(file_path))
+    {
+        return false;
+    }
+    return pushParser(parser);
+}
+
+bool ParserStreamContext::pushParser(StreamParser * parser, const std::filesystem::path& path)
+{
+    if (!pushStream(path))
+    {
+        return false;
+    }
+    return pushParser(parser);
+}
+
+void ParserStreamContext::registerError(const char* err)
+{
+    if (current_stream_ && current_parser_)
+    {
+        current_stream_->registerError(err, current_parser_->scan_buffer_.pos());
+    }
+}
 
 bool ParserStreamContext::popParser ()
 {
@@ -231,4 +432,5 @@ bool ParserStreamContext::popParser ()
     current_parser_ = context.parser_;
     current_parser_->scan_buffer_ = context.parser_->scan_buffer_;
     parser_context_.pop_back();
+    return true;
 }

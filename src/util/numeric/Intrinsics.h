@@ -1,6 +1,6 @@
 #pragma once
 
-#include <util/sysinfo/Platform.h>
+#include <util/system/Platform.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <type_traits>
@@ -8,8 +8,34 @@
 //----------------------------------------------------------------------------
 // Define byte specific integers
 //----------------------------------------------------------------------------
+
+#ifndef llong
+#ifdef __SIZEOF_INT128__ 
+typedef __int128_t  llong;
+#else
+typedef long long   llong;
+#endif
+#endif
+
+#ifndef ullong
+#ifdef __uint128_t
+typedef __uint128_t         ullong;
+#else
+typedef long long unsigned  ullong;
+#endif
+#endif
+
+#ifndef ldouble
+#ifdef __float128
+typedef __float128         ldouble;
+#else
+typedef long double        ldouble;
+#endif
+#endif
+
 namespace alt
 {
+
 //----------------------------------------------------------------------------
 // Constants
 //----------------------------------------------------------------------------
@@ -27,16 +53,28 @@ constexpr int8_t   INT8_MAX   = std::numeric_limits<int8_t>::max();   //  127
 constexpr int8_t   INT8_MIN   = std::numeric_limits<int8_t>::min();   // -127
 constexpr uint8_t  UINT8_MAX  = std::numeric_limits<uint8_t>::max();  // 255
 #endif
+#ifndef LLONG_MAX
+constexpr llong   LLONG_MAX  = std::numeric_limits<llong>::max();
+constexpr llong   LLONG_MIN  = std::numeric_limits<llong>::min();
+#endif
+#ifndef ULLONG_MAX
+constexpr ullong  ULLONG_MAX  = std::numeric_limits<ullong>::max();
+#endif
+
+constexpr ldouble  LDOUBLE_MIN  = std::numeric_limits<ldouble>::min();
+constexpr ldouble  LDOUBLE_MAX  = std::numeric_limits<ldouble>::max();
 constexpr double   DOUBLE_MIN  = std::numeric_limits<double>::min();
 constexpr double   DOUBLE_MAX  = std::numeric_limits<double>::max();
 constexpr float    FLOAT_MIN  = std::numeric_limits<float>::min();
 constexpr float    FLOAT_MAX  = std::numeric_limits<float>::max();
 
+constexpr llong    LLONG_NaN  = std::numeric_limits<llong>::min();
 constexpr int64_t  INT64_NaN  = std::numeric_limits<int64_t>::min();
 constexpr int32_t  INT32_NaN  = std::numeric_limits<int32_t>::min();
 constexpr int16_t  INT16_NaN  = std::numeric_limits<int16_t>::min();
 constexpr int8_t   INT8_NaN   = std::numeric_limits<int8_t>::min();
 constexpr int      INT_NaN    = std::numeric_limits<int>::min();
+constexpr ldouble  LDOUBLE_NaN = std::numeric_limits<ldouble>::quiet_NaN();
 constexpr double   DOUBLE_NaN = std::numeric_limits<double>::quiet_NaN();
 constexpr float    FLOAT_NaN  = std::numeric_limits<float>::quiet_NaN();
 
@@ -90,6 +128,88 @@ ALT_INLINE int log2Ceil (T n)
 //----------------------------------------------------------------------------
 // Expr table
 //----------------------------------------------------------------------------
+#ifdef __SIZEOF_INT128__ 
+
+// User-defined literal _ull for 128-bit integer constants
+namespace detail_ull
+{
+    constexpr uint8_t hexval(char c) 
+    { return c>='a' ? (10+c-'a') : c>='A' ? (10+c-'A') : c-'0'; }
+
+    template <int BASE, __uint128_t V>
+    constexpr __uint128_t lit_eval() { return V; }
+
+    template <int BASE, __uint128_t V, char C, char... Cs>
+    constexpr __uint128_t lit_eval() {
+        static_assert( BASE!=16 || sizeof...(Cs) <=  32-1, "integer constant is too large for 128-bit in BASE=16");
+        static_assert( BASE!=10 || sizeof...(Cs) <=  39-1, "integer constant is too large for 128-bit in BASE=10");
+        static_assert( BASE!=8  || sizeof...(Cs) <=  44-1, "integer constant is too large for 128-bit in BASE=8");
+        static_assert( BASE!=2  || sizeof...(Cs) <= 128-1, "integer constant is too large for 128-bit in BASE=2");
+        return lit_eval<BASE, BASE*V + hexval(C), Cs...>();
+    }
+
+    template<char... Cs > struct LitEval 
+    {static constexpr __uint128_t eval() {return lit_eval<10,0,Cs...>();} };
+
+    template<char... Cs> struct LitEval<'0','x',Cs...> 
+    {static constexpr __uint128_t eval() {return lit_eval<16,0,Cs...>();} };
+
+    template<char... Cs> struct LitEval<'0','b',Cs...> 
+    {static constexpr __uint128_t eval() {return lit_eval<2,0,Cs...>();} };
+
+    template<char... Cs> struct LitEval<'0',Cs...> 
+    {static constexpr __uint128_t eval() {return lit_eval<8,0,Cs...>();} };
+
+    template<char... Cs> 
+    constexpr __uint128_t operator "" _ull() {return LitEval<Cs...>::eval();}
+}
+
+template<char... Cs> 
+constexpr __uint128_t operator "" _ull() {return detail_ull::operator "" _ull<Cs...>();}
+
+constexpr __uint128_t s_exp10[] = {
+ 	1_ull,
+    10_ull,
+	100_ull,
+	1000_ull,
+	10000_ull,
+	100000_ull,
+	1000000_ull,
+	10000000_ull,
+	100000000_ull,
+	1000000000_ull,
+	10000000000_ull,
+	100000000000_ull,
+	1000000000000_ull,
+	10000000000000_ull,
+	100000000000000_ull,
+	1000000000000000_ull,
+	10000000000000000_ull,
+	100000000000000000_ull,
+	1000000000000000000_ull,
+    10000000000000000000_ull,
+    100000000000000000000_ull,
+    1000000000000000000000_ull,
+    10000000000000000000000_ull,
+    100000000000000000000000_ull,
+    1000000000000000000000000_ull,
+    10000000000000000000000000_ull,
+    100000000000000000000000000_ull,
+    1000000000000000000000000000_ull,
+    10000000000000000000000000000_ull,
+    100000000000000000000000000000_ull,
+    1000000000000000000000000000000_ull,
+    10000000000000000000000000000000_ull,
+    100000000000000000000000000000000_ull,
+    1000000000000000000000000000000000_ull,
+    10000000000000000000000000000000000_ull,
+    100000000000000000000000000000000000_ull,
+    1000000000000000000000000000000000000_ull,
+    10000000000000000000000000000000000000_ull,
+    100000000000000000000000000000000000000_ull,
+};
+constexpr size_t s_exp10_length = sizeof(s_exp10)/sizeof(__uint128_t);
+#else
 constexpr uint64_t s_exp10[] = {
  	1LL,
     10LL,
@@ -112,6 +232,7 @@ constexpr uint64_t s_exp10[] = {
 	1000000000000000000LL
 };
 constexpr size_t s_exp10_length = sizeof(s_exp10)/sizeof(uint64_t);
+#endif
 
 //----------------------------------------------------------------------------
 // Double digits table for fast string to numeric conversion
@@ -175,7 +296,7 @@ ALT_INLINE int bitsCount (int64_t x)
 
 template <typename UIntT> constexpr int constCLZ (UIntT x)
 {
-    auto constCLZ_N0 = [&x] (UIntT x, int r) ->int {
+    auto constCLZ_N0 = [] (UIntT x, int r) ->int {
         return (x & (1 << (sizeof(UIntT)*8-1))) ? r : constCLZ(x << 1, r+1);
     };
     return x==0 ? sizeof(UIntT)*8 : constCLZ_N0(x, 0);

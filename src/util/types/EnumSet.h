@@ -3,14 +3,13 @@
 #include "Enum.h"
 
 #include <util/string/StrUtils.h>
-
 #include <bitset>
 #include <iostream>
 
 namespace alt
 {
 
-// Helper to convert startdard enum or non-startdard enum value to size_t
+// Helper to convert standard enum or non-standard enum value to size_t
 struct EnumToSizeT
 {
     template <class ET>
@@ -43,6 +42,7 @@ struct BitSet
     bool test (size_t v) const { return (value_ & (T(1) << v))!=0; }
     BitSet& flip (size_t v) { value_ = value_ ^ (T(1) << v); return *this; }
     BitSet& flip () { value_ = ~value_; return *this; }
+    friend BitSet operator~ (BitSet bs) { bs.flip(); return bs; }
     bool empty() const { return value_==0; }
     bool any() const { return value_!=0; }
     size_t count() const { return __builtin_popcountl(value_); }
@@ -51,7 +51,16 @@ struct BitSet
     bool operator!=(const BitSet &es) const { return value_ != es.value_; }
     BitSet& operator |= (BitSet oth) { value_|= oth.value_; return *this; }
     BitSet& operator &= (BitSet oth) { value_&= oth.value_; return *this; }
+    BitSet& operator -= (BitSet oth) { value_&= ~oth.value_; return *this; }
+    BitSet& operator += (BitSet oth) { value_|= oth.value_; return *this; }
+    BitSet operator | (BitSet oth) const { oth.value_|= value_; return oth; }
+    BitSet operator & (BitSet oth) const { oth.value_&= value_; return oth; }
+    BitSet operator - (BitSet oth) const { oth.value_&= ~value_; return oth; }
+    BitSet operator + (BitSet oth) const { oth.value_|= value_; return oth; }
     uint64_t to_ullong() const { return uint64_t(value_); }
+    uint64_t toUnderlying() const { return value_; }
+    static BitSet fromUnderlying(T val) { return BitSet(val); }
+
     std::string to_string () const
     {
         std::string output;
@@ -81,6 +90,7 @@ class EnumSet
     EnumSet() = default;
     explicit EnumSet(ET e) { bitset_.set(EnumToSizeT::get<ET>(e)); }
     EnumSet(const EnumSet &es) : bitset_(es.bitset_) {}
+    //explicit EnumSet(const bitset_t &bt) : bitset_(bt) {}
 
     EnumSet &operator=(const EnumSet &es) {bitset_ = es.bitset_; return *this;}
 
@@ -104,25 +114,29 @@ class EnumSet
         return *this;
     }
 
+    friend EnumSet operator~ (EnumSet es) { es.flip(); return es; }
+
     bool has(ET e) const { return bitset_.test(EnumToSizeT::get<ET>(e)); }
+    bool empty() const { return bitset_.empty(); }
  
     explicit operator bool() const { return bitset_.any(); }
     size_t size() const { return bitset_.size(); }
     size_t count() const { return bitset_.count(); }
  
     EnumSet &operator|=(ET e) { set(e); return *this; }
-    EnumSet &operator&=(ET e)
-    { const bool v=test(e); clear(); return set(e, v); }
+    EnumSet &operator&=(ET e) { const bool v=test(e); clear(); return set(e, v); }
+    EnumSet &operator+=(ET e) { set(e); return *this; }
+    EnumSet &operator-=(ET e) { return set(e, false); }
 
-    EnumSet &operator|=(const EnumSet &es)
-    { bitset_ |= es.bitset_; return *this; }
-    EnumSet &operator&=(const EnumSet &es)
-    { bitset_ &= es.bitset_; return *this; }
+    EnumSet &operator|=(EnumSet es) { bitset_ |= es.bitset_; return *this; }
+    EnumSet &operator&=(EnumSet es) { bitset_ &= es.bitset_; return *this; }
+    EnumSet &operator+=(EnumSet es) { bitset_ |= es.bitset_; return *this; }
+    EnumSet &operator-=(EnumSet es) { bitset_ &= es.bitset_.flip(); return *this; }
 
-    friend EnumSet operator | (EnumSet es1, const EnumSet &es2)
-    { es1 |= es2; return es1; }
-    friend EnumSet operator & (EnumSet es1, const EnumSet &es2)
-    { es1 &= es2; return es1; }
+    friend EnumSet operator | (EnumSet es1, EnumSet es2) { es1 |= es2; return es1; }
+    friend EnumSet operator & (EnumSet es1, EnumSet es2) { es1 &= es2; return es1; }
+    friend EnumSet operator + (EnumSet es1, EnumSet es2) { es1 += es2; return es1; }
+    friend EnumSet operator - (EnumSet es1, EnumSet es2) { es1 -= es2; return es1; }
 
     EnumSet operator&(ET e) { EnumSet tmp(*this); return tmp&=e; }
     EnumSet operator|(ET e) { EnumSet tmp(*this); return tmp|=e; }
@@ -141,7 +155,8 @@ class EnumSet
 
     uint64_t toUInt64 () const noexcept(false) { return bitset_.to_ullong(); }
 
-    static EnumSet fromUInt64 (uint64_t uint_val) {  }
+    bitset_t toUnderlying() const { return bitset_; }
+    //static EnumSet fromUnderlying (const bitset_t& bitset) { return EnumSet(bitset); }
 
     /// Returns string in binary bitset format
     std::string toStringRaw() const { return bitset_.to_string(); }

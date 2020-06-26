@@ -2,6 +2,8 @@
 #include <util/string/StrBuffer.h>
 #include <util/string/StrPrint.h>
 
+#define ALLOCATE_DEBUG    0
+
 #if defined MEM_POOL_DEBUG
 #include <iostream>
 #include <unordered_map>
@@ -159,21 +161,30 @@ FixedMemPoolBin& FixedMemPoolBin::instance()
     return s_fixed_mem_pool_bin;
 }
 
-void FixedMemPoolBin::free(size_t bin, void* p)
+void FixedMemPoolBin::deallocate(size_t bin, void* p)
 {
+#if ALLOCATE_DEBUG
+    std::cout << "FixedMemPoolBin::deallocate bin=" << bin << " p=" << p << std::endl;
+    if (bin < POOL_NUMBER)
+        std::cout << "FixedMemPoolBin::deallocate pools_[bin]=" << pools_[bin] << std::endl;
+#endif
     if (bin >= POOL_NUMBER || nullptr == pools_[bin])
     {
-        throw std::runtime_error(std::string("PooledAllocator::fedd: currupted memory"));
+        throw std::runtime_error(std::string("PooledAllocator::deallocate: currupted memory"));
     }
 #if defined MEM_POOL_DEBUG
     tracker_.untrack(p);
 #endif
-    reinterpret_cast<FixedMemPool*>(pools_[bin])->free(p);
+    reinterpret_cast<FixedMemPool*>(pools_[bin])->coDeallocate(p);
 }
 
-void* FixedMemPoolBin::alloc(size_t bin, size_t entry_size)
+void* FixedMemPoolBin::allocate(size_t bin, size_t entry_size)
 {
-    // std::cout << "PooledAllocator::alloc: entry_size=" << entry_size << " in bin " << bin << std::endl;
+#if ALLOCATE_DEBUG
+    std::cout << "PooledAllocator::allocate: entry_size="
+    << entry_size << " in bin " << bin
+    << " pools_[bin]= " << pools_[bin] << std::endl;
+#endif
     if (nullptr == pools_[bin])
     {
 #if defined IN_UNIT_TEST
@@ -182,26 +193,52 @@ void* FixedMemPoolBin::alloc(size_t bin, size_t entry_size)
 #else
         size_t entry_num_per_bucket = (POOL_NUMBER-bin)*100;
 #endif
-        pools_[bin] = new FixedMemPool(entry_size, entry_num_per_bucket);
+        std::scoped_lock<std::mutex> lock(pools_mutex_);
+        if (nullptr == pools_[bin])
+        {
+            pools_[bin] = new FixedMemPool(1<<(bin+3), entry_num_per_bucket);
+        }
     }
-    return pools_[bin]->alloc(bin);
+#if ALLOCATE_DEBUG
+    void* p= pools_[bin]->allocate(bin);
+    std::cout << "allocated " << p << std::endl;
+    return p;
+#else
+    return pools_[bin]->coAllocate(bin);
+#endif
 }
 
-void* FixedMemPoolBin::alloc(size_t size)
+void* FixedMemPoolBin::allocate(size_t size)
 {
-    int bin = size <= 8 ? 0 : log2Floor(size) - 2;
-    // std::cout << "Allocated bin=" << bin << " at size " << size << std::endl;
+    int bin = size <= 8 ? 0 : log2Floor(size-1) - 2;
+#if ALLOCATE_DEBUG
+    std::cout << "Allocated bin=" << bin
+              << " at size " << size
+              << " log2Floor(size) " << log2Floor(size)
+              << std::endl;
+#endif
     if (bin >= POOL_NUMBER)
     {
-        throw std::runtime_error(std::string("FixedMemPoolBin::alloc: size too big"));;
+        return FixedMemPool::allocateBigSize(size, POOL_NUMBER);
     }
 
-    return alloc(bin, size);
+    return allocate(bin, size);
 }
 
-void FixedMemPoolBin::free(void* p)
+void FixedMemPoolBin::deallocate(void* p)
 {
-    free(FixedMemPool::getAlloactedBin(p), p);
+#if ALLOCATE_DEBUG
+    std::cout << "FixedMemPoolBin::deallocate p=" << p << std::endl;
+#endif
+    uint16_t bin = FixedMemPool::getAlloactedBin(p);
+    if (bin >= POOL_NUMBER)
+    {
+        FixedMemPool::deallocateBigSize(p);
+    }
+    else
+    {
+        deallocate(bin, p);
+    }
 }
 
 FixedMemPoolBin::~FixedMemPoolBin( )

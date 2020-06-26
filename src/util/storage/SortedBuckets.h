@@ -1,10 +1,11 @@
 #pragma once
-#include <util/sysinfo/Platform.h>
+#include <util/system/Platform.h>
 #include <util/numeric/Intrinsics.h> // For isel, power2Next
 #include <stddef.h>
 #include <vector>
 #include <functional>
 #include <cstring>
+#include <type_traits>               // for is_trivially_destructible
 
 // for TEST_BUILD
 #include <iostream>         // For std::cout
@@ -12,7 +13,7 @@
 namespace alt {
 
 template <typename Key>
-struct SortedBuketCompareInc
+struct SortedBucketCompareInc
 {
     static int threeway (Key x, Key y)
     {
@@ -24,7 +25,7 @@ struct SortedBuketCompareInc
 };
 
 template <typename Key>
-struct SortedBuketCompareDec
+struct SortedBucketCompareDec
 {
     static int threeway (Key x, Key y)
     {
@@ -38,13 +39,15 @@ struct SortedBuketCompareDec
 /**
  * \class SortedBuckets
  * \ingroup StorageUtils
- * \brief Sorted buckets. Each buket contains a key and value in type of T.
- * The Compare determines the order based on the key value.
- * The buckets will be kept in the middle of the container in order to reduce
+ * \brief Sorted buckets. Each bucket contains a key and value in type of T.
+ * \tparam Key the key type used in search, must be trivially destructible
+ * \tparam T the value type, must be trivially destructible
+ * \tparam Compare the function for the order based on the key value.
+ * \note Buckets will be kept in the middle of the container in order to reduce
  * the chance of memory move, especially when buckets are frequently added and
  * removed at either ends.
  */
-template <typename Key, typename T, class Compare = SortedBuketCompareInc<Key>>
+template <typename Key, typename T, class Compare = SortedBucketCompareInc<Key>>
 class SortedBuckets
 {
   public:
@@ -56,6 +59,8 @@ class SortedBuckets
     std::vector<value_type>   buckets_;
     size_t head_;
     size_t tail_;
+    static_assert(std::is_trivially_destructible<Key>::value);
+    static_assert(std::is_trivially_destructible<T>::value);
 
     size_t lowBound(const Key& x)
     {

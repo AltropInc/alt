@@ -1,6 +1,6 @@
 #pragma once
 
-#include <util/sysinfo/Platform.h>
+#include <util/system/Platform.h>
 #include <util/ipc/Mutex.h>    // For Mutex
 
 #include <stddef.h>
@@ -78,6 +78,14 @@ class StrPoolBase
         const std::initializer_list<size_t>& sizes,
         size_t total_length,
         const char* separator);
+
+    void clear()
+    {
+        pages_.clear();
+        free_spaces_.clear();
+        cur_page_ = nullptr;
+        newPage();
+    }
 
 #ifdef TEST_BUILD
   public:
@@ -186,6 +194,15 @@ class StrPool_T: public StrPoolBase
     void erase(const char* str)
     {
         erase(str, std::strlen(str));        
+    }
+
+    void clear()
+    {
+        std::scoped_lock scope_lock {mutex_};
+        pages_.clear();
+        free_spaces_.clear();
+        cur_page_ = nullptr;
+        newPage();
     }
 
   private:

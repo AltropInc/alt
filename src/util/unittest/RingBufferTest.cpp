@@ -27,7 +27,7 @@ TEST_CASE( "RingBufferTest", "[RingBufferTest]" )
     read_len = buffer.fetch(iov,  10);
     REQUIRE(alt::StrRefInLength((const char*)iov[0].iov_base, iov[0].iov_len)=="opqrstuv");
     REQUIRE(alt::StrRefInLength((const char*)iov[1].iov_base, iov[1].iov_len)=="wx");
-    buffer.commitRead();
+    buffer.commitRead(0);
 
     buffer.write ("0123456789", 10);
     read_len = buffer.read (read_buffer, 12);
@@ -36,9 +36,9 @@ TEST_CASE( "RingBufferTest", "[RingBufferTest]" )
 }
 
 
-TEST_CASE( "RingStreamBuffer", "[RingStreamBufferTest]" )
+TEST_CASE( "RingMsgBuffer", "[RingMsgBufferTest]" )
 {
-    alt::RingStreamBuffer<uint16_t> buffer(32);
+    alt::RingMsgBuffer<uint16_t> buffer(32);
     size_t read_len;
     buffer.write ("0123456789", 10);
     buffer.write ("abcdefghij", 10);

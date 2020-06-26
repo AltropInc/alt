@@ -1,6 +1,6 @@
 #pragma once
 
-#include <util/sysinfo/Platform.h>
+#include <util/system/Platform.h>
 #include <type_traits>   // for std::is_base_of
 #include <utility>       // for std::move
 
@@ -55,7 +55,7 @@ namespace alt
 //=============================================================================
 
 //----------------------------------------------------------------------------
-//@FullWraper: used for a value wraper that inherites all traits from its
+//@FullWrapper: used for a value wrapper that inherits all traits from its
 // wrapped value
 //----------------------------------------------------------------------------
 
@@ -80,7 +80,7 @@ class FullWrapper
 };
 
 //----------------------------------------------------------------------------
-//@OPWraperBase: used as a base class for all derived operator wrapper that
+//@OPWrapperBase: used as a base class for all derived operator wrapper that
 // inherits only a selected set of operators from the wrapped value
 //----------------------------------------------------------------------------
 template <typename VT, typename T>

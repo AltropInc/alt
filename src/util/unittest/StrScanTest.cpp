@@ -7,6 +7,11 @@
 #include <sstream>
 #include <assert.h>
 #include <cstring>
+#include <locale>
+#include <iconv.h>
+//#include <util/system/OS.h>
+
+#include <w32api/winnls.h>
 
 template<typename T>
 T testValue(const char* val_str)
@@ -22,7 +27,58 @@ ENUM(Day, uint8_t, Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturda
 using Days = EnumSet<Day>;
 } // namespace alt
 
+BOOL LocaleEnumprocex(
+  LPWSTR Arg1,
+  DWORD Arg2,
+  LPARAM Arg3
+)
+{
+    std::wstring ws( Arg1 ); 
+    std::wcout << ws << std::endl;
+    return true;
+}
+
 TEST_CASE( "Scan Numbers", "[StrParser]" ) {
+    //std::cout << alt::getAppDataPath(true) <<std::endl;
+    //std::cout << alt::getAppDataPath(false) <<std::endl;
+    /*char src[] = "abcčde";
+    char dst[100];
+    size_t srclen = 6;
+    size_t dstlen = 12;
+    char * pIn = src;
+    char * pOut = ( char*)dst;
+    iconv_t conv = iconv_open("UTF-8", "CP1250");
+    iconv(conv, &pIn, &srclen, &pOut, &dstlen);
+    iconv_close(conv);
+    fprintf(stderr,"out: %s\n",dst);*/
+    /*
+    try
+    {
+        std::locale my_default_loc("en_US.utf8");
+        std::cout << "1 " << my_default_loc.name() << std::endl;
+    }
+    catch(std::exception const& e)
+    {
+        std::cout << "Exception: " << e.what() << "\n";
+    }
+    try
+    {
+        std::locale my_default_loc("en_US.UTF-8");
+        std::cout << "2 " << my_default_loc.name() << std::endl;
+    }
+    catch(std::exception const& e)
+    {
+        std::cout << "Exception: " << e.what() << "\n";
+    }
+    */
+    //LPARAM lParam; LPVOID lpReserved;
+    //EnumSystemLocalesEx(LocaleEnumprocex,LOCALE_ALL,0,nullptr);
+
+    //std::cout << "Default locale =" << setlocale(LC_ALL,"zh_CN.UTF-8") << std::endl;
+    //std::cout << "Current locale =" << setlocale(LC_ALL,nullptr) << std::endl;
+    //std::cout << "Currency symbol =" << localeconv()->int_curr_symbol << std::endl;
+    //std::cout << "Sarah (שרה) is spelled" <<  std::endl;
+
     {
         int res = testValue<int>("1234");
         REQUIRE(res == 1234);
@@ -141,72 +197,72 @@ TEST_CASE( "Scan Char", "[StrParser]" ) {
         REQUIRE(res == '\\');  
     }
     {
-        char32_t res = testValue<char32_t>("c");
+        alt_char_t res = testValue<alt_char_t>("c");
         REQUIRE(res == U'c');  
     }
     {
-        char32_t res = testValue<char32_t>("\\n");
+        alt_char_t res = testValue<alt_char_t>("\\n");
         REQUIRE(res == U'\n');  
     }
     {
-        char32_t res = testValue<char32_t>("\\x2A");
+        alt_char_t res = testValue<alt_char_t>("\\x2A");
         REQUIRE(res == U'*');  
     }
     {
-        char32_t res = testValue<char32_t>("\\x2A");
+        alt_char_t res = testValue<alt_char_t>("\\x2A");
         REQUIRE(res == U'*');  
     }
     {
         // UFT-16 hex
-        char32_t res = testValue<char32_t>("\\X03A0");
+        alt_char_t res = testValue<alt_char_t>("\\X03A0");
         REQUIRE(res == U'Π');  
     }
     {
         // UFT-16 hex
-        char32_t res = testValue<char32_t>("\\u03A0");
+        alt_char_t res = testValue<alt_char_t>("\\u03A0");
         REQUIRE(res == U'Π'); 
     }
     {
         // UFT-32 Decimal
-        char32_t res = testValue<char32_t>("\\#928;");
+        alt_char_t res = testValue<alt_char_t>("\\#928;");
         REQUIRE(res == U'Π'); 
     }
     {
-        char32_t res = testValue<char32_t>("\xCF\x80");
+        alt_char_t res = testValue<alt_char_t>("\xCF\x80");
         REQUIRE(res == U'π'); 
     }
     {
-        char32_t res = testValue<char32_t>("\xC2\xA2");
+        alt_char_t res = testValue<alt_char_t>("\xC2\xA2");
         REQUIRE(res == U'¢'); 
     }
     {
         // for little endian, we'll read A2 firist, then 00
-        char32_t res = testValue<char32_t>("\u00A2");
+        alt_char_t res = testValue<alt_char_t>("\u00A2");
         REQUIRE(res == U'¢');  
     }
     {
         // UFT8 Encode in string
-        char32_t res = testValue<char32_t>("\xE3\x81\x84");
+        alt_char_t res = testValue<alt_char_t>("\xE3\x81\x84");
         REQUIRE(res == U'い');  
     }
     {
         // UFT-32 Hex
-        char32_t res = testValue<char32_t>("\\U3044");
+        alt_char_t res = testValue<alt_char_t>("\\U3044");
         REQUIRE(res == U'い');  
     }
     {
         // UFT8 Encode in string
-        char32_t res = testValue<char32_t>("\xF0\x93\x80\x80");
+        alt_char_t res = testValue<alt_char_t>("\xF0\x93\x80\x80");
         REQUIRE(res == U'𓀀');  
     }
     {
         // UFT-32 Hex
-        char32_t res = testValue<char32_t>("\\U13000 ");
+        alt_char_t res = testValue<alt_char_t>("\\U13000 ");
         REQUIRE(res == U'𓀀');  
     }
     {
         // UFT-32 Decimal
-        char32_t res = testValue<char32_t>("\\#13719;");
+        alt_char_t res = testValue<alt_char_t>("\\#13719;");
         REQUIRE(res == U'㖗');  
     }
 }

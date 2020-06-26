@@ -2,7 +2,7 @@
 #include "SharedMemory.h"
 //#include "Logger.h"
 #include <util/numeric/Intrinsics.h>
-#include <util/sysinfo/SysConfig.h>
+#include <util/system/SysConfig.h>
 
 // Must use -D_GNU_SOURCE compiler flags for cygwin
 #include <sys/features.h>
@@ -158,6 +158,7 @@ int SharedMemory::acquire (SM_Mode mode, SM_Access access, std::size_t size)
     {
         setReady(true);
     }
+    return 0;
 }
 
 

@@ -353,6 +353,7 @@ void StrScan::getString()
             switch (ch)
             {
                 case '\\': tv_.string_.push_back(ch); break;
+                case '/': tv_.string_.push_back(ch); break;
                 case '"': tv_.string_.push_back(ch); break;
                 case 'a': tv_.string_.push_back('\a'); break;
                 case 'b': tv_.string_.push_back('\b'); break;
@@ -435,7 +436,6 @@ void StrScan::getString()
     tv_.end_pos_ = scan_buffer_.curPos();
 }
 
-
 void StrScan::getCharValue()
 {
     char ch = scan_buffer_.curChar();
@@ -448,16 +448,16 @@ void StrScan::getCharValue()
             case '\\':
             case '\'':
             case '\"':
-                      tv_.char_ = char32_t(ch); break;
-            case 'a': tv_.char_ = char32_t('\a'); break;
-            case 'b': tv_.char_ = char32_t('\b'); break;
-            case 'e': tv_.char_ = char32_t('\e'); break;
-            case 'v': tv_.char_ = char32_t('\v'); break;
-            case 'n': tv_.char_ = char32_t('\n'); break;
-            case 't': tv_.char_ = char32_t('\t'); break;
-            case 'r': tv_.char_ = char32_t('\r'); break;
-            case 'f': tv_.char_ = char32_t('\f'); break;
-            case '?': tv_.char_ = char32_t('\?'); break;
+                      tv_.char_ = alt_char_t(ch); break;
+            case 'a': tv_.char_ = alt_char_t('\a'); break;
+            case 'b': tv_.char_ = alt_char_t('\b'); break;
+            case 'e': tv_.char_ = alt_char_t('\e'); break;
+            case 'v': tv_.char_ = alt_char_t('\v'); break;
+            case 'n': tv_.char_ = alt_char_t('\n'); break;
+            case 't': tv_.char_ = alt_char_t('\t'); break;
+            case 'r': tv_.char_ = alt_char_t('\r'); break;
+            case 'f': tv_.char_ = alt_char_t('\f'); break;
+            case '?': tv_.char_ = alt_char_t('\?'); break;
             case 'x':
             case 'X':
             {
@@ -469,7 +469,7 @@ void StrScan::getCharValue()
                 {
                     setErrStatus(Err_CharHexDigitMissing);
                 }
-                tv_.char_ = char32_t(code);
+                tv_.char_ = alt_char_t(code);
                 break;
             }
             case '#':
@@ -490,7 +490,7 @@ void StrScan::getCharValue()
                 {
                     scan_buffer_.nextChar();
                 }
-                tv_.char_ = char32_t(code);                    
+                tv_.char_ = alt_char_t(code);             
                 break;
             }
             case 'u':
@@ -508,10 +508,10 @@ void StrScan::getCharValue()
                 {
                     setErrStatus(Err_UCodeInvlid);
                 }
-                tv_.char_ = char32_t(code);                    
+                tv_.char_ = alt_char_t(code);
                 break;
             }
-            default: tv_.char_ = char32_t(ch); break;
+            default: tv_.char_ = alt_char_t(ch); break;
         }
     }
     else
@@ -549,6 +549,51 @@ void StrScan::getChar()
         }
     }
     tv_.end_pos_ = scan_buffer_.curPos();
+}
+
+char StrScan::getSubstring(char end_ch, std::string& substring, bool stop_at_ws)
+{
+    // skip leading white space
+    char ch = skipWhiteSpace();
+    while (ch && ch!=end_ch)
+    {
+        if (isspace(ch) && stop_at_ws)
+        {
+            break;
+        }
+        substring.push_back(ch);
+        ch = scan_buffer_.nextChar();
+    }
+    return ch;
+}
+
+char StrScan::getSubstring(const char* end_list, std::string& substring)
+{
+    // skip leading white space
+    char ch = skipWhiteSpace();
+    while (ch && (!end_list || strchr(end_list, ch)==nullptr))
+    {
+        substring.push_back(ch);
+        ch = scan_buffer_.nextChar();
+    }
+    return ch;
+}
+
+
+char StrScan::getSubstringQuoted(char end_ch, std::string& text_scanned)
+{
+    char ch = skipWhiteSpace();
+    if (ch=='\"')
+    {
+        StrScan::getString();
+        text_scanned.swap(tv_.string_);
+        ch = scan_buffer_.nextNonWhiteSpace();
+    }
+    else
+    {
+        ch = getSubstring(end_ch, text_scanned, true /*stop at whitespace*/);
+    }
+    return ch;
 }
 
 //=============================================================================
@@ -616,7 +661,7 @@ char StrParser::toChar ()
     return '\0';
 }
 
-char32_t StrParser::toWChar()
+alt_char_t StrParser::toWChar()
 {
     char ch = scan_buffer_.curChar();
     if (ch && !isSeparator(ch))

@@ -32,12 +32,16 @@ TEST_CASE( "PooledTreeNodeTest", "[PooledTreeNode]" )
  
 
     //alt::PooledAllocator& mem_pool = alt::PooledAllocator::instance();
+    //std::cout << "root = alt::PooledTreeNode::create" << std::endl;
     alt::MyTreeNode*  root = alt::PooledTreeNode::create<alt::MyTreeNode>("root");
     //REQUIRE(alt::MyTreeNode::instanceCount() == 1);
     REQUIRE(root->getValue()=="root");
     //mem_pool.getTracker().reportMostUsed();
+    //std::cout << "root->newChild chd1" << std::endl;
     alt::MyTreeNode* chd1 = root->newChild<alt::MyTreeNode>("chd1");
+    //std::cout << "root->newChild chd3" << std::endl;
     alt::MyTreeNode* chd3 = root->newChild<alt::MyTreeNode>("chd3");
+    //std::cout << "root->newChild chd2" << std::endl;
     alt::MyTreeNode* chd2 = root->newChild<alt::MyTreeNode>("chd2");
     //REQUIRE(alt::MyTreeNode::instanceCount() == 4);
     REQUIRE(root->childrenNum() == 3);
@@ -47,10 +51,12 @@ TEST_CASE( "PooledTreeNodeTest", "[PooledTreeNode]" )
     REQUIRE(chd3->youngestSibling() == chd2);
     REQUIRE(chd3->prevSibling() == chd1);
     REQUIRE(chd3->parent() == root);
+    //std::cout << "root->newChild chd5,6" << std::endl;
     alt::MyTreeNode* chd5 = root->newChildFront<alt::MyTreeNode>("chd5");
     REQUIRE(root->firstChild() == chd5);
     alt::MyTreeNode* chd6 = root->newChildAfter<alt::MyTreeNode>(root->lastChild(), "chd6");
     REQUIRE(root->lastChild() == chd6);
+    //std::cout << "root lift lower, reposition chidlren" << std::endl;
     root->children().lift(chd1);
     REQUIRE(root->firstChild() == chd1);
     REQUIRE(chd1->nextSibling() == chd5);
@@ -67,14 +73,17 @@ TEST_CASE( "PooledTreeNodeTest", "[PooledTreeNode]" )
     REQUIRE(range1.first == chd2);
     REQUIRE(range1.second == chd5);
 
+    //std::cout << " chd3->newChild" << std::endl;
     alt::MyTreeNode* chd31 = chd3->newChild<alt::MyTreeNode>("chd31");
     alt::MyTreeNode* chd32 = chd3->newChild<alt::MyTreeNode>("chd32");
     alt::MyTreeNode* chd33 = chd3->newChild<alt::MyTreeNode>("chd33");
 
+    //std::cout << " chd5->newChild" << std::endl;
     alt::MyTreeNode* chd51 = chd5->newChild<alt::MyTreeNode>("chd51");
     alt::MyTreeNode* chd52 = chd5->newChild<alt::MyTreeNode>("chd52");
     alt::MyTreeNode* chd53 = chd5->newChild<alt::MyTreeNode>("chd53");
 
+    //std::cout << " chd51->newChild" << std::endl;
     alt::MyTreeNode* chd511 = chd51->newChild<alt::MyTreeNode>("chd511");
     alt::MyTreeNode* chd512 = chd51->newChild<alt::MyTreeNode>("chd512");
     REQUIRE(chd512->root() == root);
@@ -89,16 +98,20 @@ TEST_CASE( "PooledTreeNodeTest", "[PooledTreeNode]" )
     REQUIRE(((alt::MyTreeNode*)chd512->leastCommonAncestor(chd53))->getValue() == "chd5");
     REQUIRE(((alt::MyTreeNode*)chd31->leastCommonAncestor(chd511))->getValue() == "root");
 
+    //std::cout << " chd33->newChild" << std::endl;
     alt::MyTreeNode* chd513 = chd33->newChild<alt::MyTreeNode>("chd513");
+    //std::cout << " chd513->reparent to chd51" << std::endl;
     chd513->reparent(chd51, nullptr);
     REQUIRE(chd513->parent() == chd51);
     REQUIRE(chd512->nextSibling() == chd513);
     REQUIRE(chd513->prevSibling() == chd512);
 
+    //std::cout << " chd3->extract" << std::endl;
     chd3->extract();
     REQUIRE(chd31->parent() == root);
     REQUIRE(chd31->prevSibling() == chd2);
     REQUIRE(chd33->nextSibling() == chd5);
+    //std::cout << "root->wrapChildren(chd3, chd31, chd33)" << std::endl;
     root->wrapChildren(chd3, chd31, chd33);
     REQUIRE(chd31->parent() == chd3);
     REQUIRE(chd3->firstChild() == chd31);
@@ -106,6 +119,7 @@ TEST_CASE( "PooledTreeNodeTest", "[PooledTreeNode]" )
     REQUIRE(chd3->prevSibling() == chd2);
     REQUIRE(chd3->nextSibling() == chd5);
 
+    //std::cout << "releaseNode(root)" << std::endl;
     alt::PooledTreeNode::releaseNode(root);
     REQUIRE(alt::MyTreeNode::instanceCount() == 0);
 

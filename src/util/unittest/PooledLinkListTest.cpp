@@ -35,6 +35,7 @@ TEST_CASE( "PooledLinkListTest", "[PooledLinkList]" )
     REQUIRE(testlist.size()==1);
     REQUIRE(testlist.front()!=nullptr);
     REQUIRE(testlist.front()==testlist.back());
+    //std::cout << "testlist.popFront()" << std::endl;
     auto next = testlist.popFront();
     REQUIRE(testlist.size()==0);
     // Make sure the destructor is called
@@ -65,10 +66,12 @@ TEST_CASE( "PooledLinkListTest", "[PooledLinkList]" )
         --value;
     }
 
+    //std::cout << "testlist.erase(node2)" << std::endl;
     next = testlist.erase(node2);
     REQUIRE(testlist.size()==1);
     REQUIRE(next==node);
     REQUIRE(testlist.back()==node);
+    //std::cout << "testlist.popBack()" << std::endl;
     testlist.popBack();
     REQUIRE(testlist.size()==0);
     REQUIRE(alt::PooledLinkListNode::instanceCount() == 0);

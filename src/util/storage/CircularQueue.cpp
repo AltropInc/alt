@@ -1,5 +1,4 @@
 #include "CircularQueue.h"
-//#include "Logger.h"
 #include <util/numeric/Intrinsics.h>
 
 namespace alt {
@@ -41,7 +40,7 @@ CircularQueue::CircularQueue(size_t entry_size, size_t entry_number)
 
 size_t CircularQueue::requiredEntrySize(size_t entry_size)
 {
-    size_t entry_sz = power2Next<size_t>(
+    return power2Next<size_t>(
             std::max(sizeof(EntryHeader) + entry_size,
                      SysConfig::instance().cache_line_size_));
 }

@@ -2,9 +2,9 @@
 
 #include "Allocator.h"          // for StorageAttrs
 #include <util/ipc/SharedMemory.h>
-#include <util/sysinfo/Platform.h>
+#include <util/system/Platform.h>
 #include <util/types/Enum.h>
-#include <util/sysinfo/SysConfig.h>
+#include <util/system/SysConfig.h>
 #include <string>
 #include <errno.h>
 #include <atomic>
@@ -14,7 +14,7 @@ namespace alt {
 
 /**
  * \class ReadSequencer
- * \brief implements a lock-free read syncronizing sequencer fro mutiple readers
+ * \brief implements a lock-free read synchronizing sequencer fro mutiple readers
  */
 class ReadSequencer
 {
@@ -24,7 +24,7 @@ class ReadSequencer
 
     /// \brief acquire the current read sequence and advance the sequence for next
     /// \tparam Container the indexed container to check if the entry corresponding to the
-    /// sequence in tyhe container is a valid entry (committed by a writer)
+    /// sequence in the container is a valid entry (committed by a writer)
     /// \param container the container
     /// \return the sequence for read
     template <class Container>
@@ -57,7 +57,7 @@ class ReadSequencer
 
 /**
  * \class WriteSequencer
- * \brief implements a lock-free write syncronizing sequencer for mutiple writers
+ * \brief implements a lock-free write synchronizing sequencer for mutiple writers
  */
 class WriteSequencer
 {
@@ -123,7 +123,7 @@ class WriteSequencer
  * entry has the fixed size. No derived classes, nor virtual functions, as this may be
  * allocated/reused in shared memory
  */
-class ALT_CORE_PUBLIC CircularQueue final
+class ALT_UTIL_PUBLIC CircularQueue final
 {
     struct QueueHeader
     {

@@ -1,4 +1,4 @@
-#include <util/storage/Queue.h>
+#include <util/storage/CoQueue.h>
 #include <catch2/catch.hpp>
 #include <iostream>
 #include <assert.h>
@@ -6,7 +6,7 @@
 
 namespace alt
 {
-    class MyQueueEntry: public QueueBase::EntryBase
+    class MyQueueEntry: public CoQueueBase::EntryBase
     {
         static int s_instance_cnt_;
         public:
@@ -35,7 +35,7 @@ namespace alt
 }
 TEST_CASE( "QueueTest", "[Queue]" )
 {
-    alt::Queue  testQueue;
+    alt::CoQueue  testQueue;
     testQueue.enqueue<alt::MyQueueEntry>(1);
     //testQueue.enqueue<alt::OtherQueueEntry>(1);
 }

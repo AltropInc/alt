@@ -2,6 +2,8 @@
 
 #include "StrBuffer.h"
 
+#include <util/numeric/Intrinsics.h>   // for s_double_digits, s_exp10
+
 #include <stddef.h>
 #include <string>
 #include <tuple>
@@ -22,6 +24,8 @@ class StrPrint
     { return std::is_same<std::string, BufferT>::value ? false : buffer_.overflowed(); }
 
     void clear() { buffer_.clear(); }
+
+    void resize(size_t sz) { buffer_.resize(sz); }
    
     // Append char, and string
     StrPrint& operator << (char val) { buffer_.push_back(val); return *this; }
@@ -45,6 +49,20 @@ class StrPrint
 
     StrPrint& operator << (double val);
     StrPrint& operator << (std::tuple<double, int> val);
+    StrPrint& operator << (float val) { return *this << double(val); }
+    StrPrint& operator << (std::tuple<float, int> val)
+     { return *this << std::make_tuple(std::get<0>(val), std::get<1>(val)); }
+
+    // conditionally define methods to print 128-bit integer and double if
+    // 128-bit numers are supported
+    typename std::enable_if<!std::is_same<ullong, uint64_t>::value, StrPrint>::type&
+    operator << (ullong);
+    typename std::enable_if<!std::is_same<llong, int64_t>::value, StrPrint>::type&
+    operator << (llong);
+    typename std::enable_if<!std::is_same<ldouble, double>::value, StrPrint>::type&
+    operator << (ldouble val);
+    typename std::enable_if<!std::is_same<ldouble, double>::value, StrPrint>::type&
+    operator << (std::tuple<ldouble, int> val);
 
     template <typename T>
     StrPrint& operator << (const T& val) { return *this << val.toString(); }
@@ -54,12 +72,12 @@ class StrPrint
 };
 
 template <size_t N>
-class StrPrintWithBuffer: public StrPrint<StrBuf>
+class StrPrinter: public StrPrint<StrBuf>
 {
     char        buffer_[N+1];
     StrBuf      str_buffer_;
   public:
-    StrPrintWithBuffer() : StrPrint(str_buffer_), str_buffer_(buffer_, N)
+    StrPrinter() : StrPrint(str_buffer_), str_buffer_(buffer_, N)
     {
         buffer_[N] = '\0';
     }
@@ -120,7 +138,7 @@ ALT_INLINE StrPrint<BufferT>& StrPrint<BufferT>::operator << (uint64_t val)
         return *this << (uint32_t)val;
     }
     uint64_t high = val / 10000000;
-    uint64_t low = val % 10000000;
+    uint32_t low = val % 10000000;
     *this << high;
     if (low <1000000) buffer_.push_back('0');
     if (low <100000) buffer_.push_back('0');
@@ -131,6 +149,7 @@ ALT_INLINE StrPrint<BufferT>& StrPrint<BufferT>::operator << (uint64_t val)
     return *this << low;
 }
 
+
 template<typename BufferT>
 ALT_INLINE StrPrint<BufferT>& StrPrint<BufferT>::operator << (int64_t val)
 {
@@ -140,6 +159,45 @@ ALT_INLINE StrPrint<BufferT>& StrPrint<BufferT>::operator << (int64_t val)
     }
     buffer_.push_back('-');
     return *this << uint64_t(-val);
+}
+
+template<typename BufferT> ALT_INLINE
+typename std::enable_if<!std::is_same<ullong, uint64_t>::value, StrPrint<BufferT>>::type&
+StrPrint<BufferT>::operator << (ullong val)
+{
+    if (val < 100000000000000ULL)
+    {
+        return *this << (uint64_t)val;
+    }
+    ullong high = val / 100000000000000ULL;
+    uint64_t low = val % 100000000000000ULL;
+    *this << high;
+    if (low <10000000000000) buffer_.push_back('0');
+    if (low <1000000000000) buffer_.push_back('0');
+    if (low <100000000000) buffer_.push_back('0');
+    if (low <10000000000) buffer_.push_back('0');
+    if (low <1000000000) buffer_.push_back('0');
+    if (low <100000000) buffer_.push_back('0');
+    if (low <10000000) buffer_.push_back('0');
+    if (low <1000000) buffer_.push_back('0');
+    if (low <100000) buffer_.push_back('0');
+    if (low <10000) buffer_.push_back('0');
+    if (low <1000) buffer_.push_back('0');
+    if (low <100) buffer_.push_back('0');
+    if (low <10) buffer_.push_back('0');
+    return *this << low;
+}
+
+template<typename BufferT> ALT_INLINE
+typename std::enable_if<!std::is_same<llong, int64_t>::value, StrPrint<BufferT>>::type&
+StrPrint<BufferT>::operator << (llong val)
+{
+    if (val >= 0)
+    {
+       return *this << ullong(val);
+    }
+    buffer_.push_back('-');
+    return *this << ullong(-val);
 }
 
 template<typename BufferT>
@@ -169,4 +227,32 @@ ALT_INLINE StrPrint<BufferT>& StrPrint<BufferT>::operator << (std::tuple<double,
     return *this << fval;
 }
 
+template<typename BufferT> ALT_INLINE
+typename std::enable_if<!std::is_same<double, ldouble>::value, StrPrint<BufferT>>::type&
+StrPrint<BufferT>::operator << (ldouble val)
+{
+    return *this << std::make_tuple(val,12);
+}
+
+template<typename BufferT> ALT_INLINE
+typename std::enable_if<!std::is_same<double, ldouble>::value, StrPrint<BufferT>>::type&
+StrPrint<BufferT>::operator << (std::tuple<ldouble, int> val)
+{
+    size_t precision = std::get<1>(val);
+    ldouble dval = std::get<0>(val);
+    if (dval < 0)
+    {
+        buffer_.push_back('-');
+        dval = -dval;
+    }
+    ullong exp = s_exp10[precision];
+    llong lval = llong(dval * exp + 0.5);
+    *this << llong(lval / exp) << '.';
+    llong fval = lval % exp;
+    for (int p = precision - 1; p > 0 && fval < s_exp10[p]; --p)
+    {
+       buffer_.push_back('0');
+    }
+    return *this << fval;
+}
 }

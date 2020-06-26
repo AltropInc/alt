@@ -1,9 +1,8 @@
 #pragma once
-#include "StrUtils.h"   // for strHash
-
 #include <string>
 #include <cstring>
 #include <tuple>
+#include <cstddef>   // for size_t
 
 namespace alt {
 
@@ -69,7 +68,7 @@ class StrBuf
     }
 
     StrBuf& append (const std::string val)
-    { append(val.c_str(), val.length()); }
+    { append(val.c_str(), val.length()); return *this; }
 
     StrBuf& append (size_t repeat, char val)
     {
@@ -104,6 +103,10 @@ class StrBuf
     size_t tail_;
 };
 
+size_t strHash(const char * str);
+size_t strHash(const char * str, size_t length);
+size_t strHash (const char *str, size_t length, size_t seed);
+
 template <size_t N>
 class StrFixed
 {
@@ -111,23 +114,23 @@ class StrFixed
     StrFixed() { buffer_[0]='\0'; buffer_[N]='\0'; };
 
     StrFixed (const char* str)
-	  {
+	{
         StrBuf (buffer_, N).append(str).terminate();
     }
 
     StrFixed (const char* str, size_t length)
-	  {
+	{
         StrBuf (buffer_, N).append(str, length).terminate();
     }
 
     StrFixed (const std::string& str)
-	  {
+	{
         StrBuf (buffer_, N).append(str.c_str(), str.length()).terminate();
     }
 
     template<size_t M>
     StrFixed (const StrFixed<M>& str)
-	  {
+	{
         StrBuf (buffer_, N).append(str.c_str(), M).terminate(); 
     }
 
@@ -178,6 +181,7 @@ class StrRef
 	{}
 
     StrRef () {}
+    void reset(const char* buffer) { buffer_=buffer; }
 
     size_t length() const { return buffer_ ? std::strlen(buffer_) : 0; }
     const char* c_str() const { return buffer_; }
@@ -233,13 +237,17 @@ class StrRefInLength
 
 } // namespace alt
 
-/**
- * \class PooledStrKey
- * \ingroup StringUtils
- * \brief A hash key using pooled string.
- */
-
 namespace std {
+/*
+template <> template <size_t N>
+struct hash<alt::StrFixed<N>>
+{
+    size_t operator()(const alt::StrFixed<N>& key) const noexcept
+    {
+        return key.hash();
+    }
+};
+*/
 template <>
 struct hash<alt::StrRef>
 {

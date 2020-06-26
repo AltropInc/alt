@@ -1,5 +1,6 @@
 #pragma once
 
+#include <util/Defs.h>              // for ALT_UTIL_PUBLIC
 #include "Allocator.h"
 #include "util/string/StrBuffer.h"
 #include "util/string/StrPool.h"
@@ -11,11 +12,9 @@ namespace alt
 /**
  * \brief implements a string key hash using fixed pools to reduce heap allocation at
  * run time. The key is a char pointer that points to the position in a string pool
- * where the space is not freed for new string. Therefore, this hash map is suitable
- * for the usage where erase seldomly happens during the lifetime of the map.
  */
 template <typename T, class Allocator = StdFixedPoolAllocator< std::pair<const StrRef, T> > >
-class ALT_CORE_PUBLIC StringHashMap
+class ALT_UTIL_PUBLIC StringHashMap
 {
   public:
     using key_type          = StrRef;
@@ -68,7 +67,7 @@ class ALT_CORE_PUBLIC StringHashMap
         return std::make_pair(iter, inserted);
     }
 
-    std::pair<iterator, bool> emplace(char const* key, mapped_type value)
+    std::pair<iterator, bool> emplace(const char * key, mapped_type value)
     {
         return insert(std::make_pair(StrRef(key), value));
     }
@@ -76,7 +75,14 @@ class ALT_CORE_PUBLIC StringHashMap
     template <typename... Args>
     std::pair<iterator, bool> try_emplace(char const* key, Args&&... args)
     {
-        return insert(std::make_pair(StrRef(key), T(std::forward<Args>(args)...)));      
+        const auto [iter, inserted] =
+            hash_map_.try_emplace(StrRef(key), std::forward<Args>(args)...);
+        if (inserted)
+        {
+            // replace key with pointer in string pool
+            *const_cast<StrRef*>(&iter->first) = StrRef(string_pool_.insert(key));
+        }
+        return std::make_pair(iter, inserted);
     }
 
     iterator erase(const_iterator pos)
@@ -122,6 +128,12 @@ class ALT_CORE_PUBLIC StringHashMap
 
     template <typename KeyT>
     bool contains(const KeyT& key) const { return find(key)!=hash_map_.end(); }
+
+    void clear()
+    {
+        hash_map_.clear();
+        string_pool_.clear();
+    }
 
     size_type bucket_count() const { return hash_map_.bucket_count(); }
     size_type max_bucket_count() const { return hash_map_.max_bucket_count(); }

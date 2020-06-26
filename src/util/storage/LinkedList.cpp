@@ -4,7 +4,7 @@
 namespace alt
 {
 
-LinkedNode *LinkedNode::extract()
+void LinkedNode::extract()
 {
     if (next_) next_->prev_ = prev_;
     if (prev_) prev_->next_ = next_;
@@ -114,9 +114,9 @@ LinkedNode::Pair LinkedNode::range(int distance)
     return range(-distance, 0);
 };
 
-int LinkedNode::distance(LinkedNode* node)
+int LinkedNode::distance(LinkedNode* node) const
 {
-    LinkedNode *current = this;
+    const LinkedNode *current = this;
     int num = 0;
     while (current && current != node)
     {  
@@ -135,6 +135,19 @@ int LinkedNode::distance(LinkedNode* node)
     if (current==this) return num;
 
     return std::numeric_limits<int>::max();
+}
+
+
+int LinkedNode::order() const
+{
+    const LinkedNode *current = prev_;
+    int cnt = 0;
+    while (current)
+    {  
+        ++cnt;              
+        current = current->prev_;  
+    }
+    return cnt;
 }
 
 size_t LinkedNode::length() const
@@ -180,6 +193,22 @@ bool LinkedListBase::has (const LinkedNode* node) const
         n = n->next_;
     }
     return false;
+}
+
+LinkedNode* LinkedListBase::nthNode(int n)
+{
+    auto node = head_;
+    while (n && node)
+    {
+        node = node->next_;
+        --n;
+    }
+    return node;
+}
+
+const LinkedNode* LinkedListBase::nthNode(int n) const
+{
+    return const_cast<LinkedListBase*>(this)->nthNode(n);
 }
 
 void LinkedListBase::pushBack(LinkedNode* node)

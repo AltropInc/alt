@@ -13,7 +13,7 @@ namespace alt{
  * hash. Values far away from the top beyond limit of the front bucket buffer will
  * go into the back bucket buffer, which is a SortedBuckets.
  */
-template <typename Key, typename T, class Compare = SortedBuketCompareInc<Key>>
+template <typename Key, typename T, class Compare = SortedBucketCompareInc<Key>>
 class SideBuckets
 {
     std::vector<T>                  front_bucks_;
@@ -52,7 +52,7 @@ class SideBuckets
 
     class iterator
     {
-              public:
+      private:
         SideBuckets&  parent_;
         size_t        ix_;
         bool          in_front_ { true };

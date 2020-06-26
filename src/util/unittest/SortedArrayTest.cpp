@@ -1,9 +1,31 @@
 #include <util/storage/SideBuckets.h>
+#include <util/storage/SortedArray.h>
 #include <catch2/catch.hpp>
 #include <sstream>
 #include <iostream>
 
 TEST_CASE( "SortedArray", "[SortedArray]" )
+{
+    alt::SortedArray<int> sorted_array;
+    sorted_array.insert(3);
+    int x = 5;
+    sorted_array.insert(x, true);
+    sorted_array.insert(4, true);
+    sorted_array.insert(1, true);
+    sorted_array.insert(8, true);
+    sorted_array.insert(-1, true);
+    sorted_array.insert(4, true);
+    
+    REQUIRE(sorted_array.find(-1)==6);
+    REQUIRE(sorted_array.find(1)==7);
+    REQUIRE(sorted_array.find(3)==8);
+    REQUIRE(sorted_array.find(4)==9);
+    REQUIRE(sorted_array.find(5)==10);
+    REQUIRE(sorted_array.find(8)==11);
+    // sorted_array.print();
+}
+
+TEST_CASE( "SideBuckets", "[SideBuckets]" )
 {
     using Price_t = int64_t;     // in number of ticks
     struct QtyCnt
@@ -34,6 +56,7 @@ TEST_CASE( "SortedArray", "[SortedArray]" )
         {
             qty_=0;
             order_cnt_=0;
+            return true;
         }
         bool empty() const
         {
@@ -46,7 +69,7 @@ TEST_CASE( "SortedArray", "[SortedArray]" )
     };
 
     bool dump = false;
-    alt::SideBuckets<Price_t, QtyCnt, alt::SortedBuketCompareDec<Price_t>> buckets(4, 4);
+    alt::SideBuckets<Price_t, QtyCnt, alt::SortedBucketCompareDec<Price_t>> buckets(4, 4);
     buckets.add(10, QtyCnt(100,1));   if (dump) buckets.print();
     buckets.add(11, QtyCnt(200,2));   if (dump) buckets.print();
     buckets.add(9, QtyCnt(10,1));     if (dump) buckets.print();

@@ -1,5 +1,6 @@
 
 #include "StrUtils.h"
+#include "StrPrint.h"
 #include <iostream>
 #include <cstring>
 #include <cassert>
@@ -222,8 +223,9 @@ void fastMemcpyAligned(void *dest, void *src, size_t sz)
     assert(sz % sizeof(uint64_t) == 0);
     assert((intptr_t(dest) & (sizeof(uint64_t)-1)) == 0);
     assert((intptr_t(src) & (sizeof(uint64_t)-1)) == 0);
-    for(size_t n_sz = sz >> 3; n_sz > 0 ; --n_sz)
-        *(uint64_t*)dest++ = *(uint64_t*)src++;
+    uint64_t* d = (uint64_t*)dest;
+    const uint64_t* s = (const uint64_t*)src;
+    for(size_t n_sz = sz >> 3; n_sz > 0 ; --n_sz) *d++ = *s++;
 #endif
 }
 
@@ -257,8 +259,7 @@ void fastMemcpyAlignedBackword(void *dest, void *src, size_t sz)
     size_t n_sz = sz >> 3;
     const uint64_t* s = (const uint64_t*)src + n_sz;
     uint64_t* d = (uint64_t*)dest + n_sz;
-    for(; n_sz > 0 ; --n)
-        *(uint64_t*)dest++ = *(uint64_t*)src++;
+    for(; n_sz > 0 ; --n_sz) *d-- = *s--;
 #endif
 }
 
@@ -350,46 +351,46 @@ size_t strSplit (
         length = std::strlen(str); // fastStrLen(str);
     }
 
-	size_t scanned(0);
+    size_t scanned(0);
     size_t pos = 0;
-	size_t start_pos(pos);
-	size_t end_pos(pos);
-	bool string_started (false);
-	while (pos < length && str[pos]!=terminator)
-	{
-	    if (str[pos]==separator)
-		{
-			substrings.emplace_back(str+start_pos, end_pos-start_pos);
-			string_started = false;
-			++scanned;
-			start_pos = pos+1;
-			end_pos = start_pos;
-		}
-		else if (isspace(str[pos]))
-		{
-			if (skip_leading_sp && !string_started)
-			{
-				++start_pos;
-				++end_pos;
-			}
-			else if (!skip_trailing_sp  && string_started)
-			{
-				++end_pos;
-			}   
-		}
-		else
-		{
-			string_started = true;
-			++end_pos;
-		}
-		++pos;
-  	}
-	if (end_pos>start_pos)
-	{
-	    substrings.emplace_back(str+start_pos, end_pos-start_pos);
-		++scanned;
-	}
-	return scanned;
+    size_t start_pos(pos);
+    size_t end_pos(pos);
+    bool string_started (false);
+    while (pos < length && str[pos]!=terminator)
+    {
+        if (str[pos]==separator)
+        {
+            substrings.emplace_back(str+start_pos, end_pos-start_pos);
+            string_started = false;
+            ++scanned;
+            start_pos = pos+1;
+            end_pos = start_pos;
+        }
+        else if (isspace(str[pos]))
+        {
+            if (skip_leading_sp && !string_started)
+            {
+                ++start_pos;
+                ++end_pos;
+            }
+            else if (!skip_trailing_sp  && string_started)
+            {
+                ++end_pos;
+            }   
+        }
+        else
+        {
+            string_started = true;
+            ++end_pos;
+        }
+        ++pos;
+      }
+    if (end_pos>start_pos)
+    {
+        substrings.emplace_back(str+start_pos, end_pos-start_pos);
+        ++scanned;
+    }
+    return scanned;
 }
 
 size_t strSplitQuoted (
@@ -416,7 +417,7 @@ size_t strSplitQuoted (
     return parsed;
 }
 
-char hexDigit (char ch)
+uint8_t hexDigit (char ch)
 {
     uint8_t diff;
     if ((diff = uint8_t(ch - '0')) < 10)
@@ -437,27 +438,34 @@ char hexDigit (char ch)
     }
 };
 
-size_t scanUTF8String(const char * utf8Char, char32_t& wch)
+// UTF8 encode:
+// bytes bits   first code  last code     byte1       byte2       byte3       byte4
+// 1     7      U+0000      U+007F        0xxxxxxx            
+// 2     11     U+0080      U+07FF        110xxxxx    10xxxxxx        
+// 3     16     U+0800      U+FFFF        1110xxxx    10xxxxxx    10xxxxxx    
+// 4     21     U+10000     U+10FFFF[12]  11110xxx    10xxxxxx    10xxxxxx    10xxxxxx
+
+size_t scanUTF8String(const char * utf8Char, alt_char_t& wch)
 {
     //std::cout << "scanUTF8String " << std::hex << int(uint8_t(*utf8Char)) << std::dec << std::endl;
     if (!utf8Char || *utf8Char==0)
     {
-        wch = char32_t(0);
+        wch = alt_char_t(0);
         return 0;
     }
     char ch = *utf8Char;
     if ((ch & 0x80)==0)
     {
-        wch = char32_t(ch);
+        wch = alt_char_t(ch);
         return 1;
     }
 
     size_t bytes = uCharBytes(ch);
     //std::cout << "CHAR BYTES " << bytes << std::endl;
-    wch = char32_t(uint8_t(~(uint16_t(0xFF00) >> bytes)) & uint8_t(ch));
+    wch = alt_char_t(uint8_t(~(uint16_t(0xFF00) >> bytes)) & uint8_t(ch));
     bool is_valid_uft8{true};
-    constexpr char32_t MAX_UTF8_CODE = 0x10FFFF;
-    static std::vector<std::pair<char32_t,char32_t>> utf8_ranges
+    constexpr alt_char_t MAX_UTF8_CODE = alt_char_t(0x10FFFF);
+    static std::vector<std::pair<alt_char_t,alt_char_t>> utf8_ranges
         { {0, 0X80}, {1, 0X780}, {1, 0XF800}, {1, MAX_UTF8_CODE-0XFFFF} };
     for (size_t b=1; b<bytes; ++b)
     {
@@ -479,10 +487,305 @@ size_t scanUTF8String(const char * utf8Char, char32_t& wch)
 
     if (!is_valid_uft8)
     {
-        wch = char32_t('?');
+        wch = alt_char_t('?');
     }
 
     return bytes;
+}
+
+size_t wcharToUTF8(alt_char_t wc, char * utf8Char_buffer, size_t buffer_length)
+{
+    StrBuf str_buffer(utf8Char_buffer, buffer_length);
+    StrPrint spr(str_buffer);
+    if ( 0 <= wc && wc <= 0x7f )
+    {
+        spr << static_cast<char>(wc);
+    }
+    else if ( 0x80 <= wc && wc <= 0x7ff )
+    {
+        spr << static_cast<char>(0xc0 | (wc >> 6));
+        spr << static_cast<char>(0x80 | (wc & 0x3f));
+    }
+    else if ( 0x800 <= wc && wc <= 0xffff )
+    {
+        spr << static_cast<char>(0xe0 | (wc >> 12));
+        spr << static_cast<char>(0x80 | ((wc >> 6) & 0x3f));
+        spr << static_cast<char>(0x80 |  (wc & 0x3f));
+    }
+    else if ( 0x10000 <= wc && wc <= 0x1fffff )
+    {
+        spr << static_cast<char>(0xf0 | (wc >> 18));
+        spr << static_cast<char>(0x80 | ((wc >> 12) & 0x3f));
+        spr << static_cast<char>(0x80 | ((wc >> 6) & 0x3f));
+        spr << static_cast<char>(0x80 | (wc & 0x3f));
+    }
+    // should we ignore invalid code range ??
+    /*
+    else if ( 0x200000 <= wc && wc <= 0x3ffffff )
+    {
+        spr << static_cast<char>(0xf8 | (wc >> 24));
+        spr << static_cast<char>(0x80 | ((wc >> 18) & 0x3f));
+        spr << static_cast<char>(0x80 | ((wc >> 12) & 0x3f));
+        spr << static_cast<char>(0x80 | ((wc >> 6) & 0x3f));
+        spr << static_cast<char>(0x80 | (wc & 0x3f));
+    }
+    else if ( 0x4000000 <= wc && wc <= 0x7fffffff )
+    {
+        spr << static_cast<char>(0xfc | (wc >> 30));
+        spr << static_cast<char>(0x80 | ((wc >> 24) & 0x3f));
+        spr << static_cast<char>(0x80 | ((wc >> 18) & 0x3f));
+        spr << static_cast<char>(0x80 | ((wc >> 12) & 0x3f));
+        spr << static_cast<char>(0x80 | ((wc >> 6) & 0x3f));
+        spr << static_cast<char>(0x80 | (wc & 0x3f));
+    }
+    */
+    return str_buffer.length();
+}
+
+size_t wcharStrToUTF8(
+    const alt_char_t *wch_str,
+    size_t length,
+    char * utf8Char_buffer,
+    size_t buffer_length)
+{
+    size_t converted_bytes= 0;
+    while (length >0)
+    {
+        size_t wch_bytes = wcharToUTF8(*wch_str, utf8Char_buffer, buffer_length);
+        --length;
+        utf8Char_buffer += wch_bytes;
+        converted_bytes += wch_bytes;
+        buffer_length -= wch_bytes;
+    }
+    if (buffer_length>0)
+    {
+        *utf8Char_buffer = '\0';
+    }
+    return converted_bytes;
+}
+
+
+std::u32string toU32String(const char * utf8_str)
+{
+    std::u32string u32_string;
+    alt_char_t wch;
+    const char* sp = utf8_str + scanUTF8String(utf8_str, wch);
+    while (wch)
+    {
+        u32_string.push_back(wch);
+        sp += scanUTF8String(sp, wch);
+    }
+    return u32_string;
+}
+
+bool isBasicString(const char * utf8_str)
+{
+    const char *cp = utf8_str;
+    while (*cp)
+    {
+        if (*cp++ >=128) return false;
+    }
+    return true;
+}
+
+int strCmp (const char* str1,
+            const char* str2,
+            bool case_sensitive,
+            bool number_as_whole)
+{
+    alt_char_t wch1, wch2;
+    while (true)
+    {
+        size_t sz1 = scanUTF8String(str1, wch1);
+        size_t sz2 = scanUTF8String(str2, wch2);
+        if (wch1 == 0 && wch2 == 0)
+        {
+            return 0;
+        }
+        if (wch1 == 0)
+        {
+            return -1;
+        }
+        if (wch2 == 0)
+        {
+            return 1;
+        }
+        str1 += sz1;
+        str2 += sz2;
+        if (number_as_whole && isDigit(wch1) && isDigit(wch2))
+        {
+            size_t num1 = wch1 - '0';
+            size_t num2 = wch2 - '0';
+            while (isDigit(*str1) && isDigit(*str2))
+            {
+                num1 = num1*10 + *str1 - '0';
+                num2 = num2*10 + *str2 - '0';
+                ++str1;
+                ++str2;
+            } 
+            if (num1 < num2)
+            {
+                return -1;
+            }
+            if (num1 > num2)
+            {
+                return 1;
+            }
+        }
+        else
+        {
+            if (case_sensitive)
+            {
+                // Converts the given character to lowercase according to the character
+                // conversion rules defined by the currently installed C locale.
+                // TODO: check tolower is properly convert  “ẞ” U+1E9E to “ß” U+00DF
+                // but here we do not support the coversion from "SS" to “ß” which is
+                // used in German only
+                wch1 = std::tolower(wch1);
+                wch2 = std::tolower(wch2);
+            }
+
+            if (wch1 < wch2)
+            {
+                return -1;
+            }
+            if (wch1 > wch2)
+            {
+                return 1;
+            }
+        }
+    }
+
+    return 0;
+}
+
+const char* strTrimBackward(const char* cp, size_t length) noexcept (false)
+{
+    const char* end_cp = cp + length;
+    while (length>0)
+    {
+        if (!isspace(*(end_cp-1))) break;
+        --length;
+        --end_cp;
+    }
+    return end_cp;
+}
+
+template <typename CharT, typename OutputT>
+inline bool toEscapeSeq(CharT ch, OutputT& spr)
+{
+    switch (ch)
+    {
+        case '\\' : spr << "\\\\"; return true;
+        case '\'' : spr << "\\\'"; return true;
+        case '\"' : spr << "\\\""; return true;
+        case '\n' : spr << "\\n"; return true;
+        case '\t' : spr << "\\t"; return true;
+        case '\a' : spr << "\\a"; return true;
+        case '\b' : spr << "\\b"; return true;
+        case '\e' : spr << "\\e"; return true;
+        case '\v' : spr << "\\v"; return true;
+        case '\r' : spr << "\\r"; return true;
+        case '\f' : spr << "\\f"; return true;
+        default:
+            if (ch < ' ')
+            {
+                char ch = static_cast<char>(ch);
+                spr << "\\x";
+                spr << (ch < 0xF ? '0' : '1');
+                ch &= 0xF;
+                spr << (ch < 9 ? '0' + ch : 'a' + ch - 9);
+                return true;
+            }
+    }
+    return false;
+}
+
+template <typename OutputT>
+inline void toUnicodeSeq(alt_char_t wch, OutputT& spr)
+{
+    if (wch < 0x10000)
+    {
+        spr << "\\u";
+        char u_code[5];
+        for (int ix=3; ix>=0; --ix)
+        {
+            char ch =  static_cast<char>(wch & 0xF);
+            u_code[ix] = (ch < 9 ? '0' + ch : 'a' + ch - 9);
+            wch >>= 4;
+        }
+        u_code[4] = '\0';
+        spr << (const char*) &(u_code[0]);
+    }
+    else
+    {
+        spr << "\\U";
+        char u_code[9];
+        for (int ix=7; ix>=0; --ix)
+        {
+            char ch =  static_cast<char>(wch & 0xF);
+            u_code[ix] = (ch < 9 ? '0' + ch : 'a' + ch - 9);
+            wch >>= 4;
+        }
+        u_code[8] = '\0';
+        spr << (const char*) &(u_code[0]);
+    }
+}
+
+void uCharToFormattedString(alt_char_t wch, StrBuf& buffer)
+{
+    StrPrint spr(buffer);
+    spr << '\'';
+    if (!toEscapeSeq(wch, spr))
+    {
+        if (wch < 0x100)
+        {
+            spr << static_cast<char>(wch);
+        }
+        else
+        {
+            toUnicodeSeq(wch, spr);
+        }
+    }
+    spr << '\'';
+    spr << '\0';
+}
+
+void u8StrToFormattedString(const char* u8_str, std::string& res, bool use_unicode_seq)
+{
+	StrPrint spr(res); 
+    spr << '"';
+    const char* cp = u8_str;
+    char ch=*cp++;
+
+	while(*cp)
+	{
+        if (!toEscapeSeq(*cp, spr))
+        {
+            if (use_unicode_seq)
+            {
+                if (*cp < 0x100)
+                {
+                    spr << *cp++;
+                }
+                else
+                {
+                    alt_char_t wch;
+                    cp += scanUTF8String(cp, wch);
+                    toUnicodeSeq(wch, spr);
+                }
+            }
+            else
+            {
+                spr << *cp++;
+            }
+        }
+        else
+        {
+		    ++cp;
+        }
+	}
+    spr << '"';
 }
 
 } // namespace alt

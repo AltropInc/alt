@@ -115,7 +115,6 @@ void StrPoolBase::dump()
 }
 #endif
 #ifdef TEST_BUILD
-//#include "SortedArray.h"
 int main (void)
 {
     StrPoolSpinLocked strpool(24);
@@ -128,16 +127,6 @@ int main (void)
     std::cout << "waiting for second to finish..." << std::endl;
     thread2.join();
     strpool.dump();
-   /*
-    alt::SortedArray<int> ar(4);
-    ar.insert(3);
-    ar.insert(9);
-    ar.insert(7);
-    ar.insert(1);
-    ar.insert(4);
-    //ar.insert(4);
-    //ar.print();
-    */
     return 0;
 }
 

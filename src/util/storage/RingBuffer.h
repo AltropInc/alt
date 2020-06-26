@@ -1,8 +1,8 @@
 #pragma once
-#include <util/sysinfo/Platform.h>
+#include <util/system/Platform.h>
 #include <util/numeric/Intrinsics.h>
 #include <util/ipc/SharedMemory.h>
-#include <util/sysinfo/SysConfig.h>
+#include <util/system/SysConfig.h>
 #include <sys/uio.h>
 #include <atomic>
 #include <stdlib.h>
@@ -15,7 +15,7 @@ namespace alt {
  * \class RingBuffer
  * \brief implements a lock-free circular buffer for single writer/single reader
  */
-class RingBuffer
+class ALT_UTIL_PUBLIC RingBuffer
 {
   public:
 
@@ -93,8 +93,9 @@ class RingBuffer
     /// \note commitRead must be called after the all fetchs are done.
     size_t fetchNext(struct iovec* iov,  size_t n);
 
-    /// \brief commit read after fetch. Read position will be advanced to discard fetched bytes.
-    void commitRead();
+    /// \brief commit read after fetch. Read position will be advanced to discard commited bytes.
+    /// \param uncommited numberof bytes uncommited in fetch
+    void commitRead(size_t uncommited);
 
     /// \brief copy n bytes in the buffer into buf. Read position will be advanced to discard
     /// copied bytyes
@@ -104,6 +105,15 @@ class RingBuffer
     /// contains bytes less than n
 	size_t read(char* buf, size_t n);
 
+    /// \brief get free space for write
+    /// \param iov vector to holds the free spaces in the buffer. If the buffer is empty,
+    /// both write_pos_ and read_pos_ will be reset to 0.
+    size_t fetchFreeSpace(struct iovec* iov);
+
+    /// \brief commite the written bytes after calling fetchFreeSpace
+    /// \param commited number of bytes written.
+    void commitWrite(size_t commited);
+
     /// \brief returns number of unread bytes written in the buffer
     size_t size() const;
 
@@ -112,6 +122,9 @@ class RingBuffer
 
     /// \brief check free space for write
     bool hasFreeSpace(size_t required_non_split_space, size_t required_space) const;
+
+    /// \return true of the buffer is empty
+    bool empty() const;
 
   protected:
     RingBuffer(RingBuffer &) = delete;
@@ -143,14 +156,13 @@ class RingBuffer
 
 /**
  * \class RingStreamBuffer
- * \brief implements a lock-free circular stream buffer for single writer/single reader
+ * \brief implements a lock-free circular message buffer for single writer/single reader
  * \tparam MsgSizeType Message length type.
- * \note This can be used for stream messages such as TCP message. Each stream message
- * is placed in the buffer and prefixed with an integer in MsgSizeType to indicate the
- * length of the message
+ * \note Each message is placed in the buffer and prefixed with an integer in MsgSizeType
+ *  to indicate the length of the message
  */
 template<typename MsgSizeType>
-class RingStreamBuffer: public RingBuffer
+class RingMsgBuffer: public RingBuffer
 {
   public:
     
@@ -211,7 +223,7 @@ class RingStreamBuffer: public RingBuffer
         {
             memcpy(payload+iov[0].iov_len, iov[1].iov_base, iov[1].iov_len);
         }
-        commitRead();
+        commitRead(0);
         return payload_len;
     }
 
@@ -231,20 +243,23 @@ class RingStreamBuffer: public RingBuffer
 };
 
 /**
- * \class RingMsgBuffer
- * \brief implements a lock-free circular message buffer for single writer/single reader
+ * \class RingTypedMsgBuffer
+ * \brief implements a single writer/single reader, lock-free circular buffer for
+ * nessages with a header to for type id.
  * \tparam MsgHeaderT Message Header type. It must be packed struct that follows the example
  * as shown below:
  *      struct __attribute__ ((packed)) MessageHeader
  *      {
  *          using MsgSizeType = uint16_t;  // message size type
- *          MsgSizeType payloadLenth() { return length_; }
- * 
+ *          MsgSizeType length() { return length_; }
  *          MsgSizeType         length_;   // header: payload length, excluding this field
+ *                                         // LengthPayloadOnly is true
  *      };
+ * \tparam LengthPayloadOnly True if the length in header is for payload only, otherwise
+ * the length is the size of the message structire including the length field
  */
-template<typename MsgHeaderT>
-class RingMsgBuffer: public RingBuffer
+template<typename MsgHeaderT, bool LengthPayloadOnly =true>
+class RingTypedMsgBuffer: public RingBuffer
 {
   public:
     using RingBuffer::RingBuffer;
@@ -255,7 +270,10 @@ class RingMsgBuffer: public RingBuffer
     bool write(const MsgHeaderT* msg)
     {
         // do not split data on wrap
-        return RingBuffer::write (msg, msg->payloadLenth()+sizeof(MsgSizeType), false);
+        return RingBuffer::write (
+            msg,
+            LengthPayloadOnly ? msg->length()+sizeof(MsgSizeType) : msg->length(),
+            false);
     }
 
     /// \brief read a message
@@ -269,11 +287,14 @@ class RingMsgBuffer: public RingBuffer
         size_t len = RingBuffer::fetch(iov, sizeof(MsgSizeType));
         if (len==0) return false;
         msg_length = *(reinterpret_cast<MsgSizeType*>(iov[0].iov_base));
-
+        if (!LengthPayloadOnly)
+        {
+            msg_length -= sizeof(MsgSizeType);
+        }
         size_t payload_len = RingBuffer::fetchNext(iov, msg_length);
         if (payload_len==0) return false;
         memcpy(payload, iov[0].iov_base, iov[0].iov_len);
-        commitRead();
+        commitRead(0);
         return true;
     }
 
@@ -288,7 +309,10 @@ class RingMsgBuffer: public RingBuffer
         if (len==0) return nullptr;
         MsgSizeType msg_length;
         msg_length = *(reinterpret_cast<MsgSizeType*>(iov[0].iov_base));
-
+        if (!LengthPayloadOnly)
+        {
+            msg_length -= sizeof(MsgSizeType);
+        }
         struct iovec payload_iov[2];
         size_t payload_len = RingBuffer::fetchNext(payload_iov, msg_length);
         if (payload_len==0) return nullptr;
@@ -297,8 +321,8 @@ class RingMsgBuffer: public RingBuffer
 };
 
 using SharedRingBuffer = SharedContainer<SharedMemory, RingBuffer>;
-template<typename MsgSizeType> using SharedRingStreamBuffer
-    = SharedContainer<SharedMemory, RingStreamBuffer<MsgSizeType>>;
-template<typename MsgHeaderT> using SharedRingMsgBuffer
-    = SharedContainer<SharedMemory, RingMsgBuffer<MsgHeaderT>>;
+template<typename MsgSizeType> using SharedRingMsgBuffer
+    = SharedContainer<SharedMemory, RingMsgBuffer<MsgSizeType>>;
+template<typename MsgHeaderT> using SharedRingTypedMsgBuffer
+    = SharedContainer<SharedMemory, RingTypedMsgBuffer<MsgHeaderT>>;
 }

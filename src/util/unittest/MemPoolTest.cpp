@@ -29,14 +29,14 @@ TEST_CASE( "PooledAllocator", "[PooledAllocator]" )
 {
     alt::PooledAllocator& mem_pool = alt::PooledAllocator::instance();
     size_t count = mem_pool.getTracker().getTotalCount();
-    void * p = tf_malloc(16);
+    void * p = alt_malloc(16);
     REQUIRE(p!=nullptr);
     REQUIRE(mem_pool.getTracker().getTotalCount()==count+1);
     //mem_pool.getTracker().reportMostUsed();
-    tf_free(p);
+    alt_free(p);
     REQUIRE(mem_pool.getTracker().getTotalCount()==count);
     //mem_pool.getTracker().reportMostUsed();
-    auto test = tf_new(alt::MemTest, 2);
+    auto test = alt_new(alt::MemTest, 2);
     REQUIRE(test->getValue()==2);
     REQUIRE(mem_pool.getTracker().getTotalCount()==count+1);
     //mem_pool.getTracker().reportMostUsed();
@@ -45,19 +45,19 @@ TEST_CASE( "PooledAllocator", "[PooledAllocator]" )
     std::vector<alt::MemTest*> vec(10, nullptr);
     for (int i = 0; i<10; ++i)
     {
-        vec[i] = tf_new(alt::MemTest, i);
+        vec[i] = alt_new(alt::MemTest, i);
     }
     REQUIRE(alt::MemTest::instanceCount()==11);
     //mem_pool.getTracker().reportMostUsed();
     REQUIRE(mem_pool.getTracker().getTotalCount()==count+11);
     for (int i = 0; i<10; ++i)
     {
-        tf_del(alt::MemTest, vec[i]);
+        alt_del(alt::MemTest, vec[i]);
     }
     //mem_pool.getTracker().reportMostUsed();
     REQUIRE(alt::MemTest::instanceCount()==1);
     REQUIRE(mem_pool.getTracker().getTotalCount()==count+1);
-    tf_del(alt::MemTest, test);
+    alt_del(alt::MemTest, test);
     REQUIRE(alt::MemTest::instanceCount()==0);
     REQUIRE(mem_pool.getTracker().getTotalCount()==count);
 

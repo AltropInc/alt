@@ -5,10 +5,12 @@ add_executable (UtilTest
     LinkedListTest.cpp
     PooledLinkListTest.cpp
     StringHashMapTest.cpp
-    QueueTest.cpp
+    CoQueueTest.cpp
+    TimerQueueTest.cpp
     TreeNodeTest.cpp
     NamedTreeNodeTest.cpp
     RingBufferTest.cpp
     SortedArrayTest.cpp
+    XmlParserTest.cpp
 )
 target_link_libraries (UtilTest PRIVATE alt_util)

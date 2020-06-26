@@ -6,7 +6,7 @@
 
 namespace alt
 {
-class ALT_CORE_PUBLIC TreeNodeBase: public LinkedNode
+class ALT_UTIL_PUBLIC TreeNodeBase: public LinkedNode
 {
   protected:
     TreeNodeBase*           parent_  {nullptr};
@@ -35,6 +35,8 @@ class ALT_CORE_PUBLIC TreeNodeBase: public LinkedNode
     TreeNodeBase* lastChild() { return static_cast<TreeNodeBase*>(children_.back()); }
     const TreeNodeBase* firstChild() const  { return static_cast<const TreeNodeBase*>(children_.front()); }
     const TreeNodeBase* lastChild() const { return static_cast<const TreeNodeBase*>(children_.back()); }
+    TreeNodeBase* nthChild(int n) { return static_cast<TreeNodeBase*>(children_.nthNode(n)); }
+    const TreeNodeBase* nthChild(int n) const { return static_cast<const TreeNodeBase*>(children_.nthNode(n)); }
 
     TreeNodeBase* nextSibling() { return static_cast<TreeNodeBase*>(next()); }
     TreeNodeBase* prevSibling() { return static_cast<TreeNodeBase*>(prev()); }
@@ -62,6 +64,7 @@ class ALT_CORE_PUBLIC TreeNodeBase: public LinkedNode
     bool isMyOffspring (const TreeNodeBase * n) const;	// not include me!
     bool isMyAncestor (const TreeNodeBase * n) const;	// not include me!
     bool isMySibling (const TreeNodeBase * n) const;	// include me!
+    bool isAncestorOf (const TreeNodeBase * n) const { return isMyOffspring(n); }
     TreeNodeBase * leastCommonAncestor (TreeNodeBase * n, TreeNodeBase* root=nullptr);  
 
     /// \return Range between this node and the node at the given
@@ -212,13 +215,13 @@ class TreeNode: public TreeNodeBase
     template <typename T, typename... Args>
     static T* create(Args&&... args)
     {
-        return  tf_pnew(allocator_, T, std::forward<Args>(args)...);
+        return  alt_pnew(allocator_, T, std::forward<Args>(args)...);
     }
 
     template <typename T, typename... Args>
     T* newChild(Args&&... args)
     {
-       auto chd = tf_pnew(allocator_, T, std::forward<Args...>(args...));
+       auto chd = alt_pnew(allocator_, T, std::forward<Args...>(args...));
        appendChild(chd);
        return chd;
     }
@@ -226,7 +229,7 @@ class TreeNode: public TreeNodeBase
     template <typename T, typename... Args>
     T* newChildFront(Args&&... args)
     {
-        T* chd =  tf_pnew(allocator_, T, std::forward<Args>(args)...);
+        T* chd =  alt_pnew(allocator_, T, std::forward<Args>(args)...);
         appendChild(nullptr, chd);
         return chd;
     }
@@ -234,7 +237,7 @@ class TreeNode: public TreeNodeBase
     template <typename T, typename... Args>
     T* newChildBefore(TreeNodeBase* position, Args&&... args)
     {
-        T* chd =  tf_pnew(allocator_, T, std::forward<Args>(args)...);
+        T* chd =  alt_pnew(allocator_, T, std::forward<Args>(args)...);
         insertChild(position, chd);
         return chd;
     }
@@ -242,16 +245,16 @@ class TreeNode: public TreeNodeBase
     template <typename T, typename... Args>
     T* newChildAfter(TreeNodeBase* position, Args&&... args)
     {
-        T* chd =  tf_pnew(allocator_, T, std::forward<Args>(args)...);
+        T* chd =  alt_pnew(allocator_, T, std::forward<Args>(args)...);
         appendChild(position, chd);
         return chd;
     }
 
     static TreeNode* releaseNode(TreeNode* node)
     {
-        TreeNode* next = static_cast<TreeNode*>(node->extract());
+        TreeNode* next = static_cast<TreeNode*>(node->detach());
         node->eraseChildren();
-        tf_pdel(allocator_, TreeNode, node);
+        alt_pdel(allocator_, TreeNode, node);
         return next;
     }
 
@@ -263,7 +266,7 @@ class TreeNode: public TreeNodeBase
         {
             next = static_cast<TreeNode*>(n->next_);
             n->eraseChildren();
-            tf_pdel(allocator_, TreeNode, n);
+            alt_pdel(allocator_, TreeNode, n);
         }
     }
 
@@ -278,7 +281,7 @@ class TreeNode: public TreeNodeBase
     {
         TreeNode* next = static_cast<TreeNode*>(extractChild(node));
         node->eraseChildren();
-        tf_pdel(allocator_, TreeNode, node);
+        alt_pdel(allocator_, TreeNode, node);
         return next;
     }
 

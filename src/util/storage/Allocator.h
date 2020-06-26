@@ -8,103 +8,6 @@
 
 namespace alt
 {
-
-#if 0
-
-/**
- * \brief Fixed Pool Allocator using fixed pool for std (homogeneous) container
- */
-template <class T, size_t growNum = 100>
-class StdFixedPoolAllocator : private FixedPool<T, growNum>
-{
-#if defined(_WIN32) || defined (__CYGWIN__)
-    StdFixedPoolAllocator *copyAllocator = nullptr;
-    std::allocator<T> *rebindAllocator = nullptr;
-#endif
-
-  public:
-
-    using size_type = std::size_t;
-    using difference_type = std::ptrdiff_t;
-    using value_type = T;
-
-    typedef T *pointer;
-    typedef const T *const_pointer;
-    typedef T &reference;
-    typedef const T &const_reference;
-
-    template <class U>
-    struct rebind
-    {
-        typedef StdFixedPoolAllocator<U, growNum> other;
-    };
-
-#if defined(_WIN32) || defined (__CYGWIN__)
-    StdFixedPoolAllocator() = default;
-
-    StdFixedPoolAllocator(const StdFixedPoolAllocator &allocator) :
-            copyAllocator(&allocator)
-    {
-    }
-
-    template <class U>
-    StdFixedPoolAllocator(const StdFixedPoolAllocator<U, growNum> &other)
-    {
-        if (!std::is_same<T, U>::value)
-            rebindAllocator = new std::allocator<T>();
-    }
-
-    ~StdFixedPoolAllocator()
-    {
-        delete rebindAllocator;
-    }
-#endif
-
-    pointer allocate(size_type n, const void *hint = 0)
-    {
-#if defined(_WIN32) || defined (__CYGWIN__)
-        if (copyAllocator)
-            return copyAllocator->allocate(n, hint);
-
-        if (rebindAllocator)
-            return rebindAllocator->allocate(n, hint);
-#endif
-
-        if (n != 1 || hint)
-            throw std::bad_alloc();
-
-        return FixedPool<T, growNum>::acq();
-    }
-
-    void deallocate(pointer p, size_type n)
-    {
-#if defined(_WIN32) || defined (__CYGWIN__)
-        if (copyAllocator) {
-            copyAllocator->deallocate(p, n);
-            return;
-        }
-
-        if (rebindAllocator) {
-            rebindAllocator->deallocate(p, n);
-            return;
-        }
-#endif
-
-        FixedPool<T, growNum>::del(p);
-    }
-
-    void construct(pointer p, const_reference val)
-    {
-        new (p) T(val);
-    }
-
-    void destroy(pointer p)
-    {
-        p->~T();
-    }
-};
-#endif
-
 //-----------------------------------------------------------------------------
 // Memory tracker for debug
 //-----------------------------------------------------------------------------
@@ -127,7 +30,9 @@ class MemTracker
 /**
  * \class FixedMemPoolBin
  * \brief a set of FixedMemPool arranged in different slot sizes. Allocations
- * happen in a selected FixedMemPool (bin) based on the required size
+ * happen in a selected FixedMemPool (bin) based on the required size. This is
+ * used for allocating heterogeneous containers in fixed pools. This uses a shared
+ * set of fixed memory pools, so it is mutex protected for multiple thread usage.
  */
 class FixedMemPoolBin
 {
@@ -138,16 +43,16 @@ class FixedMemPoolBin
 
     static FixedMemPoolBin& instance();
 
-    void* alloc(size_t entry_size) noexcept(false);
-    void free(void* p) noexcept(false);
+    void* allocate(size_t entry_size) noexcept(false);
+    void deallocate(void* p) noexcept(false);
 
 #if defined MEM_POOL_DEBUG
     const MemTracker& getTracker() const { return tracker_; }
     MemTracker& getTracker() { return tracker_; }
 
-	void * alloc(size_t entry_size, const char *file, int line)  noexcept(false)
+	void * allocate(size_t entry_size, const char *file, int line)  noexcept(false)
     {
-        void * res = alloc(entry_size);
+        void * res = allocate(entry_size);
         if (res) tracker_.track (res, file, line);
         return res;
     }
@@ -155,8 +60,8 @@ class FixedMemPoolBin
 
     ~FixedMemPoolBin();
 
-    void free(size_t bin, void* p) noexcept(false);
-    void* alloc(size_t bin, size_t entry_size) noexcept(false);
+    void deallocate(size_t bin, void* p) noexcept(false);
+    void* allocate(size_t bin, size_t entry_size) noexcept(false);
 
   private:
 #if defined MEM_POOL_DEBUG
@@ -164,11 +69,15 @@ class FixedMemPoolBin
 #endif
 
     FixedMemPool* pools_ [POOL_NUMBER] {nullptr};
+    std::mutex                         pools_mutex_;
 };
 
 /**
- * \brief Fixed Pool Allocator for std like (homogeneous) containers such as std::list,
- * std::map and std::unordered_map
+ * \brief Fixed Pool Allocator for std containers such as std::list, std::map and 
+ * std::unordered_map. Most std containers are homogeneous containers, i.e. have
+ * a fixed element type, but internally allocated memory are not in the same size
+ * due to auxiliary structures allocated for connecting elements. Therefore,
+ * a set of fixed pools is required to accomplish the allocation.
  */
 template <class T>
 class StdFixedPoolAllocator
@@ -202,12 +111,12 @@ class StdFixedPoolAllocator
     {
         // if (n != 1 || hint) throw std::bad_alloc();
         // Allocate n number of T instances
-        return reinterpret_cast<pointer>(fixed_mem_pools_.alloc(n * sizeof(T)));
+        return reinterpret_cast<pointer>(fixed_mem_pools_.allocate(n * sizeof(T)));
     }
 
     void deallocate(pointer p, size_type n)
     {
-        fixed_mem_pools_.free(p);
+        fixed_mem_pools_.deallocate(p);
     }
 
     void construct(pointer p, const_reference val)
@@ -230,14 +139,15 @@ class StdFixedPoolAllocator
 
 /**
  * \class PooledAllocator
- * \brief Allocator using FixedMemPool for (hetergeneous) non standard containers
- * such as alt::LinkedList and alt::TreeNode
+ * \brief Allocator using FixedMemPool for (heterogeneous) non standard containers
+ * such as alt::LinkedList, alt::CoQueue and alt::TreeNode.
  */
 class PooledAllocator
 {
   public:
 
     static PooledAllocator& instance();
+
     PooledAllocator() : fixed_mem_pools_(FixedMemPoolBin::instance()) {};
     PooledAllocator(FixedMemPoolBin& pools) : fixed_mem_pools_(pools) {};
     
@@ -247,7 +157,7 @@ class PooledAllocator
         //constexpr size_t sz_aligned = constAlign(sizeof(T),8);
         static_assert (sizeof(T) <= FixedMemPoolBin::MAX_VALUE_SIZE);
         //constexpr uint32_t pool_index = sz_aligned <= 8 ? 0 : constLog2(sz_aligned-1) - 2;
-        void *p = fixed_mem_pools_.alloc(sizeof(T));
+        void *p = fixed_mem_pools_.allocate(sizeof(T));
         return p ? new(p)T(std::forward<Args>(args)...) : (T*)nullptr;
     }
 
@@ -256,15 +166,15 @@ class PooledAllocator
     {
         if (p)
         {
-            constexpr size_t sz_aligned = constAlign(sizeof(T),8);
-            constexpr uint32_t pool_index = sz_aligned <= 8 ? 0 : constLog2(sz_aligned-1) - 2;
+            //constexpr size_t sz_aligned = constAlign(sizeof(T),8);
+            //constexpr uint32_t pool_index = sz_aligned <= 8 ? 0 : constLog2(sz_aligned-1) - 2;
             p->~T();
-            fixed_mem_pools_.free(pool_index, (void*)p);
+            fixed_mem_pools_.deallocate((void*)p);
         }
     }
 
-    void* alloc(size_t sz) noexcept(false) { return fixed_mem_pools_.alloc(sz); }
-    void free(void* p) noexcept(false) { return fixed_mem_pools_.free(p); }
+    void* allocate(size_t sz) noexcept(false) { return fixed_mem_pools_.allocate(sz); }
+    void deallocate(void* p) noexcept(false) { return fixed_mem_pools_.deallocate(p); }
 
 #if defined MEM_POOL_DEBUG
     template <typename T, typename... Args>
@@ -275,9 +185,9 @@ class PooledAllocator
         return res;
     }
 
-	void * alloc(size_t entry_size, const char *file, int line)  noexcept(false)
+	void * allocate(size_t entry_size, const char *file, int line)  noexcept(false)
     {
-        return fixed_mem_pools_.alloc(entry_size, file, line);
+        return fixed_mem_pools_.allocate(entry_size, file, line);
     }
 
     const MemTracker& getTracker() const { return fixed_mem_pools_.getTracker(); }
@@ -292,14 +202,13 @@ class PooledAllocator
 /**
  * \class Allocator
  * \brief Allocator using malloc and free non standard containers
- * such as alt::LinkedList and alt::TreeNode
+ * such as alt::LinkedList, alt::CoQueue and alt::TreeNode.
  */
 class Allocator
 {
   public:
 
     static Allocator& instance();
-    Allocator() {}
 
     static void* allocate(size_t entry_size)
     {
@@ -343,7 +252,7 @@ class Allocator
         return res;
     }
 
-    const MemTracker& getTracker() const { return tracker_; }
+    static const MemTracker& getTracker() { return tracker_; }
 #endif
 
   private:
@@ -353,25 +262,73 @@ class Allocator
 #endif
 };
 
+
+/**
+ * \class PAllocator
+ * \brief Allocator using PooledAllocator::instance()
+ */
+class PAllocator
+{
+  public:
+
+    static void* allocate(size_t entry_size)
+    {
+        return PooledAllocator::instance().allocate(entry_size);
+    }
+
+    static void deallocate(void* p)
+    {
+        PooledAllocator::instance().deallocate(p);
+    }
+    
+    template <typename T, typename... Args>
+    static T* acq(Args... args) noexcept(false)
+    {
+        void *p = allocate(sizeof(T));
+        return p ? new(p)T(args...) : (T*)nullptr;
+    }
+
+    template <typename T>
+    static void del(T* p) noexcept(false)
+    {
+        if (p) { p->~T(); deallocate((void*)p); }
+    }
+
+#if defined MEM_POOL_DEBUG
+	static void * allocate(size_t entry_size, const char *file, int line)  noexcept(false)
+    {
+        return PooledAllocator::instance().allocate(entry_size, file, line);
+    }
+
+    template <typename T, typename... Args>
+    static T* acq(const char *file, int line, Args... args) noexcept(false)
+    {
+        return PooledAllocator::instance().acq(file, line, args...);
+    }
+
+    static const MemTracker& getTracker() { return PooledAllocator::instance().getTracker(); }
+#endif
+};
+
 } // name space alt
 
 namespace {
 
 #if defined MEM_POOL_DEBUG
-#define tf_malloc(len) alt::PooledAllocator::instance().alloc(len,__FILE__,__LINE__)
-#define tf_new(T,...) alt::PooledAllocator::instance().template acq<T>(__FILE__,__LINE__,__VA_ARGS__)
-#define tf_palloc(pool,len) pool.alloc(len,__FILE__,__LINE__)
-#define tf_pnew(pool, T,...) pool.template acq<T>(__FILE__,__LINE__,__VA_ARGS__)
+#define alt_malloc(len) alt::PooledAllocator::instance().allocate(len,__FILE__,__LINE__)
+#define alt_new(T,...) alt::PooledAllocator::instance().template acq<T>(__FILE__,__LINE__,__VA_ARGS__)
+#define alt_palloc(pool,len) pool.allocate(len,__FILE__,__LINE__)
+#define alt_pnew(pool, T,...) pool.template acq<T>(__FILE__,__LINE__,__VA_ARGS__)
 #else
-#define tf_malloc(len) alt::PooledAllocator::instance().alloc(len,)
-#define tf_new(T,...) alt::PooledAllocator::instance().template acq<T>(__VA_ARGS__)
-#define tf_palloc(pool,len) pool.alloc(len)
-#define tf_pnew(pool,T,...) pool.template acq<T>(__VA_ARGS__)
+#define alt_malloc(len) alt::PooledAllocator::instance().allocate(len,)
+#define alt_new(T,...) alt::PooledAllocator::instance().template acq<T>(__VA_ARGS__)
+#define alt_palloc(pool,len) pool.allocate(len)
+#define alt_pnew(pool,T,...) pool.template acq<T>(__VA_ARGS__)
 #endif
-#define tf_free(p) alt::PooledAllocator::instance().free(p)
-#define tf_del(T, p) alt::PooledAllocator::instance().template del<T>(p)
-#define tf_pfree(pool,p) pool.free(p)
-#define tf_pdel(pool,T, p) pool.template del<T>(p)
+#define alt_free(p) alt::PooledAllocator::instance().deallocate(p)
+#define alt_del(T, p) alt::PooledAllocator::instance().template del<T>(p)
+#define alt_pfree(pool,p) pool.deallocate(p)
+#define alt_pdel(pool,T, p) pool.template del<T>(p)
 }
 
  

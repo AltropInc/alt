@@ -1,6 +1,7 @@
 #pragma once
 
-#include <util/sysinfo/Platform.h>
+#include <util/system/Platform.h>
+#include <util/Defs.h>              // for ALT_UTIL_PUBLIC
 #include "Allocator.h"
 
 #include <functional>
@@ -17,7 +18,7 @@ class LinkedListBase;
  * \ingroup ContainerUtils
  * \brief A doubly linked node
  */
-struct ALT_CORE_PUBLIC LinkedNode
+struct ALT_UTIL_PUBLIC LinkedNode
 {
     using Pair = std::pair<LinkedNode*, LinkedNode*>;
 
@@ -30,7 +31,7 @@ struct ALT_CORE_PUBLIC LinkedNode
     const LinkedNode* prev() const { return prev_; }
 
     /// \brief extract this node from neighbors
-    LinkedNode* extract();
+    void extract();
 
     /// \brief extract linked nodes from this to util node
     /// \param util The last node in the link to be extracted. If it is
@@ -65,14 +66,18 @@ struct ALT_CORE_PUBLIC LinkedNode
     /// \return positive distance if this is behind node, or negative distance
     /// if this is ahead of node. 0 if this==node. std::numeric_limits<int>::max()
     /// if node is not linked with this
-    int distance(LinkedNode* node);
+    int distance(LinkedNode* node) const;
+
+    /// \brief Get the order of the node in the chain.
+    /// \return the order of the node in the chain
+    int order() const;
 
     /// \brief Count the number of nodes linked with this node.
     size_t length() const;
 
-    /// \return Range betwwen this node and the node at the given
+    /// \return Range between this node and the node at the given
     /// distance at most. If the distance is negative, the range is
-    /// betwwen the node at the distance and this node.
+    /// between the node at the distance and this node.
     Pair range(int distance);
 
     /// \return Range between the node at distance at most before this node
@@ -89,10 +94,10 @@ struct ALT_CORE_PUBLIC LinkedNode
  * \class LinkedListBase
  * \ingroup ContainerUtils
  * \brief A base class doubly linked list to hold a set of doubly linked nodes.
- * Unlike std::list, this list conatins a set of heterogeneous nodes without
- * using pointer polumorphism, which enables a more efficent memory management.
+ * Unlike std::list, this list contains a set of heterogeneous nodes without
+ * using pointer polymorphism, which enables a more efficient memory management.
  */ 
-class ALT_CORE_PUBLIC LinkedListBase
+class ALT_UTIL_PUBLIC LinkedListBase
 {
   protected:
     LinkedNode*  head_   {nullptr};
@@ -167,6 +172,10 @@ class ALT_CORE_PUBLIC LinkedListBase
     /// \return The last node in the list
     LinkedNode* back() { return tail_; }
     const LinkedNode* back() const { return tail_; }
+
+    /// \return The nth node of the list
+    LinkedNode* nthNode(int n);
+    const LinkedNode* nthNode(int n) const;
 
     ///@{
     /** Push functions */
@@ -392,19 +401,22 @@ class ALT_CORE_PUBLIC LinkedListBase
     void merge(predicate pred, LinkedListBase& other);
 
     /// \brief merge the nodes from the first to the last in the other list into this list by pred.
-    void merge(predicate pred, LinkedListBase& other, LinkedNode* first, LinkedNode* lalst);
+    void merge(predicate pred, LinkedListBase& other, LinkedNode* first, LinkedNode* last);
     ///@}
 };
 
 //-----------------------------------------------------------------------------
-// LinkedList
+// Heterogeneous LinkedList
 //-----------------------------------------------------------------------------
 /**
  * \class LinkedList
  * \ingroup ContainerUtils
- * \brief Template for doubly linked list using the given memory allocation type
+ * \brief Template for doubly linked list of nodes in different types stored in
+ * the given memory allocation type
  * \tparam Alloc type for memory allocator. The default allocator is the one using
- * C mallc/free. see Allocator.h. 
+ * C malloc/free. see Allocator.h.
+ * \note This class differs from std::list in that linked nodes are in different
+ * types and sizes.
  */ 
 template <class Alloc = Allocator>
 class LinkedList: public LinkedListBase
@@ -413,18 +425,20 @@ class LinkedList: public LinkedListBase
 
   public:
 
+    MOVEONLY(LinkedList);
+
     LinkedList(Alloc& allocator=Alloc::instance()): allocator_(allocator) {};
 
-    LinkedList(LinkedList && other) :
-        LinkedListBase(static_cast<LinkedList&&>(other)), allocator_(other.allocator_)
-        {}
-
-    LinkedList(LinkedList & other) = delete;
+    void swap(LinkedList& other)
+    {
+        LinkedListBase::swap(other);
+        allocator_ = other.allocator_;
+    }
 
     template <typename T, typename... Args>
     T* emplaceBack(Args&&... args)
     {
-        T* node =  tf_pnew(allocator_, T, std::forward<Args>(args)...);
+        T* node =  alt_pnew(allocator_, T, std::forward<Args>(args)...);
         pushBack(node);
         return node;
     }
@@ -432,7 +446,7 @@ class LinkedList: public LinkedListBase
     template <typename T, typename... Args>
     T* emplaceFront(Args&&... args)
     {
-        T* node =  tf_pnew(allocator_, T, std::forward<Args>(args)...);
+        T* node =  alt_pnew(allocator_, T, std::forward<Args>(args)...);
         pushFront(node);
         return node;
     }
@@ -440,7 +454,7 @@ class LinkedList: public LinkedListBase
     template <typename T, typename... Args>
     T* emplace(LinkedNode* position, Args&&... args)
     {
-        T* node =  tf_pnew(allocator_, T, std::forward<Args>(args)...);
+        T* node =  alt_pnew(allocator_, T, std::forward<Args>(args)...);
         insert(position, node);
         return node;
     }
@@ -448,7 +462,7 @@ class LinkedList: public LinkedListBase
     template <typename T, typename... Args>
     T* emplaceAfter(LinkedNode* position, Args&&... args)
     {
-        T* node =  tf_pnew(allocator_, T, std::forward<Args>(args)...);
+        T* node =  alt_pnew(allocator_, T, std::forward<Args>(args)...);
         append(position, node);
         return node;
     }
@@ -456,13 +470,13 @@ class LinkedList: public LinkedListBase
     template <typename T, typename... Args>
     T* create(Args&&... args)
     {
-       return tf_pnew(allocator_, T, std::forward<Args>(args)...);
+       return alt_pnew(allocator_, T, std::forward<Args>(args)...);
     }
 
     LinkedNode* erase(LinkedNode* node)
     {
         LinkedNode* next = extract(node);
-        tf_pdel(allocator_, LinkedNode, node);
+        alt_pdel(allocator_, LinkedNode, node);
         return next;
     }
 
@@ -473,7 +487,7 @@ class LinkedList: public LinkedListBase
         for (auto n = node; n; n = next)
         {
             next = n->next_; // extract(n);
-            tf_pdel(allocator_, LinkedNode, n);
+            alt_pdel(allocator_, LinkedNode, n);
         }
     }
 
@@ -502,7 +516,213 @@ class LinkedList: public LinkedListBase
     }
 };
 
+/**
+ * \class PooledLinkList
+ * \ingroup ContainerUtils
+ * \brief  Doubly linked list of nodes in different types stored in memory pool.
+*/
 using PooledLinkList = LinkedList<PooledAllocator>;
+
+//-----------------------------------------------------------------------------
+// homogeneous linked list using fixed pool
+//-----------------------------------------------------------------------------
+/**
+ * \class FixPooledLinkList
+ * \ingroup ContainerUtils
+ * \brief A linked list of nodes of a fixed type in fixed memory pool.
+ * \tparam ValueType the type of the value in the linked node
+ * \tparam BucketSize the size of the bucket of the fixed memory pool.
+ * \note This class is similar to std::list<ValueType, alt::StdFixedPoolAllocator<ValueType>>,
+ * but has the following advantages:
+ *    - less fragments because link pointers are packed together with the value
+ *    - less cache misses because it uses a single fixed pool
+ *    - choice of pool: you can provide dedicated fixed pool instead of using the singleton
+ *      of the memory pool shared with all others
+ *    - much more efficient and compact
+ */
+template <typename ValueType, size_t BucketSize=1024>
+class FixPooledLinkList: public LinkedListBase
+{
+  public:
+
+    struct NodeType : public LinkedNode
+    {
+        template <typename... Args>
+        NodeType(Args&&... args) : value_(std::forward<Args>(args)...) {}
+        
+        NodeType(const ValueType& value) : value_(value) {}
+
+        NodeType* next() { return reinterpret_cast<NodeType*>(next_); }
+        const NodeType* next() const { return reinterpret_cast<const NodeType*>(next_); }
+        NodeType* prev() { return reinterpret_cast<NodeType*>(prev_); }
+        const NodeType* prev() const { return reinterpret_cast<const NodeType*>(prev_); }
+
+        ValueType      value_;
+    };
+  
+    using value_type = ValueType;
+    using node_type = NodeType;
+    using allocator_type = FixedPool<NodeType, BucketSize>;
+
+    NONCOPYABLE(FixPooledLinkList);
+
+    FixPooledLinkList(allocator_type* pool=nullptr) : pool_(pool)
+    {
+        if (!pool_)
+        {
+            pool_ = new allocator_type();
+            owns_pool_ = true;
+        }
+    };
+
+    ~FixPooledLinkList()
+    {
+        clear();
+        if (owns_pool_)
+        {
+            delete pool_;
+        }
+    }
+
+    allocator_type* getPool() { return pool_; }
+
+    template <typename... Args>
+    NodeType* create(Args&&... args)
+    {
+        if (owns_pool_)
+        {
+            return pool_->acq(std::forward<Args>(args)...);
+        }
+        return pool_->coAcq(std::forward<Args>(args)...);
+    }
+
+    void release(NodeType* node)
+    {
+        if (owns_pool_)
+        {
+            pool_->del(node);
+        }
+        else
+        {
+            pool_->coDel(node);
+        }
+    }
+
+    template <typename... Args>
+    NodeType* emplaceBack(Args&&... args)
+    {
+        NodeType* node = pool_->acq(std::forward<Args>(args)...);
+        pushBack(node);
+        return node;
+    }
+
+    template <typename... Args>
+    NodeType* emplaceFront(Args&&... args)
+    {
+        NodeType* node = pool_->acq(std::forward<Args>(args)...);
+        pushFront(node);
+        return node;
+    }
+
+    template <typename... Args>
+    NodeType* emplace(NodeType* position, Args&&... args)
+    {
+        NodeType* node =  pool_->acq(std::forward<Args>(args)...);
+        insert(position, node);
+        return node;
+    }
+
+    template <typename... Args>
+    NodeType* emplaceAfter(NodeType* position, Args&&... args)
+    {
+        NodeType* node = pool_->acq(std::forward<Args>(args)...);
+        append(position, node);
+        return node;
+    }
+
+    // node is already extracted
+    void releaseNode(NodeType* node)
+    {
+        NodeType* next{nullptr};
+        for (auto n = node; n; n = next)
+        {
+            next = n->next(); // extract(n);
+            release(node);
+        }
+    }
+
+    NodeType* extract(NodeType* node)
+    {
+        return reinterpret_cast<NodeType*>(LinkedListBase::extract(node));
+    }
+
+    NodeType* erase(NodeType* node)
+    {
+        NodeType* next = extract(node);
+        release(node);
+        return reinterpret_cast<NodeType*>(next);
+    }
+
+    NodeType* erase(NodeType* from, NodeType* to)
+    {
+        auto next = extract(from, to);
+        releaseNode(from);
+        return reinterpret_cast<NodeType*>(next);
+    }
+
+    NodeType* erase(NodeType* from, size_t n)
+    {
+        auto next = extract(from, n);
+        releaseNode(from);
+        return reinterpret_cast<NodeType*>(next);
+    }
+
+    NodeType* find(const value_type& val)
+    {
+        for (auto & n: *this)
+        {
+            if (n->value_==val)
+            {
+                return n;
+            }
+        }
+        return nullptr;
+    }
+
+    bool erase(const value_type& val)
+    {
+        NodeType* node = find(val);
+        if (node)
+        {
+            erase(node);
+            return true;
+        }
+        return false;
+    }
+
+    NodeType* popFront() { return reinterpret_cast<NodeType*>(erase(front())); }
+
+    void popBack() { erase(back()); }
+    
+        /// \return The first node of the list
+    NodeType* front() { return reinterpret_cast<NodeType*>(head_); }
+    const NodeType* front() const { return reinterpret_cast<NodeType*>(head_); }
+
+    /// \return The last node in the list
+    NodeType* back() { return reinterpret_cast<NodeType*>(tail_); }
+    const NodeType* back() const { return reinterpret_cast<NodeType*>(tail_); }
+
+    /// \brief delete all nodes
+    void clear()
+    {
+        auto head = LinkedListBase::extract();
+        releaseNode(reinterpret_cast<NodeType*>(head));
+    }
+
+  private:
+    allocator_type *    pool_ {nullptr};
+    bool                owns_pool_ {false};
+};
 
 }
 

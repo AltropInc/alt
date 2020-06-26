@@ -1,13 +1,14 @@
 #pragma once
 
-#include <util/sysinfo/Platform.h>
+#include <util/system/Platform.h>
+#include <util/Defs.h>                 // for ALT_UTIL_PUBLIC
 #include <util/numeric/Intrinsics.h>
 #include <util/ipc/SharedMemory.h>
-#include <util/sysinfo/Platform.h>
-#include <util/sysinfo/SysConfig.h>     // for CACHE_LINE_ALIGN
+#include <util/system/SysConfig.h>     // for CACHE_LINE_ALIGN
 
 #include <vector>
 #include <atomic>
+#include <mutex>                       // for mutex
 
 
 namespace alt
@@ -23,13 +24,15 @@ class PooledAllocator;
  * \ingroup ContainerUtils
  * \brief An growable memory pool with fix-sized slots. The pool is expanded
  * by slab which hold a number of slots. Once expanded, the pool will not
- * shrink. This is not thread safe.
+ * shrink.
+ * \note thread-safe and non-thread-safe versions should not be mixed in use
  */
 class FixedMemPool
 {
   public:
       
-    /// \brief Constructor
+    /// \brief Constructor. This can only be safely done when all other threads using
+    /// this pool have not started accessing to this.
     /// \param value_size the size of the value contained in each slot. The slot
     /// size is aliged value size by 8 bytes.
     /// \param slot_num_per_slab number of slots per slab
@@ -39,27 +42,60 @@ class FixedMemPool
             size_t slot_num_per_slab=100,
             bool lazy_alloc = true);
 
-    /// \brief Destructor
+    /// \brief Destructor. This can only be safely done when all other threads using
+    /// this pool no longer have access to this.
+    /// \note For performance reason, FixedMemPool does not track allocated memory
+    /// internally, therefore, the user is responsible to free all allocated entries
+    /// (if entries stored in the pool is not trivially destructable) before this
+    /// instance is destroyed.
     ~FixedMemPool();
 
     /// \brief allocate a slot in the pool
     /// \return the starting address of the slot
-    void* alloc(uint16_t bin = 0) noexcept(false);
+    void* allocate(uint16_t bin = 0) noexcept(false);
 
     /// \brief deallocate a slot in the pool
     /// \param p the starting address of the slot
-    void free(void* p) noexcept(false);
+    void deallocate(void* p) noexcept(false);
+
+    /// \brief allocate a slot in the pool (thread safe version)
+    /// \return the starting address of the slot
+    void* coAllocate(uint16_t bin = 0) noexcept(false);
+
+    /// \brief deallocate a slot in the pool (thread safe version)
+    /// \param p the starting address of the slot
+    void coDeallocate(void* p) noexcept(false);
+
+    /// \brief deallocate all slots in the pool. This can only be used in non-thread-safe
+    /// version
+    /// \note FixedMemPool does not track allocated memory internally, therefore,
+    /// the user is responsible to free all allocated entries before this is called
+    void clear() noexcept(false);
 
     /// \brief get allocated bin of the slot
     /// \param p the starting address of the slot
     /// \note The bin is used as an id to indicate which fixed pool is used for the
     /// slot. This is used for the case when multiple pools are used and each pool
-    /// is used for slots in a particular size. If always return 0 if a sigle pool
-    /// is used. For using multiple pools, see PooledAllocator.
+    /// is used for slots in a particular size. It always return 0 if a single pool
+    /// is used. For using multiple pools, see PooledAllocator in Allocator.h
     static uint16_t getAlloactedBin(void* p);
+
+    /// \brief allocate a memory block that is bigger than the slot in the pool.
+    /// \param size the size of space to be allocated
+    /// \param bin the number set in the allocated header. Use getAlloactedBin to
+    /// check the address, if the bin number is equal to the bin given here, it is
+    /// allocated by allocateBigSize and must be freed by deallocateBigSize
+    /// \return the starting address of the allocated memory
+    /// \note this is allocated in heap directly, not in the pool.
+    static void* allocateBigSize(size_t size, uint16_t bin);
+
+    /// \brief deallocate a memory block allocated by allocateBigSize
+    static void deallocateBigSize(void* p);
 
   private:
     friend class PooledAllocator;
+
+    void initSlab(void* slab);
 
     struct EntryHeader;
     EntryHeader* newSlab()    noexcept(false);
@@ -68,6 +104,7 @@ class FixedMemPool
     size_t                    slot_size_ { 0 };
     size_t                    slot_num_per_slab_ { 0 };
     std::vector<void*>        slab_list_;
+    std::mutex                mutex_;
 };
 
 //-----------------------------------------------------------------------------
@@ -84,14 +121,6 @@ template <typename  T, size_t growNum = 100, bool lazyAlloc = true>
 class FixedPool: public FixedMemPool
 {
   public:
-  
-    /*
-    static FixedPool& instance()
-    {
-        static FixedPool s_allocator;
-        return s_allocator;
-    }
-    */
 
     /// \brief Constructor
     FixedPool(): FixedMemPool(sizeof(T), growNum, lazyAlloc) {}
@@ -102,16 +131,34 @@ class FixedPool: public FixedMemPool
     template <typename... Args>
     T* acq(Args&&... args) noexcept(false)
     {
-        void* p = FixedMemPool::alloc();
+        void* p = FixedMemPool::allocate();
         return new (p) T (std::forward<Args>(args)...);
     }
 
     /// \brief delete an instance of T in the pool
-    /// \tparam v pointer to the insatnce
+    /// \tparam v pointer to the instance
     void del(T* v) noexcept(false)
     {
         v->~T();
-        FixedMemPool::free(v);
+        FixedMemPool::deallocate(v);
+    }
+    
+    /// \brief create an instance of T in the pool (thread safe version)
+    /// \tparam Args argument list for T constructor
+    /// \return pointer to the instance
+    template <typename... Args>
+    T* coAcq(Args&&... args) noexcept(false)
+    {
+        void* p = FixedMemPool::allocate();
+        return new (p) T (std::forward<Args>(args)...);
+    }
+
+    /// \brief delete an instance of T in the pool (thread safe version)
+    /// \tparam v pointer to the instance
+    void coDel(T* v) noexcept(false)
+    {
+        v->~T();
+        FixedMemPool::deallocate(v);
     }
 };
 
@@ -127,6 +174,7 @@ class FixedPool: public FixedMemPool
  * known or the case where the memory cannot be expanded (e.g. in a shared memory).
  * This is not thread safe.
  */
+// TODO: justify usage of this and then decide whether to keep it or remove it
 class FixedMemPoolPrealloc
 {
   public:
@@ -164,11 +212,11 @@ class FixedMemPoolPrealloc
 
     /// \brief allocate a slot in the pool
     /// \return the starting address of the slot
-    void* alloc() noexcept(false);
+    void* allocate() noexcept(false);
 
     /// \brief deallocate a slot in the pool
     /// \param p the starting address of the slot
-    void free(void* p) noexcept(false);
+    void deallocate(void* p) noexcept(false);
 
   private:
 
@@ -228,16 +276,16 @@ class FixedPoolPrealloc: public FixedMemPoolPrealloc
     template <typename... Args>
     T* acq(Args&&... args) noexcept(false)
     {
-        void* p = FixedMemPoolPrealloc::alloc();
+        void* p = FixedMemPoolPrealloc::allocate();
         return new (p) T (std::forward<Args>(args)...);
     }
 
     /// \brief delete an instance of T in the pool
-    /// \tparam v pointer to the insatnce
+    /// \tparam v pointer to the instance
     void del(T* v) noexcept(false)
     {
         v->~T();
-        FixedMemPoolPrealloc::free(v);
+        FixedMemPoolPrealloc::deallocate(v);
     }
 };
 

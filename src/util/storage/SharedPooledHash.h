@@ -2,7 +2,7 @@
 
 #include "LinkedList.h"
 #include "FixedMemPool.h"
-#include <util/sysinfo/Platform.h>
+#include <util/system/Platform.h>
 #include <ipc/Mutex.h>
 #include <vector>
 #include <atomic>
