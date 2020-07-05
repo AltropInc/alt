@@ -52,7 +52,7 @@ A container has the following additional members:
 ## Generator
 
 A Generator is an iterable collection that generates element values on a certain rule without a
-physical storage for the contained elements.
+physical storage for the contained elements. The Iterator class of a generator is read only.
 
 
 
