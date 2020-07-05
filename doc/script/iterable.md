@@ -15,7 +15,7 @@ foreach book in library
 This can be translated into:
 
 ```altscript
-book_iter := library.begin();  // iterater: Library.Iterator = library.begin();
+book_iter := library.begin();  // book_iter: Library.Iterator = library.begin();
 while book_iter                // book_iter.valid()
 {
     book := *book_iter;        // book: Library.ElementType = book_iter.get();
@@ -27,7 +27,7 @@ while book_iter                // book_iter.valid()
 An iterable class has the following members:
 
 | name        | scope  | meaning                                                              |
-|:----------- |:----------------------------------------------------------------------------- |
+|:----------- |:------ |:-------------------------------------------------------------------- |
 | Iterator    | class  | The iterator class for the iterable                                  |
 | ElementType | class  | The element type of the iterable collection                          |
 | begin       | object | function returns to the iterator to the first element                |
@@ -45,7 +45,7 @@ iteration.
 
 A container has the following additional members:
 | name        | scope  | meaning                                                              |
-|:----------- |:----------------------------------------------------------------------------- |
+|:----------- |:------ |:-------------------------------------------------------------------- |
 | length      | object | function returns number of elements                                  |
 | empty       | object | function to tell if the collection is empty                          |
 
