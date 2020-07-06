@@ -43,15 +43,37 @@ output is generated.
 
 ## Arguments Passing
 
-Function arguments can either be "pass-by-value" or "pass-by-reference". For all instances of
-value classes such as int, char, enum etc are passed by value. That is, a copy (or converted copy) of the instance
-(the value) is passed in the function and hence the change of the value is not reflected outside
-from the caller. For all instances of non-value classes, if the type of the actual instance is
-a subtype of the type decalred by the formal parameter, it will be passed by reference. If the type of
-the actual instance is convertable to the type decalred by the formal parameter and the former paramter is
-specified to accept convertable values, it will be passed
-by value. Otherwise, the actual instance cannot be passed and it is considered a type mis-match
-error.
+Function arguments can either be "pass-by-value" or "pass-by-reference".
+
+For all instances of value classes such as int, char, enum etc are passed by value. That is,
+a copy (or converted copy) of the instance (the value) is passed into the function and hence
+the change of the value is not reflected outside from the caller. "pass-by-value" accept values
+of sybtypes and convertable types. For instacne, you can pass an integer value to a double
+precision parameter because an interger value can be converted to double precision. You can also
+pass an integer to a parameter in declared type "Numeric", because integer is a subtype of
+Numeric.
+
+For all instances of non-value classes,  if the former paramter is specified to accept convertable
+values, it will be passed by value.  A converted copy will be created. Otherwise, it will be passed
+by reference, which means that values are not copied when they are passed to functions and  modifications
+to mutable values (such as arrays and tuple) made within a function will be visible to the caller.
+"pass-by-value" accepts references of sybtypes only. Convertible types are not aceepted. Consider:
+
+```altscript
+// this accept all values convertable to tuple(int, int, int)
+func print1(x :< tuple(char, char, char)) { system.out.println(x); }
+
+// this accept values in subtype of tuple(int, int, int)
+func print2(x : tuple(char, char, char)) { system.out.println(x); }
+
+print1("xyz");  // okay, "xyz" is converted to ('x', 'y', 'z')
+print1("xz");   // okay, "xy" is converted to ('x', 'y', '\0')
+print1("ABCD"); // okay, "ABCD" is converted to ('A', 'B', 'C')
+print2("xyz");  // not okay, "xyz" is not subtype of tuple(char, char, char)
+print2(('A', 'B', 'C', 'D'));  // okay, tuple(char, char, char, char) is subtype of tuple(char, char, char)
+
+
+```
 
 
 
