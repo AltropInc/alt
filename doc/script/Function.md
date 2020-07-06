@@ -67,9 +67,9 @@ func print1(x :< tuple(char, char, char)) { system.out.println(x); }
 func print2(x : tuple(char, char, char)) { system.out.println(x); }
 
 print1("xyz");  // okay, "xyz" is converted to ('x', 'y', 'z')
-print1("xz");   // okay, "xy" is converted to ('x', 'y', '\0')
+print1("xy");   // okay, "xy" is converted to ('x', 'y', '\0')
 print1("ABCD"); // okay, "ABCD" is converted to ('A', 'B', 'C')
-print2("xyz");  // not okay, "xyz" is not subtype of tuple(char, char, char)
+print2("xyz");  // error, "xyz" is not subtype of tuple(char, char, char)
 print2(('A', 'B', 'C', 'D'));  // okay, tuple(char, char, char, char) is subtype of tuple(char, char, char)
 ```
 
