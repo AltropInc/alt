@@ -46,9 +46,10 @@ output is generated.
 Function arguments can either be "pass-by-value" or "pass-by-reference". For all instances of
 value classes such as int, char, enum etc are passed by value. That is, a copy (or converted copy) of the instance
 (the value) is passed in the function and hence the change of the value is not reflected outside
-from the caller. For all instances of non-value classes, if the type if the actual instance is
-a subtype of type decalred by the formal paramter, it will be passed by reference. If the type of
-the actual instance is convertable to the type decalred by the formal paramter, it will be passed
+from the caller. For all instances of non-value classes, if the type of the actual instance is
+a subtype of the type decalred by the formal parameter, it will be passed by reference. If the type of
+the actual instance is convertable to the type decalred by the formal parameter and the former paramter is
+specified to accept convertable values, it will be passed
 by value. Otherwise, the actual instance cannot be passed and it is considered a type mis-match
 error.
 
