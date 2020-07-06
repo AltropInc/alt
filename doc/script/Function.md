@@ -57,13 +57,13 @@ For all instances of non-value classes,  if the former paramter is specified to 
 values, it will be passed by value.  A converted copy will be created. Otherwise, it will be passed
 by reference, which means that values are not copied when they are passed to functions and  modifications
 to mutable values (such as arrays and tuple) made within a function will be visible to the caller.
-"pass-by-value" accepts references of sybtypes only. Convertible types are not aceepted. Consider:
+"pass-by-refenrece" accepts references of sybtypes only. Convertible types are not aceepted. Consider:
 
 ```altscript
-// this accept all values convertable to tuple(int, int, int)
+// this accepts all values convertable to tuple(int, int, int)
 func print1(x :< tuple(char, char, char)) { system.out.println(x); }
 
-// this accept values in subtype of tuple(int, int, int)
+// this accepts values in subtype of tuple(int, int, int)
 func print2(x : tuple(char, char, char)) { system.out.println(x); }
 
 print1("xyz");  // okay, "xyz" is converted to ('x', 'y', 'z')
@@ -71,9 +71,6 @@ print1("xz");   // okay, "xy" is converted to ('x', 'y', '\0')
 print1("ABCD"); // okay, "ABCD" is converted to ('A', 'B', 'C')
 print2("xyz");  // not okay, "xyz" is not subtype of tuple(char, char, char)
 print2(('A', 'B', 'C', 'D'));  // okay, tuple(char, char, char, char) is subtype of tuple(char, char, char)
-
-
 ```
-
 
 
