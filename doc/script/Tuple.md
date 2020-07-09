@@ -43,6 +43,9 @@ my_tuple = (my_array.first(), my_array);  // my_tuple has a value of type (int, 
 ```
 ## Tuple Subtype
 
+When we pass a tuple by reference, the declared type of the passed reference must be a subtype of the
+decalred type of the reference that takes the passed reference. By default, a tuple is passed bt reference.
+
 Tuple types cannot be covariant in their element types but can be covariant in their type paramters.
 For instance, (int[5], int[5]) cannot be a subtype of (array, array), but can be a subtype of
 #(type T: array)(T, T).
@@ -75,7 +78,7 @@ type T2 = tuple#(type T: numeric)(x:T, y:T)  // T1 is a subtype of T2
 type T3 = tuple#(type T=integral)(x:T, y:T)  // T3 is a subtype of T2
 type T4 = tuple#(type T1: integral, type T2: integral)(x:T1, y:T2)  // T4 is not a subtype of T2
 ```
-Case (4) tbi evaluates to a type. tai must evaluates to the same type. For instance:
+Case (3) tbi evaluates to a type. tai must evaluates to the same type. For instance:
 
 ```altscript
 type T1 = tuple (int, string)
@@ -97,9 +100,18 @@ To understand case (4), let us check T2 in the above example: y in t2 is a type 
 tuple element x in T1 whose type is array#(int,5)  and array#(int,5).ElementType evaluates to int, then check the declared type y of T1 agains int
 which is a match.
 
+## Tuple Convertable Rule
 
+When we pass a tuple by value, the passed value is not necessarily be a subtype, instead, it can any any type that is convertable
+to the tuple value. for inatance, the value ((1,2,3,4), 3.14) in the type of ((int, int, int, int), double) is convertable to
+tuple #(type T: array)(x:T, y:T.ElementType) and can be passed to a object that accepts the interface defined by tuple #(type T: array)(x:T, y:T.ElementType).
 
+The oject interface is map from a tuple value (input) to an output. The oject interface always use the tuple convertible rules to take the input value.
 
+A value V is convertable to tuple type T, if
 
+(1) V is a array or stream whole element type can be coverted to the type of all tuple elelemnts. Note, string is a special case of stream.
+(2) V is tuple value, and for each tuple element e in T, if e does not have initial (default) value, there must be a correspondent element e' in V
+such that the type of e' is convertable e type if e is defined as pass-by-value and the type of e' is subtype of e type if e is defined as pass-by-reference .
 
 
