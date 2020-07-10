@@ -1,6 +1,6 @@
 # Iterable, Containner and Generator
 
-## Iterable
+## Iterable and Iterator
 
 An Iterable is a collection of element objects that can be visited one by one through an iterator.
 Let's say, library is an iterable collection (class name Library) of books, we can do:
@@ -34,6 +34,42 @@ An iterable class has the following members:
 | rbegin      | object | function returns to the reverse iterator to the last element         |
 
 Note, rbegin returns a valid iterator only when the iterable support bidirectional iteration.
+
+Iterator is a member class of iterable in class scope. i.e. an Iterater class is always accessed
+through a iterable class: IterableClass.Iterator. For instance:
+
+```altscript
+type T = tuple (x:int, y:double, z: string);
+t : T = (1, 2.1, "text");
+t_first : T.Iterator = t.begin();
+t_last : T.Iterator = t.rbegin();
+```
+
+An iteractor has the following member classes:
+
+| name     | scope  | meaning                                                              |
+|:-------- |:------ |:-------------------------------------------------------------------- |
+| value    | object | get the value/object referred by the iterator                        |
+| ended    | object | tells if the iterator reaches to the end and it referes to null      |
+| index    | object | returns the order of the element the iterator refers in the iterable |
+| name     | object | returns the name, if any, of he element in the iterable              |
+
+An example of usage:
+
+```altscript
+t : tuple (x:int, y:double, z: string) = (1, 2.1, "text");
+for (iter:=t.begin(); !iter.ended(); ++iter)
+{
+    system.out.println(iter.index(), ' ', iter.nmae(), ": ", iter.value())
+}
+```
+The output is:
+```altscript
+1 x: 1
+2 y: 2.1
+3 z: text
+```
+
 
 ## Container
 
