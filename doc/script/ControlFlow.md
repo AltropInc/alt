@@ -8,7 +8,7 @@ Altscript provides follwing control flow constructs:
   
 ## Conditional
 
-Conditional evaluation allows portions of code to be evaluated or not evaluated depending on the value of a conditional expression
+Conditional evaluation allows portions of code to be executed or not executed depending on the value of a conditional expression
 (condition).
 
 A condition is an expresion that evalutes to a value convertable to a boolean value true or false.
@@ -56,6 +56,7 @@ else
 A conditional expression can also be a type assumption expression in the format of "expresion => tag is type". For example:
 
 ```altscript
+x:=(3, "text", 3.14);
 if (x[i] => ele is string)
 {
     system.out << "the element type is string: " << ele;
@@ -78,4 +79,41 @@ elif (x is double)
     system.out << "the x type is douible: " << x;
 }
 ```
+
+## Branched
+
+A branched control flow executes blocks of code from multiple conditions, like if-else-if ladder statement. In other words, it
+evaluates a control expression, and use the evaluated value to test the equality, check a condition, or find a pattern match
+to decide witch portions of the code to be executed.
+
+The Altscript switch statement is used for this purpose. Syntax:
+
+```altscript
+switch (control_expression => tag)  // => tag is used to hold the result of the control_expression and is optional
+{
+    case value1:  // code to execute when the value is equal to value1;
+    case value2, value3:  // code to execute when the value is equal to value2 or value3;
+    when conditional_expression1: // code to execute when conditional_expression1 is evaluated to true;
+    when conditional_expression2: // code to execute when conditional_expression2 is evaluated to true;
+    match pattern1: // code to execute when pattern1 is matched;
+    match pattern2: // code to execute when pattern2 is matched;
+    is type1: // code to execute when the type of value is type1;
+    is type2: // code to execute when the type of value is type2;
+    default: // code to execute if none of the listed cases or conditions satisfy;
+}
+```
+The "case" test is the equality test. The case value must be literal or constant. It doesn't allow variables and must be unique.
+Using a case test requires the control expression be of type of integral, enum, enumset, string, and type.
+
+The "when" condition test is the execution of the following conditional expression that typically containes the value of the
+control expression, optionally represented by the tag. There is no limitation of the type of control expression if "when" condition
+test is used.
+
+The "match" pattern test is to check the value of the control expression and see if it matches the given pattern.
+
+The "is" test is to check the type of the value evaluated from the control expression.
+
+All tests are performed top to bottom, however, a case test must appear before any other kind of tests. If a case is found, condition is true,
+or a pattern is matched, the first corresponding block will be executed and the control flow is done if there is no contibue to fallthrough.
+
 
