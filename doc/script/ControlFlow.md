@@ -111,9 +111,11 @@ test is used.
 
 The "match" pattern test is to check the value of the control expression and see if it matches the given pattern.
 
-The "is" test is to check the type of the value evaluated from the control expression.
+The "is type" test is to check the type of the value evaluated from the control expression.
 
 All tests are performed top to bottom, however, a case test must appear before any other kind of tests. If a case is found, condition is true,
 or a pattern is matched, the first corresponding block will be executed and the control flow is done if there is no contibue to fallthrough.
+In the fallthrough, the case, the condition or the pattern whill be tested again and the block will be executed only when the test is
+sucessful. Therefore, the "case" test for equality in fallthrough will be ignored.
 
 
