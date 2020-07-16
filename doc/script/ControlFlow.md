@@ -14,7 +14,7 @@ A conditional expression is an expresion that evalutes to a value convertable to
 The boolean value false, zero value, null value, any empty container are convereted to boolean false and everything else
 is convereted to true.
 
-A conditional expression can also be a type assumption expression in the format of <expresion> => <tag> is <type>. For example:
+A conditional expression can also be a type assumption expression in the format of "expresion => tag is type". For example:
 
 ```altscript
 x := (3, "text", 3.14);
