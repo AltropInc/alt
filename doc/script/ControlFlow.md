@@ -8,16 +8,54 @@ Altscript provides follwing control flow constructs:
   
 ## Conditional
 
-Conditional evaluation allows portions of code to be evaluated or not evaluated depending on the value of a conditional expression.
+Conditional evaluation allows portions of code to be evaluated or not evaluated depending on the value of a conditional expression
+(condition).
 
-A conditional expression is an expresion that evalutes to a value convertable to a boolean value true or false.
-The boolean value false, zero value, null value, any empty container are convereted to boolean false and everything else
-is convereted to true.
+A condition is an expresion that evalutes to a value convertable to a boolean value true or false.
+The boolean value false, zero value, null value, any empty container are converted to boolean false and everything else
+is converted to true.
+
+The Altscript if statement tests the condition and it executes the if block if the condition is true and otherwise,
+if the else block or elif block is provided, executes the else block or test the elif condition to perform the work
+as an if statement is followed. The syntax of if statement:
+
+```altscript
+// if statement
+if (condition)
+{
+    // if-block with code to execute if condition is evaluated to true
+}
+
+// if statement with else
+if (condition)
+{
+    // if-block with code to execute if condition is evaluated to true
+}
+else
+{
+    // else-block with code to execute if condition is evaluated to false
+}
+
+// if statement with elif
+if (condition1)
+{
+    // if-block with code to execute if condition1 is evaluated to true
+}
+elif (condition2)
+{
+    // elif-block with code to execute if condition1 is evaluated to false and condition2 is evaluated to true
+}
+// more elif may follow here
+else
+{
+    // optional else-block with code to execute if all conditions are evaluated to false
+}
+
+```
 
 A conditional expression can also be a type assumption expression in the format of "expresion => tag is type". For example:
 
 ```altscript
-x := (3, "text", 3.14);
 if (x[i] => ele is string)
 {
     system.out << "the element type is string: " << ele;
