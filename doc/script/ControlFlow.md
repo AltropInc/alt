@@ -114,8 +114,30 @@ The "match" pattern test is to check the value of the control expression and see
 The "is type" test is to check the type of the value evaluated from the control expression.
 
 All tests are performed top to bottom, however, a case test must appear before any other kind of tests. If a case is found, condition is true,
-or a pattern is matched, the first corresponding block will be executed and the control flow is done if there is no contibue to fallthrough.
+or a pattern is matched, the first corresponding block will be executed and the control flow is done if there is no continue to fallthrough.
 In the fallthrough, the case, the condition or the pattern whill be tested again and the block will be executed only when the test is
 sucessful. Therefore, the "case" test for equality in fallthrough will be ignored.
 
+The "match pattern" test works for string, array, stream and tuple. For string, the match pattern is a regular expresion. For example
 
+```altscript
+switch (file_name)
+{
+    match r"[a-z]+\.txt" => results: foreach (result in results) print(result);
+}
+```
+For array, stream and tuple, the match pattern is the composite pattern that contains a list of comma seperated sub patterns.
+
+```altscript
+switch (x):
+    match (): print("Empty container matched");
+    match (1, 3, "test", null): print("a specific tuple value matched")
+    match (start, *, "end"]: print("First element is ", start, ", the middle is any, and the last is \"end\"")
+    match (start, ..., "end"]: print("First element is ", start, ", multiple middles ignored, and the last is \"end\"")
+    match (42, ...): print("First element is 42 and the rest are ignored")
+    match ((*, 32), ...): print("A nested patttern. The first has two element and the second is 32 and the rest are ignored")
+}
+```
+
+
+        
