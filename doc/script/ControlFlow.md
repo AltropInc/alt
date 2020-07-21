@@ -12,7 +12,7 @@ Conditional evaluation allows portions of code to be executed or not executed de
 (condition).
 
 A condition is an expresion that evalutes to a value convertable to a boolean value true or false.
-The boolean value false, zero value, null value, any empty container are converted to boolean false and everything else
+The boolean value false, zero value, null value, invalid enum value, empty enum set value, and any empty container are converted to boolean false and everything else
 is converted to true.
 
 The Altscript if statement tests the condition and it executes the if block if the condition is true and otherwise,
