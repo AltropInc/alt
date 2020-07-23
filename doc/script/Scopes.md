@@ -50,7 +50,7 @@ func clone (x: string) : string
 }
 ```
 
-When the function some_string_op is called, say hello("World"), we get the floowing block scope:
+When the function hello is called, say hello("World"), we get the floowing block scope:
 
 ```altscript
 // for hello("World");
@@ -125,5 +125,49 @@ is selfclass.
 If a name decalred in an outer scope is obscured by the same name in an innder scope, it can be still used when it is qualified by the
 name of its enclosing class with a scope select operator ::
 
-## 
+## self, owner, selfclass, ownerclass, and root
+When the self appears in the block scope of a class constructor (enter block), it referes the instance of this class. When the owner appears
+in the block scope of an enter block if a member class, it referes the instance of the class that owns the member. For instance:
 
+```altscript
+class A
+{
+    class bar is func
+    {
+        enter (x: string) : string
+        {
+            self;   // refers to the instahce of bar
+            owner;  // refers to the instahce of A
+        }
+    }
+    
+    func foo (x: string) : string
+    {
+       self;   // refers to the instahce of foo
+       owner;  // refers to the instahce of A
+    }
+}
+```
+The self in func foo is potentially surprising and thus worth noting. Altscript treats a function as a class, and a member function as a
+member class. Thus the decarations of bar and foo within the class A are equivalent. This is an important difference than any of the other 
+OO languages. Since foo is a class, the instance of foo can have its own memebers and the self reference within foo is used to access foo's
+member.
+
+The selfclass appears in the block scope of a class's enter block referes to the class. The ownerclass
+appears in the block scope of a member class's enter block referes to the actual class from witch the instance that owns the member is created.
+For instance:
+
+```altscript
+class A
+{
+    class bar is func
+    {
+        enter (x: string) : string
+        {
+            selfclass;   // refers to bar because any subclass of func is final
+            ownerclass;  // refers to the class of the instance that wons the nar instance
+                         // It is not necessarily A, rather, can be any subclass of A
+        }
+    }
+}
+```
