@@ -178,5 +178,5 @@ class A
 }
 ```
 
-The root reference refers to an implicit global object. An Alt application (executable has one and only one root object. All application objects
-are created with the root object.
+The root reference refers to an implicit global object. An Alt application (executable) has one and only one root object. All application objects
+are created within the root object.
