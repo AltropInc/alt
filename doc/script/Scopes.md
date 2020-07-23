@@ -126,8 +126,8 @@ If a name decalred in an outer scope is obscured by the same name in an innder s
 name of its enclosing class with a scope select operator ::
 
 ## self, owner, selfclass, ownerclass, and root
-When the self appears in the block scope of a class constructor (enter block), it referes the instance of this class. When the owner appears
-in the block scope of an enter block if a member class, it referes the instance of the class that owns the member. For instance:
+When the self appears in the block scope of a class constructor (enter block), it refers to the instance of this class. When the owner appears
+in the block scope of an enter block of a member class, it refers the instance of the class that owns the member. For instance:
 
 ```altscript
 class A
@@ -136,22 +136,22 @@ class A
     {
         enter (x: string) : string
         {
-            self;   // refers to the instahce of bar
-            owner;  // refers to the instahce of A
+            self;   // refers to the instance of bar
+            owner;  // refers to the instance of A
         }
     }
     
     func foo (x: string) : string
     {
-       self;   // refers to the instahce of foo
-       owner;  // refers to the instahce of A
+       self;   // refers to the instance of foo
+       owner;  // refers to the instance of A
     }
 }
 ```
 The self in func foo is potentially surprising and thus worth noting. Altscript treats a function as a class, and a member function as a
-member class. Thus the decarations of bar and foo within the class A are equivalent. This is an important difference than any of the other 
-OO languages. Since foo is a class, the instance of foo can have its own memebers and the self reference within foo is used to access foo's
-member.
+member class. Thus declarations of bar and foo within the class A are equivalent. This is an important difference than any of the other 
+OO languages. Since foo is a class, the instance of foo can have its own members and the self reference within foo is used to access foo's
+member. This unification of function and class opens door to user-defined functional objects.
 
 The selfclass appears in the block scope of a class's enter block referes to the atucal class of the instance of this class. The ownerclass
 appears in the block scope of a member class's enter block referes to the actual class from witch the instance that owns the member is created.
@@ -177,3 +177,6 @@ class A
     }
 }
 ```
+
+The root reference refers to an implicit global object. An Alt application (executable has one and only one root object. All application objects
+are created with the root object.
