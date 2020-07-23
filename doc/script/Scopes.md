@@ -153,7 +153,7 @@ member class. Thus the decarations of bar and foo within the class A are equival
 OO languages. Since foo is a class, the instance of foo can have its own memebers and the self reference within foo is used to access foo's
 member.
 
-The selfclass appears in the block scope of a class's enter block referes to the class. The ownerclass
+The selfclass appears in the block scope of a class's enter block referes to the atucal class of the instance of this class. The ownerclass
 appears in the block scope of a member class's enter block referes to the actual class from witch the instance that owns the member is created.
 For instance:
 
@@ -165,9 +165,15 @@ class A
         enter (x: string) : string
         {
             selfclass;   // refers to bar because any subclass of func is final
-            ownerclass;  // refers to the class of the instance that wons the nar instance
+            ownerclass;  // refers to the class of the instance that owns the bar instance
                          // It is not necessarily A, rather, can be any subclass of A
         }
+    }
+    
+    enter()
+    {
+        selfclass;   // refers to the class of the instance currently executing the enter block, and
+                     // and it can any subclass of A
     }
 }
 ```
