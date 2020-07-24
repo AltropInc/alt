@@ -29,8 +29,8 @@ from the block. For instance
 ```
 ## IO Scope.
 The IO scope is an object instantiation input and output parameter scope. When we create an object or do a function call,
-we provide a number of input parmaters and expect an output. Names of input paramters in the IO block nevers owns the value
-unless the provided actual parameter is a literal value or it holds value of pass-by-value (primitive values).
+we provide a number of input parmaters and expect an output. Names of input paramters in the IO block never owns the value
+unless the provided actual parameter is a literal value or it holds value of pass-by-value type (primitive values).
 The output paramter is a hidden name. It can either owns its own value or refer to a value passed from one of input paramters
 or a value owned by names in object or class scope. If the value is owned by the output and is not transfered on exit of the
 IO scope, the output value will be dropped. The output cannot refer to a value owned by any name introduced in the function
@@ -41,8 +41,8 @@ For instance
 ```altscript
 func hello (x: string) : string
 {
-   hello := "Hello ";
-   hello + x;     // return the result of x+y
+   str := "Hello ";
+   str + x;     // return the result of x+y
 }
 func clone (x: string) : string
 {
@@ -50,7 +50,7 @@ func clone (x: string) : string
 }
 ```
 
-When the function hello is called, say hello("World"), we get the floowing block scope:
+When the function hello is called, say hello("World"), we get the fllowing block scope:
 
 ```altscript
 // for hello("World");
@@ -59,10 +59,10 @@ hello:
     x:= "World";                 // x owns "World" because the actual paramter is a literal
     output: string;              // the output is a hidden name
     {                            // the body block scope of the function some_string_op starts here
-        hello := "Hello ";
+        str := "Hello ";
         output = hello + x;      // output owns the result of hello + x, which is "Hello World"
         exit hello;              // exit to the outer IO scope
-    }                            // the name hello and its value is dropped here
+    }                            // the name str and its value is dropped here
 }                                // The name 'x' and its value dropped.
                                  // The output value is dropped if the valu is not transferred on exit
                                  
@@ -72,16 +72,16 @@ hello:
     x:= s;                       // x refers to the value of s, but does not own it
     output: string;              // the output is a hidden name
     {                            // the body block scope of the function some_string_op starts here
-        hello := "Hello ";
-        output = hello + x;      // output owns the result of hello + x, which is "Hello World"
+        str := "Hello ";
+        output = str + x;        // output owns the result of str + x, which is "Hello World"
         exit hello;              // exit to the outer IO scope
     }                            // the name hello and its value is dropped here
 }                                // The name 'x' is dropped, but not the value it refers to
                                  // The output value is dropped if the valu is not transferred on exit
                        
-// clone("World");
+// for s:="World";  clone(s);
 clone:
-{                                // the IO scope of the function hello starts here
+{                                // the IO scope of the function clone starts here
     x:= s;                       // x refers to the value of s, but does not own it
     output: string;              // the output is a hidden name
     {                            // the body block scope of the function some_string_op starts here
@@ -91,9 +91,9 @@ clone:
 }                                // The name 'x' is dropped, but not the value it refers to
                                  // The output value is dropped if the valu is not transferred on exit
 
-// for s:="World"; clone(s);
+// clone("World");
 clone:
-{                                // the IO scope of the function hello starts here
+{                                // the IO scope of the function clone starts here
     x:= "World";                 // x owns "World" because the actual paramter is a literal
     output: string;              // the output is a hidden name
     {                            // the body block scope of the function some_string_op starts here
