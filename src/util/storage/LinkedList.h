@@ -1,5 +1,25 @@
 #pragma once
 
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file LinkedList.h
+ * @library alt_util
+ * @brief Implements a doubly linked list. This differs to std::list in the following:
+ *    - support for both heterogeneous and homogeneous type
+ *    - less fragments because link pointers are packed together with the value
+ *    - more efficient and compact
+ * Classes defined in this file include:
+ *    - LinkedNode: doubly linked node
+ *    - LinkedListBase: a based class for all linked list
+ *    - LinkedList: a heterogeneous linked list
+ *    - PooledLinkList: a heterogeneous linked list using a set of fixed pools
+ *    - FixPooledLinkList: a homogeneous linked list using a single fixed pool
+ */
+
 #include <util/system/Platform.h>
 #include <util/Defs.h>              // for ALT_UTIL_PUBLIC
 #include "Allocator.h"

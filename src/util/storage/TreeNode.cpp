@@ -48,7 +48,7 @@ TreeNodeBase* TreeNodeBase::root()
     return r;
 }
 
-TreeNodeBase * TreeNodeBase::leastCommonAncestor (TreeNodeBase* other, TreeNodeBase* root)
+const TreeNodeBase * TreeNodeBase::leastCommonAncestor (const TreeNodeBase* other, const TreeNodeBase* root) const
 {
     auto n1 = this;
     auto n2 = other;

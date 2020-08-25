@@ -95,12 +95,11 @@ inline void StreamConnection::sendDirect(const char *buffer, ssize_t length)
 
 void StreamConnection::flushSendBuffer()
 {
-    iovec iov_array[2];
-    std::span<iovec,2> iov(iov_array);
+    std::array<iovec,2> iov;
     size_t data_size = send_buffer_.fetchAll(iov);   // zero copy fetch
     if (data_size)
     {
-        ssize_t bytes_sent = socket_.send(iov_array, iov_array[1].iov_len ? 2 : 1);
+        ssize_t bytes_sent = socket_.send(iov, iov[1].iov_len ? 2 : 1);
         assert(data_size >= bytes_sent);
         send_buffer_.commitRead(data_size - bytes_sent /* uncommitted */);
     }
@@ -130,23 +129,26 @@ void StreamConnection::send(const char *buffer, ssize_t length)
 
 void StreamConnection::receive(Clock::tick_type tick_realtime)
 {
-    //iovec iov[2];
-    iovec iov_array[2];
-    std::span<iovec,2> iov(iov_array);
+    std::array<iovec,2> iov;
     ssize_t bytes_got;
     do
     {
         size_t buffer_size = recv_buffer_.fetchFreeSpace(iov);
-        if (iov_array[1].iov_len==0)
+        if (buffer_size == 0)
         {
-            bytes_got = socket_.receive(iov_array[0].iov_base, (iov_array[0].iov_len));
+            SYS_ERR_THROW(NetException, "StreamConnection receive failed. Buffer is full", false);
+        }
+        
+        if (iov[1].iov_len==0)
+        {
+            bytes_got = socket_.receive(iov[0].iov_base, (iov[0].iov_len));
         }
         else
         {
-            bytes_got = socket_.receive(iov_array, 2);
+            bytes_got = socket_.receive(&iov[0], 2);
         }
         recv_buffer_.commitWrite(bytes_got);
-        listener_.onStreamData(recv_buffer_);
+        listener_.onStreamData(tick_realtime, recv_buffer_);
     }
     while (bytes_got > 0);
 }

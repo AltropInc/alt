@@ -1,7 +1,26 @@
 #pragma once
 
+
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file StrPool.h
+ * @library alt_util
+ * @brief definition of string pool to store commonly used string constants to
+ * avoid memory allocation for each individual string.
+ *    - StrPoolBase: the based class of string pool
+ *    - StrPool_T: template to choose concurrency mode
+ *    - StrPool: a string pool not thread safe
+ *    - StrPoolMutexLocked: a mutext-locked string pool
+ *    - StrPoolSpinLocked: a spin-locked string pool
+*/
+
 #include <util/system/Platform.h>
-#include <util/ipc/Mutex.h>    // For Mutex
+#include <util/ipc/Mutex.h>                     // For Mutex
+#include <util/types/TemplateHelper.h>          // For MoveOnly
 
 #include <stddef.h>
 #include <assert.h>
@@ -212,6 +231,64 @@ class StrPool_T: public StrPoolBase
 using StrPool = StrPool_T<MutexNone>;
 using StrPoolMutexLocked = StrPool_T<std::mutex>;
 using StrPoolSpinLocked = StrPool_T<SpinMutex>;
+
+
+/**
+ * \class ScopedString
+ * \ingroup Core
+ * \brief a temporary string buffer in a scope, used to avoid heap allocation for a string
+ */
+class PooledString
+{
+  public:
+    PooledString(const char* ptr, size_t length)
+        : ptr_(str_pool_.insert(ptr, length))
+        , length_(length)
+    { }
+
+    constexpr PooledString()
+    { }
+
+    ~PooledString()
+    {
+        if (ptr_) str_pool_.erase(ptr_, length_);
+    }
+
+    MOVEONLY(PooledString);
+
+    void clear()
+    {
+        if (ptr_) str_pool_.erase(ptr_, length_);
+        ptr_ = nullptr;
+        length_ = 0;
+    }
+    
+    void reset(const char* ptr, size_t length)
+    {
+        if (ptr_) str_pool_.erase(ptr_, length_);
+        ptr_ = str_pool_.insert(ptr, length);
+        length_ = length;
+    }
+
+    const char* operator->() const noexcept { return ptr_; }
+    const char* get() const noexcept { return ptr_; }
+    explicit operator bool() const noexcept { return ptr_!=nullptr; }
+
+    bool operator==(const PooledString &other) const
+    { return length_==other.length_ && std::strcmp(ptr_, other.ptr_)==0; }
+
+    void swap (PooledString& other)
+    {
+        std::swap(ptr_, other.ptr_);
+        std::swap(length_, other.length_);
+    }
+
+  private:
+    const char* ptr_ {nullptr};
+    size_t      length_ {0};
+    inline static StrPool str_pool_;
+};
+
 
 }
 

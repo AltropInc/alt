@@ -220,7 +220,7 @@ class FDEventPoller::Impl
     using EventIndexMap = PooledHash<EventIndex>;
     EventIndexMap                               event_index_map_;
 	std::vector<pollfd>                         poll_fds_;
-    std::vector<FDEventHandler*>                  handlers_;
+    std::vector<FDEventHandler*>                handlers_;
     size_t                                      event_num_{0};
 	std::mutex                                  mutex_;
     bool                                        busy_poller_;
@@ -382,17 +382,17 @@ void FDEventPoller::Impl::poll(Clock::tick_type tick_realtime, Clock::tick_type 
                 FDEventIdSet done_set = handler->onEvent(tick_realtime, event_ids);
                 if (done_set.has(FDEventId::EVENT_OUT))
                 {
-                    // handler is no longer insterested in EVENT_OUT
+                    // handler is no longer interested in EVENT_OUT
                     e.events &= ~POLLOUT;
                 }
                 if (done_set.has(FDEventId::EVENT_IN))
                 {
-                    // handler is no longer insterested in EVENT_IN
+                    // handler is no longer interested in EVENT_IN
                     e.events &= ~POLLIN;
                 }
                 if (e.events==0)
                 {
-                    // handler is no longer insterested any event
+                    // handler is no longer interested any event
                     // remove this event in poll_fds_
                     std::swap (e, poll_fds_[--event_num_]);
                     --i;

@@ -1,15 +1,16 @@
-#include "FixedMemPool.h"
-#include <util/string/StrBuffer.h>
-#include <util/string/StrPrint.h>
+#include "FixedMemPool.h"            // For FixedMemPool etc. 
+#include <util/numeric/Intrinsics.h> // for constAlogn
 
-#include <cstdlib>        // for malloc and free
-#include <stdexcept>      // for runtime_error
-#include <string>         // for string used by runtime_error
-#include <iostream>
+#include <cstdlib>                   // for malloc and free
+#include <stdexcept>                 // for runtime_error
+#include <string>                    // for string used by runtime_error
 
 #define FIXED_POOL_DEBUG      0
 #if FIXED_POOL_DEBUG
 #define FIXED_POOL_DBG(x)      x
+#include <iostream>
+#include <util/string/StrBuffer.h>
+#include <util/string/StrPrint.h>
 #else
 #define FIXED_POOL_DBG(x)
 #endif
@@ -48,9 +49,26 @@ struct FixedMemPool::EntryHeader
 };
 
 void* FixedMemPool::allocateBigSize(size_t size, uint16_t bin)
-{ 
+{
+    // bin is calculated by: bin = size <= 8 ? 0 : log2Floor(size-1) - 2;
+    size_t allocate_size = 1<<(bin+3);
     EntryHeader* header =
-         reinterpret_cast<EntryHeader*>(::malloc(size + sizeof(EntryHeader)));
+         reinterpret_cast<EntryHeader*>(::malloc(allocate_size + sizeof(EntryHeader)));
+    header->setAllocated(bin);
+    return header+1;
+}
+
+void* FixedMemPool::reallocateBigSize(void* p, size_t new_size, uint16_t bin)
+{
+    uint16_t old_bin = getAlloactedBin(p);
+    if (bin == old_bin || bin == old_bin-1)
+    {
+        return p;
+    }
+    EntryHeader* header = reinterpret_cast<EntryHeader*>(p) - 1;
+    size_t new_allocate_size = 1<<(bin+3);
+    header =
+         reinterpret_cast<EntryHeader*>(::realloc(header, new_allocate_size + sizeof(EntryHeader)));
     header->setAllocated(bin);
     return header+1;
 }
@@ -66,6 +84,7 @@ FixedMemPool::FixedMemPool(size_t value_size, size_t slot_num_per_slab, bool laz
     : value_size_(value_size)
     , slot_size_ (sizeof(EntryHeader)+constAlign(value_size,8))
     , slot_num_per_slab_(slot_num_per_slab)
+    , slab_size_(slot_size_*slot_num_per_slab_)
 { 
     FIXED_POOL_DBG((std::cout << "FixedMemPool(" << slot_size_ << ") Constructor lazy_alloc=" << lazy_alloc << std::endl));
     if (!lazy_alloc)
@@ -80,7 +99,7 @@ FixedMemPool::~FixedMemPool()
     FIXED_POOL_DBG((std::cout << "~FixedMemPool(" << slot_size_ << ") called" <<  std::endl));
     for (auto slab: slab_list_)
     {
-        ::free(slab);
+        ::free(slab.first);
     }
 }
 
@@ -88,10 +107,10 @@ void FixedMemPool::clear()
 {
     for (size_t i = 1; i<slab_list_.size(); ++i)
     {
-        ::free(slab_list_[i]);
+        ::free(slab_list_[i].first);
     }
     slab_list_.resize(1);
-    initSlab(slab_list_[0]);
+    initSlab(slab_list_[0].first);
 }
 
 void* FixedMemPool::allocate(uint16_t bin)
@@ -99,7 +118,24 @@ void* FixedMemPool::allocate(uint16_t bin)
     FIXED_POOL_DBG((std::cout << "FixedMemPool(" << slot_size_ << ")::allocate head_= " << head_ <<  std::endl));
     if (!head_)
     {
-        head_ = newSlab();
+        if (slab_list_.empty())
+        {
+            head_ = newSlab();
+        }
+        else
+        {
+            auto & recent_slab = slab_list_.back();
+            if (recent_slab.second < slab_size_)
+            {
+                head_ = reinterpret_cast<EntryHeader*>(recent_slab.first + recent_slab.second);
+                recent_slab.second += slot_size_;
+                head_->next_free_entry_ = nullptr;
+            }
+            else
+            {
+                head_ = newSlab();
+            }
+        }
         FIXED_POOL_DBG((std::cout << "FixedMemPool(" << slot_size_ << ") newSlab in allocate head_ " << head_<<  std::endl));
     }
 
@@ -154,23 +190,14 @@ void FixedMemPool::coDeallocate(void* p)
     deallocate(p);
 }
 
-void FixedMemPool::initSlab(void* slab)
+void FixedMemPool::initSlab(uint8_t* slab)
 {
-    uint8_t* p = reinterpret_cast<uint8_t*>(slab);
-    EntryHeader* entry=reinterpret_cast<EntryHeader*>(p);
-    for ( int i=0; i<slot_num_per_slab_-1; ++i )
-    {
-        p+=slot_size_;
-        entry->next_free_entry_ = reinterpret_cast<EntryHeader*>(p);
-#if FIXED_POOL_DEBUG
-        if (i < 10)
-           std::cout << "FixedMemPool(" << slot_size_ << ")::newSlab next_free_entry_"
-           << entry->next_free_entry_  << std::endl;
-#endif
-        entry=reinterpret_cast<EntryHeader*>(p);
-    }
+    EntryHeader* entry=reinterpret_cast<EntryHeader*>(slab);
+    // Only initialize the first slot for the newly allocated slab to avoid the cost of
+    // initializing and linking together all the unused slots.
     entry->next_free_entry_ = nullptr;
-    slab_list_.push_back(slab);
+    slab_list_.emplace_back(slab, /* header of the slab */
+                            slot_size_ /* size initialized in this slab */);
 }
 
 FixedMemPool::EntryHeader* FixedMemPool::newSlab()
@@ -179,7 +206,7 @@ FixedMemPool::EntryHeader* FixedMemPool::newSlab()
               << slot_size_*slot_num_per_slab_
               << " slot_size="  << slot_size_
               << std::endl));
-    void* slab = ::malloc(slot_size_*slot_num_per_slab_);
+    uint8_t* slab = reinterpret_cast<uint8_t*>(::malloc(slab_size_));
     if (!slab)
     {
         throw std::runtime_error(std::string("FixedMemPool::newSlab: memory full"));
@@ -188,13 +215,20 @@ FixedMemPool::EntryHeader* FixedMemPool::newSlab()
     return reinterpret_cast<EntryHeader*>(slab);
 }
 
+
+//------------------------------------------------------------------------------------------
+// FixedMemPoolPrealloc
+//------------------------------------------------------------------------------------------
+
 FixedMemPoolPrealloc::PoolHeader::PoolHeader(char* addr, size_t slot_num, size_t value_size)
     : owns_buffer_(false)
     , value_size_(value_size)
     , slot_size_ (constAlign(value_size,8))
     , slot_num_(slot_num)
     , addr_ (addr)
-{}
+{
+    initialize();
+}
 
 FixedMemPoolPrealloc::PoolHeader::PoolHeader(size_t slot_num, size_t value_size)
     : owns_buffer_(true)
@@ -202,7 +236,9 @@ FixedMemPoolPrealloc::PoolHeader::PoolHeader(size_t slot_num, size_t value_size)
     , slot_size_ (constAlign(value_size,8))
     , slot_num_(slot_num)
     , addr_ (reinterpret_cast<char*>(::malloc(slot_size_*slot_num_)))
-{}
+{
+    initialize();
+}
 
 struct FixedMemPoolPrealloc::EntryHeader
 {

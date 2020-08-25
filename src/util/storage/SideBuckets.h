@@ -1,5 +1,20 @@
 #pragma once
 
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file SideBuckets.h
+ * @library alt_util
+ * @brief definition of a sorted buckets to store values that change frequently at the
+ * top side in an indexed buffer (the front bucket buffer) so the search of frequently
+ * used buckets will be O(1). Buckets with values far away from the top beyond limit of
+ * the front bucket buffer will go into the back bucket buffer, which is a SortedBuckets
+ * and the cost of seach of infrequently used buckets will be O(logN).
+ */
+
 #include "SortedBuckets.h"
 
 namespace alt{
@@ -7,26 +22,13 @@ namespace alt{
 /**
  * \class SideBuckets
  * \ingroup StorageUtils
- * \brief Sorted buckets to store values that change frequently at only one side.
- * And the active side usually conatins consecutive values that we are insterensted.
- * The front bucket buffer is a ring buffer to store the active side with an indexed
- * hash. Values far away from the top beyond limit of the front bucket buffer will
- * go into the back bucket buffer, which is a SortedBuckets.
+ * \brief defines sorted buckets, where the front bucket buffer is a ring buffer to
+ * store the active side with an indexed hash. Values far away from the top beyond
+ * limit of the front bucket buffer are stored in a SortedBuckets.
  */
 template <typename Key, typename T, class Compare = SortedBucketCompareInc<Key>>
 class SideBuckets
 {
-    std::vector<T>                  front_bucks_;
-    SortedBuckets<Key, T, Compare>  back_bucks_;
-
-    int     top_ix_ {0};           ///< index of the top entry in front_bucks_
-    int     bot_ix_ {0};           ///< index of the bottom entry in front_bucks_
-    Key     top_ {Compare::max()}; ///< the top key value
-    size_t  count_ {0};            ///< number of non-empty entries in front_bucks_
-
-    size_t  front_bucket_sz_;      ///< size of front_bucks_
-    size_t  front_bucket_mask_;    ///< module mask of front_bucks_ bot_ix_
-
   public:
 
     using value_type = std::pair<Key, T>;
@@ -426,6 +428,18 @@ class SideBuckets
             --bot_ix_;
         }
     }
+    
+  private:
+    std::vector<T>                  front_bucks_;
+    SortedBuckets<Key, T, Compare>  back_bucks_;
+
+    int     top_ix_ {0};           ///< index of the top entry in front_bucks_
+    int     bot_ix_ {0};           ///< index of the bottom entry in front_bucks_
+    Key     top_ {Compare::max()}; ///< the top key value
+    size_t  count_ {0};            ///< number of non-empty entries in front_bucks_
+
+    size_t  front_bucket_sz_;      ///< size of front_bucks_
+    size_t  front_bucket_mask_;    ///< module mask of front_bucks_ bot_ix_
 
 };
 

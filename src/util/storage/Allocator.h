@@ -1,7 +1,23 @@
 #pragma once
 
-#include "FixedMemPool.h"  // for FixedMemPool
-#include <stdlib.h>        // for malloc/free
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file Allocator.h
+ * @library alt_util
+ * @brief definition of various allocators:
+ *   - StdFixedPoolAllocator: a fixed pool allocator for std containers
+ *   - PooledAllocator: a fixed pool allocator for ALT heterogeneous containers
+ *   - Allocator: heap allocator for ALT heterogeneous containers
+ *   - PAllocator: a singleton of PooledAllocator 
+ */
+
+#include "FixedMemPool.h"               // for FixedMemPool
+#include <util/numeric/Intrinsics.h>    // for constLog2
+#include <stdlib.h>                     // for malloc/free
 #include <iostream>
 #include <typeinfo> 
 #define MEM_POOL_DEBUG      1
@@ -44,6 +60,7 @@ class FixedMemPoolBin
     static FixedMemPoolBin& instance();
 
     void* allocate(size_t entry_size) noexcept(false);
+    void* reallocate(void* p, size_t entry_size) noexcept(false);
     void deallocate(void* p) noexcept(false);
 
 #if defined MEM_POOL_DEBUG

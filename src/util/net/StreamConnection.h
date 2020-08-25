@@ -9,7 +9,7 @@ namespace alt {
 class StreamListener
 {
   public:
-    virtual void onStreamData(RingBuffer& data);
+    virtual void onStreamData(Clock::tick_type, RingBuffer& data);
 };
 
 /**

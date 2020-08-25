@@ -1,5 +1,19 @@
 #pragma once
 
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file TranslationMap.h
+ * @library alt_util
+ * @brief definition of a string to string translation map
+ * Strings are pointers that points to the position in a string pool
+ * where the space is not freed for new string. Therefore, the map is suitable
+ * for the usage where erase is not required.
+ */
+
 #include "Allocator.h"
 #include "util/string/StrBuffer.h"
 #include "util/string/StrPool.h"
@@ -10,9 +24,6 @@ namespace alt
 
 /**
  * \brief implements a string to string translation map.
- * Strings are pointers that points to the position in a string pool
- * where the space is not freed for new string. Therefore, the map is suitable
- * for the usage where erase is not required.
  */
 using TranslationMapBase =
         std::unordered_map<StrRef,

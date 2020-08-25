@@ -1,5 +1,20 @@
 #pragma once
 
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file StrPrint.h
+ * @library alt_util
+ * @brief definition of a fast string printer
+ *    - StrPrint: a template string printer use std::string or alt::StrBuf
+ *      for the output
+ *    - StrPrinter: a  template string printer with self-contained fixe length
+ *      buffer
+*/
+
 #include "StrBuffer.h"
 
 #include <util/numeric/Intrinsics.h>   // for s_double_digits, s_exp10

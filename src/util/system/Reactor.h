@@ -1,4 +1,33 @@
 
+#pragma once
+
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file Reactor.h
+ * @library alt_util
+ * @brief Implements an event/message dispatch mechanism per thread for events delivered
+ * concurrently from multiple sources. The mechanism delivers the incoming events/nessages
+ * synchronously to its associated event handlers or message listeners. A reactor handles
+ * three types of events:
+ *    - Timer events. One timer queue per reactor.
+ *    - event messages posted for other threads through concurrent queue or from other
+ *      processes through shared memory queue. These are non-bloking messages queues and
+ *      a reactor may have multiple queues.
+ *    - events/messages polled from event poller in network or message queue from underlying
+ *      operating system. A reactor can have only one queue for this purpose. Because this
+ *      event poller typically blocks caller, though with a timeout, it is not practical
+ *      to have more than one event pollers to poll events with a timeout one after
+ *      another. It is better to put all event sources in one queue and pull them all at
+ *      once. If operating system does not support one poll for all events, you will need
+ *      to poll these in separate threads. For instance, in Windows system, you cannot
+ *      poll GUI messages and network events in one thread. A practical solution is to
+ *      have a separate thread to handle network events.
+ */
+
 #include <util/Defs.h>                  // for ALT_UTIL_PUBLIC
 #include "TimerQueue.h"                 // for TimerQueue
 #include "MsgPoller.h"                  // for MsgPoller
@@ -25,23 +54,7 @@ class ReactorOwner
 /**
  * \class Reactor
  * \ingroup Util
- * \brief  Implements an event/message dispatch mechanism per thread for events delivered
- * concurrently from multiple sources. The mechanism delivers the incoming events/nessages
- * synchronously to its associated event handlers or message listeners. A reactor handles
- * three types of events:
- *    - Timer events. One timer queue per reactor.
- *    - event messages posted for other threads through concurrent queue or from other
- *      processes through shared memory queue. These are non-bloking messages queues and
- *      a reactor may have multiple queues.
- *    - events/messages polled from event poller in network or message queue from underlying
- *      operating system. A reactor can have only one queue for this purpose. Because this
- *      event poller typically blocks caller, though with a timeout, it is not practical
- *      to have more than one event pollers to poll events with a timeout one after
- *      another. It is better to put all event sources in one queue and pull them all at
- *      once. If operating system does not support one poll for all events, you will need
- *      to poll these in separate threads. For instance, in Windows system, you cannot
- *      poll GUI messages and network events in one thread. A practical solution is to
- *      have a separate thread to handle network events.
+ * \brief  Implements an event/message dispatcher
  */
 class ALT_UTIL_PUBLIC Reactor
 {

@@ -1,5 +1,18 @@
 #pragma once
 
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file SortedArray.h
+ * @library alt_util
+ * @brief definition of a sorted array. Inserted values start in the
+ * middle of the storage and then expand on either direction depending
+ * on which end is shorter for the memory movement.
+ */
+
 #include <util/system/Platform.h>
 #include <util/numeric/Intrinsics.h> // For isel, power2Next
 #include <stddef.h>
@@ -19,7 +32,7 @@ namespace alt{
  * \brief Sorted array
  * \tparam T the value type, must be trivially destructible, because this array uses
  * fast memory move
- * \tparam Compare the function for the order based on the key value.
+ * \tparam Compare function for the order based on the key value.
  */
 template <typename T, class Compare=std::less<T> >
 class SortedArray
@@ -110,7 +123,7 @@ class SortedArray
                 ++erase_count;
                 --ix;
             }
-            // Compact memory from shorter end.
+            // Compact memory from the shorter end.
             if (ix - head_ < tail_ - ix)
             {
                 if (ix>head_)

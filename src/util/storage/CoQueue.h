@@ -1,9 +1,24 @@
 #pragma once
 
-#include "LinkedList.h"
-#include <util/system/Platform.h>
-#include <vector>
-#include <functional>
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file CoQueue.h
+ * @library alt_util
+ * @brief definition of lock free concurrent queues for single reader/writer
+ *   - CoQueueBase: the base class for all concurrent queues 
+ * Derived classes from CoQueueBase are:
+ *   - CoQueueT<T, Allocator> is for homogeneous entries of type T
+ *   - CoQueueT<T, FixedPool<T>> is for homogeneous entries of type T allocated in fixed pool
+ *   - CoQueue<Allocator> is for heterogeneous entries of different types
+ *   - CoQueue<PooledAllocator> is for heterogeneous entries of different types in a set of fixed pools
+ */
+
+#include <util/Defs.h>               // for ALT_UTIL_PUBLIC
+#include "Allocator.h"               // for Allocator 
 #include <atomic>                    // for atomic
 #include <mutex>                     // for mutex
 #include  <condition_variable>       // for condition_variable
@@ -13,16 +28,11 @@ namespace alt {
 
 /**
  * \class CoQueueBase
- * \brief implements thread safe concurrent queue. Lock free for single writer mode
+ * \brief implements thread safe concurrent queue. Lock free for single reader/writer mode
  * @note  Dequeue is wait-free if blocking_ is false. Enqueue operation is always wait-free.
  * Elements in the queue are chained in a linklist which can be allocated a memory pool.
- * Derived classes from CoQueueBase are:
- * CoQueueT<T, Allocator> is for homogeneous entries of type T
- * CoQueueT<T, FixedPool<T>> is for homogeneous entries of type T allocated in fixed pool
- * Queue<Allocator> is for heterogeneous entries of different types
- * Queue<PooledAllocator> is for heterogeneous entries of different types in memory pool
  */
-class CoQueueBase
+class ALT_UTIL_PUBLIC CoQueueBase
 {
   public:
 

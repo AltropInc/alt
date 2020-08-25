@@ -1,6 +1,18 @@
 
 #pragma once
 
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file MsgPoller.h
+ * @library alt_util
+ * @brief Implements a message poller using concrent queue. This is used to
+ * poll messages sending from other threads.
+ */
+
 #include <util/storage/CoQueue.h>       // for CoQueue
 #include <util/types/Clock.h>           // for Clock::duration
 #include <util/types/TemplateHelper.h>  // for NONCOPYABLE

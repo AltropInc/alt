@@ -11,6 +11,7 @@ add_executable (UtilTest
     NamedTreeNodeTest.cpp
     RingBufferTest.cpp
     SortedArrayTest.cpp
+    JsonParserTest.cpp
     XmlParserTest.cpp
 )
 target_link_libraries (UtilTest PRIVATE alt_util)

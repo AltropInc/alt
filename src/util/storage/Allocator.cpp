@@ -199,6 +199,7 @@ void* FixedMemPoolBin::allocate(size_t bin, size_t entry_size)
             pools_[bin] = new FixedMemPool(1<<(bin+3), entry_num_per_bucket);
         }
     }
+
 #if ALLOCATE_DEBUG
     void* p= pools_[bin]->allocate(bin);
     std::cout << "allocated " << p << std::endl;
@@ -223,6 +224,35 @@ void* FixedMemPoolBin::allocate(size_t size)
     }
 
     return allocate(bin, size);
+}
+
+void* FixedMemPoolBin::reallocate(void* p, size_t new_size)
+{
+    if (!p)
+    {
+        return allocate(new_size);
+    }
+    uint16_t old_bin = FixedMemPool::getAlloactedBin(p);
+    int new_bin = new_size <= 8 ? 0 : log2Floor(new_size-1) - 2;
+    if (old_bin > POOL_NUMBER && new_bin > POOL_NUMBER)
+    {
+        return FixedMemPool::reallocateBigSize(p, new_size, new_bin);
+    }
+    if ((old_bin==new_bin || new_bin == old_bin-1) && old_bin < POOL_NUMBER)
+    {
+        // no need to allocate if both are allocate in bins and the new bin
+        // is not bigger nor smaller by more than one.
+        return p;
+    }
+
+    // for all other case, we nee reallocate and copy the memory contents
+    void* new_buffer =  (new_bin >= POOL_NUMBER)
+        ? FixedMemPool::allocateBigSize(new_size, POOL_NUMBER)
+        : allocate(new_bin, new_size);
+
+    size_t sz = old_bin > POOL_NUMBER ? new_size : std::min(new_size, pools_[old_bin]->slotSize());
+    memcpy(new_buffer, p, sz);
+    return new_buffer;
 }
 
 void FixedMemPoolBin::deallocate(void* p)

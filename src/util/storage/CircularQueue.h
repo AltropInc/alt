@@ -1,14 +1,26 @@
 #pragma once
 
-#include "Allocator.h"          // for StorageAttrs
-#include <util/ipc/SharedMemory.h>
-#include <util/system/Platform.h>
-#include <util/types/Enum.h>
-#include <util/system/SysConfig.h>
-#include <string>
-#include <errno.h>
-#include <atomic>
-#include <unistd.h>  // for pause
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file CircularQueue.h
+ * @library alt_util
+ * @brief Defines circular queue:
+ *    - lock free
+ *    - mutiple writers and readers
+ *    - support usage in shared memory
+ *    - zero copy in read and write
+ * TODO to be tested
+ */
+
+#include "Allocator.h"              // for StorageAttrs
+#include <util/ipc/SharedMemory.h>  // for SharedMemory
+#include <util/types/Enum.h>        // for ENUM
+#include <atomic>                   // for atomic
+#include <unistd.h>                 // for pause
 
 namespace alt {
 
@@ -167,7 +179,7 @@ class ALT_UTIL_PUBLIC CircularQueue final
     static SM_Mode getOpenMode(bool is_master)
     { return is_master ? SM_Mode::SM_OpenOrCreate : SM_Mode::SM_OpenOnly; }
 
-    static SM_Access getAccessRequeust(bool is_master) { return SM_Access::SM_ReadWrite; }
+    static SM_Access getAccessRequest(bool is_master) { return SM_Access::SM_ReadWrite; }
 
     size_t getIndex (int64_t seq) const
     {

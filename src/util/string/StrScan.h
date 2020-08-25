@@ -1,12 +1,19 @@
+#pragma once
+
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
 /**
  * @file StrScan.h
- * @brief Defines ScanBuffer, StrScan, StrParser Classes
- * @author David Shang
- * @version 1.00
- * $Id: $
- */
-
-#pragma once
+ * @library alt_util
+ * @brief definition of fast string scanners:
+ *    - ScanBuffer: a wrapper to hold a reference to the string to be scanned
+ *    - StrScan: a base class for other string parsers 
+ *    - StrParser: a string parser using operator >> and handling seperators
+ *      for string split
+*/
 
 #include "StrBuffer.h"
 
@@ -162,7 +169,6 @@ public:
     /// current position
     char getSubstringQuoted(char end_ch, std::string& substring);
 
-
     enum ErrorStatus
     {
         Err_MissingHexDigits,
@@ -192,6 +198,7 @@ public:
         const char *start_pos_{nullptr};
         const char *end_pos_{nullptr};
         std::string string_;
+        size_t      start_line_{0};
 
         ScannedValue() { string_.reserve(1000); }
 
@@ -353,7 +360,7 @@ inline char StrScan::nextNonWhiteSpace()
 /**
  * \class StrParser
  * \ingroup util
- * \brief A string parser using operator >> and handles sperators for string slipts
+ * \brief A string parser using operator >> and handles seperators for string splits
  */
 class StrParser : public StrScan
 {

@@ -1,5 +1,18 @@
 #pragma once
 
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file EnumSet.h
+ * @library alt_util
+ * @brief Defines reflective Enum Set Type that supports that works for both
+ * reflective enum adn standard C++ enum. Howver, the reflective feature for
+ * standard C++ enum is not available
+ */
+
 #include "Enum.h"
 
 #include <util/string/StrUtils.h>
@@ -9,7 +22,11 @@
 namespace alt
 {
 
-// Helper to convert standard enum or non-standard enum value to size_t
+/**
+ * \struct EnumToSizeT
+ * \ingroup Types
+ * \brief helper to convert standard enum or refelective enum value to size_t
+ */
 struct EnumToSizeT
 {
     template <class ET>
@@ -27,10 +44,18 @@ struct EnumToSizeT
     }
 };
 
-// A simple replacement of std::bitset. Number of bits limitation by bits in T
+/**
+ * \struct BitSet
+ * \ingroup Types
+ * \brief bitset template on an integral underlying type as an alternative for
+ * std::bitset used to construct EnumSet. See EnumSet. This is used whe you need a
+ * fixed-sized value.
+ * \tparam T underlying type for the bit set type.
+ */
 template <typename T>
 struct BitSet
 {
+    static_assert(std::is_integral<T>::value, "Integral required for BitSet");
     T   value_ { 0UL} ;
     BitSet() = default;
     BitSet(const BitSet& oth): value_(oth.value_) {}
@@ -43,7 +68,7 @@ struct BitSet
     BitSet& flip (size_t v) { value_ = value_ ^ (T(1) << v); return *this; }
     BitSet& flip () { value_ = ~value_; return *this; }
     friend BitSet operator~ (BitSet bs) { bs.flip(); return bs; }
-    bool empty() const { return value_==0; }
+    bool none() const { return value_==0; }
     bool any() const { return value_!=0; }
     size_t count() const { return __builtin_popcountl(value_); }
     size_t size() const { return __builtin_popcountl(value_); }
@@ -58,7 +83,7 @@ struct BitSet
     BitSet operator - (BitSet oth) const { oth.value_&= ~value_; return oth; }
     BitSet operator + (BitSet oth) const { oth.value_|= value_; return oth; }
     uint64_t to_ullong() const { return uint64_t(value_); }
-    uint64_t toUnderlying() const { return value_; }
+    T toUnderlying() const { return value_; }
     static BitSet fromUnderlying(T val) { return BitSet(val); }
 
     std::string to_string () const
@@ -74,15 +99,16 @@ struct BitSet
 
 /**
  * \class EnumSet
- * \brief implements a bitset of enum
+ * \brief implements an enum set type
  * @note The limitation of not being constexpr for constructor comes from
  *       std::bitset whose constructor is not constexpr as it should be.
- *       Using constexpr EnumSet value is not very common so we will stick
- *       with std::bitset.
  */
 template<typename ET, typename BT=std::bitset<sizeof(ET)*CHAR_BIT>>
 class EnumSet
 {
+    static_assert(std::is_enum<ET>::value || std::is_base_of<EnumBase, ET>::value,
+        "Enum type required for EnumSet");
+
     using bitset_t = BT;
     bitset_t bitset_;
 
@@ -100,7 +126,7 @@ class EnumSet
     void set(ET e) { bitset_.set(EnumToSizeT::get<ET>(e)); }
     EnumSet &set(ET e, bool value)
     { bitset_.set(EnumToSizeT::get<ET>(e), value); return *this; }
-    EnumSet& set() const { return bitset_.set(); }
+    EnumSet& set() { bitset_.set(); return *this; }
 
     void unset(ET e) { bitset_.reset(EnumToSizeT::get<ET>(e)); }
     void clear() { bitset_.reset(); }
@@ -117,14 +143,16 @@ class EnumSet
     friend EnumSet operator~ (EnumSet es) { es.flip(); return es; }
 
     bool has(ET e) const { return bitset_.test(EnumToSizeT::get<ET>(e)); }
-    bool empty() const { return bitset_.empty(); }
+    bool hasAny(const EnumSet &es) const { return (bitset_ & es.bitset_).any(); }
+
+    bool empty() const { return bitset_.none(); }
  
     explicit operator bool() const { return bitset_.any(); }
     size_t size() const { return bitset_.size(); }
     size_t count() const { return bitset_.count(); }
  
     EnumSet &operator|=(ET e) { set(e); return *this; }
-    EnumSet &operator&=(ET e) { const bool v=test(e); clear(); return set(e, v); }
+    EnumSet &operator&=(ET e) { const bool v=bitset_.test(e); clear(); return set(e, v); }
     EnumSet &operator+=(ET e) { set(e); return *this; }
     EnumSet &operator-=(ET e) { return set(e, false); }
 
@@ -146,7 +174,6 @@ class EnumSet
     ///Contructor from multiple underlying enum type values
     ///@Usage: EnumSet<EnumType>(EnumValue1, EnumValue3, EnumValue5)
     template<typename... ETS>
-             //class = std::enable_if_t<all_same_type<ET, ETS...>::value, void>>
     EnumSet(ET e, ETS... others)
     {
         bitset_.set(EnumToSizeT::get<ET>(e));
@@ -156,7 +183,7 @@ class EnumSet
     uint64_t toUInt64 () const noexcept(false) { return bitset_.to_ullong(); }
 
     bitset_t toUnderlying() const { return bitset_; }
-    //static EnumSet fromUnderlying (const bitset_t& bitset) { return EnumSet(bitset); }
+    static EnumSet fromUnderlying (const bitset_t& bitset) { return EnumSet(bitset); }
 
     /// Returns string in binary bitset format
     std::string toStringRaw() const { return bitset_.to_string(); }
@@ -206,5 +233,8 @@ template <typename ET> using EnumSet8  = EnumSet<ET, BitSet<uint8_t>>;
 template <typename ET> using EnumSet16 = EnumSet<ET, BitSet<uint16_t>>;
 template <typename ET> using EnumSet32 = EnumSet<ET, BitSet<uint32_t>>;
 template <typename ET> using EnumSet64 = EnumSet<ET, BitSet<uint64_t>>;
+#ifdef __SIZEOF_INT128__ 
+template <typename ET> using EnumSet128 = EnumSet<ET, BitSet<ullong>>;
+#endif
 
 } // namespace alt

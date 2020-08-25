@@ -1,8 +1,33 @@
 #pragma once
 
-#include "LinkedList.h"              // for LinkedList
-#include "FixedMemPool.h"            // for FixedPool
-#include <type_traits>               // for is_trivially_destructible
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file PooledHash.h
+ * @library alt_util
+ * @brief Defines  a hush table use fixed memory pool.
+ * PooledHash is similar to:
+ *    - std::unordered_map<T, alt::StdFixedPoolAllocator<std::pair<const Key, T>>>,
+ * but has the following advantages:
+ *    - less fragments: the key and the link pointers are packed together with the value
+ *    - less cache misses: uses a single fixed pool. std::unordered_map has to rebind
+ *      allocator and using multiple fixed pool for different allocate sizes
+ *    - choice of pool: you can provide dedicated fixed pool instead of using the singleton
+ *      of the memory pool shared with all others
+ *    - more efficient
+ * Besides, there is one important difference:
+ *    - the map may contain mutiple values with the same key if Uniqueness is false
+ *      unless you guarantee that all values inserted have unique keys.
+ */
+
+#include "LinkedList.h"                 // for LinkedList
+#include "FixedMemPool.h"               // for FixedPool
+#include <util/numeric/Intrinsics.h>    // for power2Next
+#include <util/types/TemplateHelper.h>  // for NONCOPYABLE
+#include <type_traits>                  // for is_trivially_destructible
 
 #define MAKE_POOLED_HASH_ENTRY(KT, KF, KFUNC) \
     using KeyType = KT; \
@@ -28,18 +53,8 @@ namespace alt {
  * \tparam Uniqueness tells whether the uniqueness of the key should be ensured.
  * If you know for sure all values inserted into the map have unique keys, and can
  * leave Uniqueness false so the map will not check uniqueness for each insert and
- * this will make the map more effcient
- * \tparam BucketSize the size of the bucket of the fixed memeory pool.
- * \note This class is similar to std::unordered_map<T, alt::StdFixedPoolAllocator<std::pair<const Key, T>>>,
- * but has the following advantages:
- *    - less fragments: the key and the link pointers are packed together with the value
- *    - less cache misses: uses a single fixed pool
- *    - choice of pool: you can provide dedicated fixed pool instead of using the singleton
- *      of the memory pool shared with all others
- *    - more efficient
- * Besides, there is one important difference:
- *    - the map may contain mutiple values with the same key if Uniqueness is false
- *      unless you guarantee that all values inserted have unique keys.
+ * this will make the map more efficient
+ * \tparam BucketSize the size of the bucket of the fixed memory pool.
  */
 template <typename ValueType, bool Uniqueness=false, size_t BucketSize=1024>
 class PooledHash
@@ -296,7 +311,7 @@ class PooledHash
     /// \return iterator to the element found.  If no such element is found,
     /// past-the-end (see end()) iterator is returned
     /// \note If values in the map contains the entries of the same leys, call
-    /// this function to get the otherator so that you can check if the value at
+    /// this function to get the iterator so that you can check if the value at
     /// the next position have the same key
     iterator find(typename ValueType::KeyType const& key)
     {
@@ -317,11 +332,11 @@ class PooledHash
     }
 
     /// \brief replace the element key value
-    /// \return the InsertResult hvaing a pointer to the memory where the value's
+    /// \return the InsertResult having a pointer to the memory where the value's
     ///  key is renewed and a boolean value to indicate whether the key is newly
     /// replaced or the value is replaced by an existing value having the new key.
     /// \note make sure the the new key does not exist. Otherwise, the element
-    /// will be removed if the uniquess must be ensured
+    /// will be removed if the uniqueness must be ensured
     InsertResult replaceKey(typename ValueType::KeyType const& key,
                   typename ValueType::KeyType const& new_key)
     {
@@ -344,7 +359,7 @@ class PooledHash
     /// \brief delete all entries
     /// if the ValueType is a trivially destructible type and it owns the pool,
     /// this will do a fast internal memory clear without going through all
-    /// entries to desttoy allocated object. Otherwise a normal clear will be
+    /// entries to destroy allocated object. Otherwise a normal clear will be
     /// performed
     void clear()
     {

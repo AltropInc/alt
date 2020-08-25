@@ -1,3 +1,8 @@
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
 #include "StreamParser.h"
 #include "StrUtils.h"
 #include <sstream>
@@ -39,10 +44,12 @@ ParserStream* ParserStream::createFileStream (const char* file_path)
     return nullptr;
 }
 
-void ParserStream::registerError(const char* err, size_t pos)
+void ParserStream::registerError(ParseErrID err, const char* extra_into, size_t pos)
 {
-    errors_.emplace_back(ErrorInfo{err, line_, pos});
-    std::cout << "Error: " << err << " at line " << line_ << ", pos " << pos << std::endl;
+    errors_.emplace_back(ErrorInfo(err, extra_into, line_, pos));
+    std::cerr << "Error (" << err << "): ";
+    if (extra_into) std::cerr << extra_into;
+    std::cerr << " at line " << line_ << ", pos " << pos << std::endl;
 }
 
 //==============================================================================
@@ -84,6 +91,17 @@ StreamParser::StreamParser(ParserStreamContext& context, std::istream * input_st
 {
     context_.current_stream_ = new ParserStream(input_stream);
     context_.current_parser_ = this;
+}
+
+bool StreamParser::hasError() const
+{
+    return context_.current_stream_ && !context_.current_stream_->getErrors().empty();
+}
+
+const ErrorInfoVec& StreamParser::getErrors() const
+{
+    static ErrorInfoVec empty_errors_;
+    return context_.current_stream_ ? context_.current_stream_->getErrors() : empty_errors_;
 }
 
 char StreamParser::skipWhiteSpace()
@@ -214,6 +232,52 @@ char StreamParser::skipToChar(char target)
     return ch;
 }
 
+#if 0
+char StreamParser::getName(char end_ch, std::string& name_scanned, bool stop_at_ws)
+{
+    // skip leading white space
+    char ch = skipWhiteSpace();
+    while (ch && ch!=end_ch)
+    {
+        if (isspace(ch))
+        {
+            if (stop_at_ws)
+            {
+                break;
+            }
+            scan_buffer_.advance(); 
+        }
+        else
+        {
+            name_scanned.push_back(ch);
+        }
+        // A name must complete within the current line
+        ch = scan_buffer_.curChar();
+    }
+    return ch;
+}
+
+char StreamParser::getNameOrString(char end_ch, std::string& text_scanned)
+{
+    char ch = skipWhiteSpace();
+    if (ch=='\"')
+    {
+        StrScan::getString();
+        text_scanned.swap(tv_.string_);
+        ch = nextChar(true);
+    }
+    else
+    {
+        ch = getName(end_ch, text_scanned, true /*stop at whitespace*/);
+    }
+    if (ch==end_ch)
+    {
+        ch = nextChar(true);
+    }
+    return ch;
+}
+#endif
+
 //==============================================================================
 // ParserStreamContext
 //==============================================================================
@@ -319,6 +383,7 @@ bool ParserStreamContext::pushStream (ParserStream * stream)
     {
         current_parser_->scan_buffer_.reset();
     }
+    nextLine();
     return true;
 }
 
@@ -348,6 +413,7 @@ bool ParserStreamContext::pushFileStream (const char* file_path)
     auto stream = ParserStream::createFileStream(file_path);
     if (stream)
     {
+        stream->original_file_path_ = file_path;
         return pushStream(stream);
     }
     return false;
@@ -361,6 +427,21 @@ bool ParserStreamContext::pushStream (std::istream * stream)
 bool ParserStreamContext::pushStream (const char * input)
 {
     return pushStream(new ParserStream(input));
+}
+
+bool ParserStreamContext::pushStream
+    (const std::filesystem::path& path, const std::filesystem::path& original_path)
+{
+    auto stream = ParserStream::createFileStream(path.string().c_str());
+    if (stream)
+    {
+        if (!original_path.empty())
+        {
+            stream->original_file_path_ = original_path.string();
+        }
+        return pushStream(stream);
+    }
+    return false;
 }
 
 bool ParserStreamContext::pushParser (StreamParser * parser)
@@ -413,11 +494,19 @@ bool ParserStreamContext::pushParser(StreamParser * parser, const std::filesyste
     return pushParser(parser);
 }
 
-void ParserStreamContext::registerError(const char* err)
+void ParserStreamContext::registerError(ParseErrID err, const char* extra_into)
 {
     if (current_stream_ && current_parser_)
     {
-        current_stream_->registerError(err, current_parser_->scan_buffer_.pos());
+        current_stream_->registerError(err, extra_into, current_parser_->scan_buffer_.pos());
+    }
+}
+
+void ParserStreamContext::registerError(const char* err_into)
+{
+    if (current_stream_ && current_parser_)
+    {
+        current_stream_->registerError(0, err_into, current_parser_->scan_buffer_.pos());
     }
 }
 

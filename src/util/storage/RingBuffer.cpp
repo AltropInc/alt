@@ -1,6 +1,7 @@
-#include "RingBuffer.h"
-#include <util/system/SysConfig.h>
-#include <assert.h>
+#include "RingBuffer.h"              // for RingBuffer etc
+#include <assert.h>                  // for assert
+#include <array>                     // for array
+#include <cstring>                   // for memcpy
 
 namespace alt
 {
@@ -149,7 +150,7 @@ bool RingBuffer::write (const char* buff, size_t len, bool split)
     return true;
 }
 
-size_t RingBuffer::fetchFreeSpace(std::span<iovec,2>& iov)
+size_t RingBuffer::fetchFreeSpace(std::array<iovec,2>& iov)
 {
     size_t read_pos = header_.read_pos_.load(std::memory_order_acquire);
     size_t write_pos = header_.write_pos_.load(std::memory_order_relaxed);
@@ -197,7 +198,7 @@ void RingBuffer::commitWrite(size_t commited)
     header_.write_pos_.store(write_pos + commited, std::memory_order_release);
 }
 
-size_t RingBuffer::fetchAll(std::span<iovec,2>& iov)
+size_t RingBuffer::fetchAll(std::array<iovec,2>& iov)
 {
     size_t read_pos = header_.read_pos_.load(std::memory_order_relaxed);
     size_t write_pos = header_.write_pos_.load(std::memory_order_acquire);
@@ -239,18 +240,18 @@ size_t RingBuffer::fetchAll(std::span<iovec,2>& iov)
 }
 
 // Non-copy read
-size_t RingBuffer::fetch(std::span<iovec,2>& iov,  size_t len)
+size_t RingBuffer::fetch(std::array<iovec,2>& iov,  size_t len)
 {
     size_t read_pos = header_.read_pos_.load(std::memory_order_relaxed);
     return fetch_i(iov, len, read_pos);
 }
 
-size_t RingBuffer::fetchNext(std::span<iovec,2>& iov, size_t len)
+size_t RingBuffer::fetchNext(std::array<iovec,2>& iov, size_t len)
 {
     return fetch_i(iov, len, header_.commit_pos_);
 }
 
-size_t RingBuffer::fetch_i(std::span<iovec,2>& iov,  size_t len, size_t read_pos)
+size_t RingBuffer::fetch_i(std::array<iovec,2>& iov,  size_t len, size_t read_pos)
 {
     size_t write_pos = header_.write_pos_.load(std::memory_order_acquire);
     if (read_pos + len > write_pos)

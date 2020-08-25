@@ -1,9 +1,21 @@
 #pragma once
 
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file SharedHash.h
+ * @library alt_util
+ * @brief definition of lock free pooled hash table in shared memory
+ * TODO to be justified for its usage and tested
+ */
+
 #include "LinkedList.h"
 #include "FixedMemPool.h"
 #include <util/system/Platform.h>
-#include <ipc/Mutex.h>
+#include <util/ipc/Mutex.h>
 #include <vector>
 #include <atomic>
 #include <functional>
@@ -29,9 +41,9 @@ struct  SharedHashEntryBase
 /**
  * \class SharedHash
  * \brief Lock free pooled hash table for multiple processes
- * \note Earse function is not supported
+ * \note Erase function is not supported
  */
-template <typename T, typename std::enable_if<std::is_base_of<PooledHashEntryBase,T>::value>::type>
+template <typename T, typename std::enable_if<std::is_base_of<SharedHashEntryBase,T>::value>::type>
 class SharedHash
 {
   public:

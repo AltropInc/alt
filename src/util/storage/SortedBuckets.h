@@ -1,4 +1,22 @@
 #pragma once
+
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file SortedBuckets.h
+ * @library alt_util
+ * @brief definition of a sorted buckets in which the bucket value can
+ * be merged (accumulated or deducted). If the bucket value becomes zero,
+ * it will be removed. Buckets starts in the middle of the storage and then
+ * expand on either direction depending on which end is shorter for the memory
+ * movement. This significantly reduce the need to move memory if inserting/
+ * deleting buckets mostly happens at the end or near the end of the bucket
+ * storage., for instance, in a price book.
+ */
+
 #include <util/system/Platform.h>
 #include <util/numeric/Intrinsics.h> // For isel, power2Next
 #include <stddef.h>
@@ -257,5 +275,5 @@ class SortedBuckets
     }
 };
 
-} // namesapce alt
+} // namespace alt
 

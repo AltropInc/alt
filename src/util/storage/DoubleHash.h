@@ -1,4 +1,33 @@
-#include "basictypes.h"
+#pragma once
+
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file DoubleHash.h
+ * @library alt_util
+ * @brief Implements an open-addressing hash table to resolve hash collisions
+ * by using a secondary hash of the key as an offset when a collision occurs.
+ * DoubleHash has a much faster search but may be slower in inserting. Therefore,
+ * it is suitable to use in case we have a fixed number of things to hash during
+ * initialization.  During inserting, if collision cannot be resolved, resize the
+ * table and rehash the whole entries are required.
+ * TODO: to be tested and more work required to make it a good hash table to use
+ */
+
+#include <util/numeric/Intrinsics.h>    // RJIntHash and TWIntHash
+#include <util/string/StrUtils.h>       // for StrHash
+
+namespace alt
+{
+
+struct DoubleHashKey
+{
+    uint32_t           key1_ {0};
+    uint32_t           key2_ {0};
+};
 
 template <class KT, class T, class Hash>
 class DoubleHash
@@ -11,8 +40,7 @@ class DoubleHash
     {
         key_type           key_;
         mapped_type        value_;
-        uint32_t           key1_ {0};
-        uint32_t           key2_ {0};
+        DoubleHashKey      dh_key_;
         bool               replaced_ {false};
         bool               empty_ {true};
     };
@@ -51,18 +79,17 @@ void DoubleHash<KT,T,Hash>::initialize(uint32_t init_size)
 template <class KT, class T, class Hash>
 int32_t DoubleHash<KT,T,Hash>::find(key_type key)
 {
-    int32_t key1, key2;
-    key_type dh_key;
+    DoubleHashKey dh_key;
     Hash::hash (key, dh_key);
     int32_t index1 = dh_key.key1_ & index_mask_;
     int32_t index2 = dh_key.key2_ & index_mask_;
     auto& val1 = values_[index1];
-    if (val1.key1_ == dh_key.key1_ && val1.key2_ == dh_key.key2_)
+    if (val1.dh_key_ == dh_key)
     {
         return val1_.index_;
     }
     auto& val2 = values_[index2];
-    if (val2.key1_ == dh_key.key1_ && val2.key2_ == dh_key.key2_)
+    if (val1.dh_key_ == dh_key)
     {
         return val2.index_;
     }
@@ -73,30 +100,30 @@ template <class KT, class T, class Hash>
 bool DoubleHash<KT,T,Hash>::replace(int32_t index, const T& new_val)
 {
     auto& val = values_[index];
-    if (val.repalced_)
+    if (val.replaced_)
     {
         sdt::cerr << "Cyclic replacing position " << index << std::endl;
-        val.repalced_ = false;
+        val.replaced_ = false;
         return false;
     }
     const auto old_val = values_[index];
     values_[index] = new_val;
     if (old_val.empty_)
     {
-        val.repalced_ = false;
+        val.replaced_ = false;
         return true;
     }
-    val.repalced_ = true;
+    val.replaced_ = true;
     bool res {false};
-    if (index==old_val.key1_ & index_mask_)
+    if (index==old_val.dh_key_.key1_ & index_mask_)
     {
-        res = replace(old_val.key2_ & index_mask_, old_val);
+        res = replace(old_val.dh_key_.key2_ & index_mask_, old_val);
     }
     else
     {
-        res = replace(old_val.key1_ & index_mask_, old_val);
+        res = replace(old_val.dh_key_.key1_ & index_mask_, old_val);
     }
-    val_.repalced_ = false;
+    val_.replaced_ = false;
     return res;
 }
 
@@ -104,7 +131,7 @@ template <class KT, class T, class Hash>
 bool DoubleHash<KT,T,Hash>::insert(key_type key, const T& val)
 {
     int32_t key1, key2;
-    key_type dh_key;
+    DoubleHashKey dh_key;
     Hash::hash (key, dh_key);
     int32_t index1 = dh_key.key1_ & index_mask_;
     int32_t index2 = dh_key.key2_ & index_mask_;
@@ -138,8 +165,7 @@ bool DoubleHash<KT,T,Hash>::insert(key_type key, const T& val)
         val2.empty_ = false;
         val2.replaced_ = false;
         val2.key_   = key;
-        val2.key1_  = dh_key.key1_;
-        val2.key2_  = dh_key.key2_;
+        val2.dh_key_  = dh_key;
         return true;
     }
  
@@ -155,10 +181,10 @@ class UInt32DoubleHasher
 {
    typedef uint32_t        KeyType;
 
-   static inline void hash (KeyType key, DoubleHash::key_type& dh_key)
+   static inline void hash (KeyType key, DoubleHashKey& dh_key)
    {
-      dh_key.index1_ = RJIntHash(key);
-      dh_key.index2_ = TWIntHash(key);
+      dh_key.key1_ = RJIntHash(key);
+      dh_key.key2_ = TWIntHash(key);
    }
 };
 
@@ -166,10 +192,10 @@ class UInt64DoubleHasher
 {
    typedef uint64_t        KeyType;
 
-   static inline void hash (KeyType key, DoubleHash::Index& dh_index)
+   static inline void hash (KeyType key, DoubleHashKey& dh_index)
    {
-      dh_index.index1_ = RJIntHash(key & 0xFFFFFFFFU) ^ TWIntHash(key >> 32);
-      dh_index.index2_ = TWIntHash(key & 0xFFFFFFFFU) ^ RJIntHash(key >> 32);
+      dh_index.key1_ = RJIntHash(key & 0xFFFFFFFFU) ^ TWIntHash(key >> 32);
+      dh_index.key2_ = TWIntHash(key & 0xFFFFFFFFU) ^ RJIntHash(key >> 32);
    }
 };
 
@@ -177,11 +203,11 @@ class AddressDoubleHasher
 {
    typedef void*        KeyType;
 
-   static inline void hash (KeyType key, DoubleHash::Index& dh_index)
+   static inline void hash (KeyType key, DoubleHashKey& dh_index)
    {
-      dh_index.index1_ = RJIntHash(reinterpret_cast<uint64_t>(key) & 0xFFFFFFFFU) ^
+      dh_index.key1_ = RJIntHash(reinterpret_cast<uint64_t>(key) & 0xFFFFFFFFU) ^
                          TWIntHash(reinterpret_cast<uint64_t>(key) >> 32);
-      dh_index.index2_ = TWIntHash(reinterpret_cast<uint64_t>(key) & 0xFFFFFFFFU) ^
+      dh_index.key2_ = TWIntHash(reinterpret_cast<uint64_t>(key) & 0xFFFFFFFFU) ^
                          RJIntHash(reinterpret_cast<uint64_t>(key) >> 32);
    }
 };
@@ -190,12 +216,12 @@ class StringDoubleHasher
 {
    typedef char*        KeyType;
 
-   static inline hash (KeyType key, DoubleHash::Index& dh_index)
+   static inline void hash (KeyType key, DoubleHashKey& dh_index)
    {
-      dh_index.index1_ = strHash(key, len, 0x165667b1);
-      dh_index.index2_ = strHash(key, len, 0x27d4eb2d);
+      dh_index.key1_ = strHash(key, 0x165667b1);
+      dh_index.key2_ = strHash(key, 0x27d4eb2d);
    }
 };
 
-
+} // namespace alt
  

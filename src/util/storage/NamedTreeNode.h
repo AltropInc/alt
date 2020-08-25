@@ -1,13 +1,39 @@
 #pragma once
 
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file NamedTreeNode.h
+ * @library alt_util
+ * @brief Defines named tree node. If a tree node has a name, its name is
+ * registered in one of its ancestor's hash table. A child can be searched
+ * through its parent by name. The node that holds the name hash table is
+ * a name register. Other nodes are hanger-ons. The root must be a name register.
+ * Therefore, a hanger-on node should normally not be detached from a tree unless
+ * it is going to be deleted. However, a hanger-on node can still be detached
+ * without unregistering its name in its name register, and in this case, the
+ * hanger-on node still belongs to its original parent and it can be fostered by
+ * another tree node and the names of the hanger-on and all its hander-on children
+ * will be transferred to a new name register.
+ */
+
 #include <util/Defs.h>              // for ALT_UTIL_PUBLIC
-#include "TreeNode.h"
-#include "StringHashMap.h"
-#include "util/string/StrPrint.h"
+#include "TreeNode.h"               // for TreeNode
+#include "StringHashMap.h"          // for StringHashMap
+#include "util/string/StrPrint.h"   // for StrPrinter
+#include "util/string/StrUtils.h"   // for StrSplit
 
 namespace alt
 {
 
+/**
+ * \class NamedTreeNode
+ * \brief  Defines named tree node
+ * \tparam Alloc: type of allocator to determine how the tree node is allocated 
+ */
 template <class Alloc = Allocator>
 class ALT_UTIL_PUBLIC NamedTreeNode: public TreeNode<Alloc>
 {
@@ -266,6 +292,20 @@ class ALT_UTIL_PUBLIC NamedTreeNode: public TreeNode<Alloc>
     {
         return const_cast<NamedTreeNode*>(this)->searchDown(name);
     }
+
+    NamedTreeNode* myOffspring (const char* name);
+    NamedTreeNode* myOffspring (std::vector<std::string> const& name_list);
+
+    const NamedTreeNode* myOffspring (const char* name) const
+    {
+        return const_cast<NamedTreeNode*>(this)->myMyOffspring(name);
+    }
+
+    const NamedTreeNode* myOffspring (std::vector<std::string> const& name_list) const
+    {
+        return const_cast<NamedTreeNode*>(this)->myMyOffspring(name_list);
+    }
+
 
     //static NamedTreeNode* releaseChild(NamedTreeNode* node);
 
@@ -561,6 +601,49 @@ void NamedTreeNode<Alloc>::searchDown (const char * name , ConstSearchResult& re
 }
 
 template <class Alloc>
+NamedTreeNode<Alloc>* NamedTreeNode<Alloc>::myOffspring (const char * name)
+{
+    std::vector<std::string> name_list;
+    size_t res = strSplit(name, name_list, 0, ',');
+    NamedTreeNode* node = this;
+     NamedTreeNode* found = nullptr;
+    for (auto& n: name_list)
+    {
+        auto const & name_map = node->childNameMap();
+        auto iter = name_map.find(QualifiedName(node->id_, name).c_str());
+        if (iter==name_map.end())
+        {
+            found = nullptr;
+            break;
+        }
+        node = iter->second;
+        found = node;
+    }
+    return found;
+}
+
+
+template <class Alloc>
+NamedTreeNode<Alloc>* NamedTreeNode<Alloc>::myOffspring (std::vector<std::string> const& name_list)
+{
+    NamedTreeNode* node = this;
+    NamedTreeNode* found = nullptr;
+    for (auto& n: name_list)
+    {
+        auto const & name_map = node->childNameMap();
+        auto iter = name_map.find(QualifiedName(node->id_, n.c_str()).c_str());
+        if (iter==name_map.end())
+        {
+            found = nullptr;
+            break;
+        }
+        node = iter->second;
+        found = node;
+    }
+    return found;
+}
+
+template <class Alloc>
 void NamedTreeNode<Alloc>::searchUp (const char * name, ConstSearchResult& res) const
 {
     const auto p = this;
@@ -621,7 +704,7 @@ void NamedTreeNode<Alloc>::search (const char * name, SearchResult& res)
     }
 }
 
-using NamedNode = NamedTreeNode<PooledAllocator>;
+using PooledNamedNode = NamedTreeNode<PooledAllocator>;
 
 }
 

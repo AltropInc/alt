@@ -23,8 +23,7 @@ TEST_CASE( "RingBufferTest", "[RingBufferTest]" )
     read_buffer[read_len] = '\0';
     REQUIRE(alt::StrRefInLength(read_buffer, read_len)=="cdefghijklmn");
 
-    struct iovec iov_arr[2];
-    std::span<iovec,2> iov(iov_arr);
+    std::array<iovec,2> iov;
     read_len = buffer.fetch(iov,  10);
     REQUIRE(alt::StrRefInLength((const char*)iov[0].iov_base, iov[0].iov_len)=="opqrstuv");
     REQUIRE(alt::StrRefInLength((const char*)iov[1].iov_base, iov[1].iov_len)=="wx");
@@ -37,9 +36,9 @@ TEST_CASE( "RingBufferTest", "[RingBufferTest]" )
 }
 
 
-TEST_CASE( "RingMsgBuffer", "[RingMsgBufferTest]" )
+TEST_CASE( "RingDataBudder", "[RingDataBufferTest]" )
 {
-    alt::RingMsgBuffer<uint16_t> buffer(32);
+    alt::RingDataBudder<uint16_t> buffer(32);
     size_t read_len;
     buffer.write ("0123456789", 10);
     buffer.write ("abcdefghij", 10);

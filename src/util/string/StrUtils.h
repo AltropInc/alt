@@ -1,5 +1,16 @@
 #pragma once
 
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file StrUtils.h
+ * @library alt_util
+ * @brief string utility function
+*/
+
 #include "StrBuffer.h"
 
 #include <util/system/Platform.h>
@@ -107,14 +118,45 @@ template<> ALT_INLINE bool strEqual<16> (const char* x, const char* y)
 { return str8Equal(x,y) && str8Equal(x+8,y+8); }
 
 // Call these functions if you know the start buffer is already
-// aligned by 16. Oterwise, called the unaligned version
+// aligned by 16. Otherwise, called the unaligned version
 const char* fastStrChrAligned(const char* s, char ch);
 size_t fastStrLenAligned(const char* s);
 uint64_t fastSumAligned(const uint8_t* bytes, int sz);
 
+// unaligned versions
 const char* fastStrChr(const char* s, char ch);
 size_t fastStrLen(const char* s);
 uint64_t fastSum(const uint8_t* bytes, int sz);
+
+/// \brief conver std::array<char,8> into 64-bit integer for template parameter
+/// usage to overcome the limit of template parameter not being a string
+constexpr static uint64_t strToNameId(std::array<char,8> name)
+{
+    uint64_t res = 0;
+    for (auto ch: name)
+    {
+        if (!ch) break;
+        res = (res<<8) + uint8_t(ch);
+    }
+    return res;
+}
+
+/// \brief conver  64-bit integer into std::array<char,9> for template parameter
+/// usage to overcome the limit of template parameter not being a string
+constexpr std::array<char,9> strFromNameId(uint64_t id)
+{
+    std::array<char,9> res {0};
+    int i = 0;
+    int j = 0;
+    for (; i<8; ++i)
+    {
+        char ch = char ((id & 0xFF00000000000000UL) >> 56);
+        if (ch) res[j++] = ch;
+        id <<= 8;
+    }
+    if (j<8) res[j] = 0;
+    return res;
+}
 
 /// \brief Split a string into substrings with the given separator
 /// \param str The string to be slipt
@@ -306,7 +348,7 @@ inline StrT strTrim(const StrT& str)
     const char* begin;
     const char* end;
     strTrim(str.c_str(), str.length(), begin, end);
-    return StrT(begin, size_t(begin-end)+1);
+    return StrT(begin, size_t(end-begin)+1);
 }
 
 /// \brief Trim copy (remove leading and trailing spaces) for any string type
@@ -320,7 +362,7 @@ inline StrT strTrimCpy(StrT const & str)
     strTrim(str.c_str(), str.length(), startp, endp);
     if (startp && endp)
     {
-        return StrT(startp, size_t(endp-startp));
+        return StrT(startp, size_t(endp-startp+1));
     }
     return StrT();
 }
@@ -334,7 +376,7 @@ inline void strTrimCpy(char* dest, const char* source)
     strTrim(source, strlen(source), startp, endp);
     if (startp && endp)
     {
-        strncmp(dest, startp, size_t(endp-startp));
+        strncmp(dest, startp, size_t(endp-startp+1));
     }
     else
     {
@@ -355,11 +397,11 @@ inline std::string uCharToFormattedString(alt_char_t wch)
 }
 
 /// \brief coverts uft8 string into a formatted string with escape sequence
-/// \param u8_str the utf=8 string to be converted
-/// \param res the buffer to hold the convert result
+/// \param u8_str the utf-8 string to be converted
+/// \param res the buffer to hold the converted result
 /// \param use_unicode_seq when true, utf-8 encoded sequence will be converted into
-/// unicode escape sequence if the character value is greater tah 0x100. Otherwise,
-/// the output will keep the  utf-8 encoded sequence
+/// unicode escape sequence if the character value is greater than 0x100. Otherwise,
+/// the output will keep the utf-8 encoded sequence
 void u8StrToFormattedString(const char* u8_str, std::string& res, bool use_unicode_seq);
 
 } // namespace alt

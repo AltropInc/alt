@@ -1,4 +1,21 @@
 #pragma once
+
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file StrBuffer.h
+ * @library alt_util
+ * @brief definition of various buffers for a string:
+ *    - StrBuf: wrapper of a c string to provide some common interface as in
+ *      std::string and some other interface for the usage in ALT string utils
+ *    - StrFixed: a string in a fixed length
+ *    - StrRef: a const reference to a c string
+ *    - StrRefInLength:  a const reference to a c string in a fixed length
+*/
+
 #include <string>
 #include <cstring>
 #include <tuple>
@@ -103,6 +120,7 @@ class StrBuf
     size_t tail_;
 };
 
+// These are implemented in StrUtils
 size_t strHash(const char * str);
 size_t strHash(const char * str, size_t length);
 size_t strHash (const char *str, size_t length, size_t seed);

@@ -77,7 +77,7 @@ char XmlParser::getText(char end_ch, std::string& text_scanned)
     return ch;
 }
 
-bool XmlParser::parseClosingTag(NamedNode* node)
+bool XmlParser::parseClosingTag(PooledNamedNode* node)
 {
 	scan_buffer_.advance();
     std::string node_name;
@@ -92,7 +92,7 @@ bool XmlParser::parseClosingTag(NamedNode* node)
 	if (node_name!=node->name())
     {
         context_.registerError("unmatched closing tag name");
-        std::cout << "node_name=" << node_name << " expect " << node->name() << std::endl;
+        XMLP_DBG((std::cout << "node_name=" << node_name << " expect " << node->name() << std::endl));
         return false;
     }
     scan_buffer_.advance();
@@ -108,9 +108,9 @@ inline bool isXMLNameStartChar(unsigned char ch)
     return false;
 }
 
-NamedNode* XmlParser::createXmlNode(
+PooledNamedNode* XmlParser::createXmlNode(
     const std::string& name,
-    NamedNode* parent)
+    PooledNamedNode* parent)
 {
     XmlElement* element = static_cast<XmlElement*>(parent->myChild(name.c_str()));
     if (!element)
@@ -127,15 +127,15 @@ NamedNode* XmlParser::createXmlNode(
 
 void XmlParser::setNodeText(
     std::string& text,
-    NamedNode* node)
+    PooledNamedNode* node)
 {
     reinterpret_cast<XmlNode*>(node)->text_ = strTrimCpy(text);
 }
 
 
-NamedNode* XmlParser::createXmlAttribute(
+PooledNamedNode* XmlParser::createXmlAttribute(
     const std::string& name,
-    NamedNode* parent,
+    PooledNamedNode* parent,
     std::string& value)
 {
     XmlAttribute* attr = PooledTreeNode::create<XmlAttribute>(name, parent);
@@ -143,7 +143,7 @@ NamedNode* XmlParser::createXmlAttribute(
     return attr;
 }
 
-NamedNode* XmlParser::parseOpeningTag(NamedNode* parent, bool& closed)
+PooledNamedNode* XmlParser::parseOpeningTag(PooledNamedNode* parent, bool& closed)
 {
     closed = false;
 
@@ -165,7 +165,7 @@ NamedNode* XmlParser::parseOpeningTag(NamedNode* parent, bool& closed)
         return nullptr;
     }
 
-    NamedNode* node = createXmlNode(node_name, parent);
+    PooledNamedNode* node = createXmlNode(node_name, parent);
 
     // Here we either at '>' or a white space
      ch = skipWhiteSpace();
@@ -273,12 +273,14 @@ bool XmlParser::parseComment()
     return false;
 }
 
-bool XmlParser::parse (NamedNode* node)
+XmlNode* XmlParser::parse ()
 {
-    return parseNodes(node, nullptr);
+    XmlNode* root = PooledTreeNode::create<XmlNode>();
+    parseNodes(root, nullptr);
+    return root;
 }
 
-bool XmlParser::parseNodes (NamedNode* node, std::string* node_text)
+bool XmlParser::parseNodes (PooledNamedNode* node, std::string* node_text)
 {
     while (true)
     {
@@ -358,8 +360,8 @@ bool XmlParser::parseNodes (NamedNode* node, std::string* node_text)
 
         if (ch=='/')
         {
-            std::cout << "Closing Tag node=" 
-                      << static_cast<NamedNode*>(node->TreeNode::parent())->name()  << std::endl;
+            XMLP_DBG((std::cout << "Closing Tag node=" 
+                      << static_cast<PooledNamedNode*>(node->TreeNode::parent())->name()  << std::endl));
             // closing tag
             if (!node_text)
             {
@@ -367,13 +369,13 @@ bool XmlParser::parseNodes (NamedNode* node, std::string* node_text)
                 return false; 
             }
 
-            if (!parseClosingTag(static_cast<NamedNode*>(node->TreeNode::parent())))
+            if (!parseClosingTag(static_cast<PooledNamedNode*>(node->TreeNode::parent())))
             {
                 return false;
             }
-            std::cout << "SetNodeText node=" 
-                      << static_cast<NamedNode*>(node->TreeNode::parent())->name()
-                      << " text=" << *node_text << std::endl;
+            XMLP_DBG((std::cout << "SetNodeText node=" 
+                      << static_cast<PooledNamedNode*>(node->TreeNode::parent())->name()
+                      << " text=" << *node_text << std::endl));
             setNodeText(*node_text, node);
 
             //XMLP_DBG((std::cout << "End of XML Node. ch=" << scan_buffer_.curChar() << std::endl));
@@ -383,7 +385,7 @@ bool XmlParser::parseNodes (NamedNode* node, std::string* node_text)
         }
 
         bool closed;
-        NamedNode* new_node = parseOpeningTag(node, closed);
+        PooledNamedNode* new_node = parseOpeningTag(node, closed);
 
         if (!new_node)
         {
@@ -407,7 +409,7 @@ bool XmlParser::parseNodes (NamedNode* node, std::string* node_text)
     return true;
 }
 
-bool XmlParser::parseNode (NamedNode* node)
+bool XmlParser::parseNode (PooledNamedNode* node)
 {
     std::string node_text;
     if (!parseNodes (node, &node_text))
@@ -417,93 +419,108 @@ bool XmlParser::parseNode (NamedNode* node)
     return true;
 }
 
-bool XmlParser::parseFile(const char* file_path, NamedNode* xml_root)
+XmlNode* XmlParser::parseFile(const char* file_path)
 {
     ParserStreamContext context;
     if (!context.pushFileStream (file_path))
     {
-        return false;
+        return nullptr;
     }
     XmlParser parser(context);
     if (!context.pushParser (&parser))
     {
-        return false;
+        return nullptr;
     }
-    return parser.parse(xml_root);
+    return parser.parse();
 }
 
-void XmlParser::print (std::ostream& sot, NamedNode* xml_node,
-     const std::string& indent)
+void XmlNode::print (std::ostream& sot) const
 {
-    if (xml_node->subCategory()==XML_ATTRIBUTE)
+    static std::function<void(const PooledNamedNode*, const std::string& indent)> print_node =
+    [&sot](const PooledNamedNode* xml_node, const std::string& indent)
     {
-        sot << xml_node->name() << '=' << static_cast<XmlAttribute*>(xml_node)->value_;
-    }
-    else if (xml_node->subCategory()==XML_NODE)
-    {
-        const char* element_name =
-             static_cast<NamedNode*>(xml_node->TreeNode::parent())->name();
-        sot << indent << '<' << element_name;
-        for (auto child: xml_node->children())
+        if (xml_node->subCategory()==XML_ATTRIBUTE)
         {
-            auto n = static_cast<NamedNode*>(child);
-            if (n->subCategory()==XML_ATTRIBUTE)
-            {
-                sot << ' ';
-                print (sot, n);
-            }
+            sot << xml_node->name() << '=' << static_cast<const XmlAttribute*>(xml_node)->value_;
         }
-        sot << '>';
-        if (xml_node->childrenNum(0, XML_ELEMENT)>0)
+        else if (xml_node->subCategory()==XML_NODE)
         {
-            sot << '\n';
-            std::string new_indent = indent + "  ";
+            const char* element_name = nullptr;
+            if (xml_node->TreeNode::parent())
+            {
+                element_name =
+                    static_cast<const PooledNamedNode*>(xml_node->TreeNode::parent())->name();
+                sot << indent << '<' << element_name;
+            }
             for (auto child: xml_node->children())
             {
-                auto n = static_cast<NamedNode*>(child);
-                if (n->subCategory()==XML_ELEMENT)
+                auto n = static_cast<const PooledNamedNode*>(child);
+                if (n->subCategory()==XML_ATTRIBUTE)
                 {
-                    print (sot, n, new_indent);
+                    sot << ' ';
+                    print_node (n, "");
                 }
             }
-            if (!static_cast<XmlNode*>(xml_node)->text_.empty())
+            if (element_name) sot << '>';
+            if (xml_node->childrenNum(0, XML_ELEMENT)>0)
             {
-                sot << new_indent << static_cast<XmlNode*>(xml_node)->text_ << '\n';
+                sot << '\n';
+                std::string new_indent = indent + "  ";
+                for (auto child: xml_node->children())
+                {
+                    auto n = static_cast<const PooledNamedNode*>(child);
+                    if (n->subCategory()==XML_ELEMENT)
+                    {
+                        print_node (n, new_indent);
+                    }
+                }
+                if (!static_cast<const XmlNode*>(xml_node)->text_.empty())
+                {
+                    sot << new_indent << static_cast<const XmlNode*>(xml_node)->text_ << '\n';
+                }
+                if (element_name)
+                {
+                    sot << indent << "</" << element_name << ">\n";
+                }
             }
-            sot << indent << "</" << element_name << ">\n";  
+            else
+            {
+                if (!static_cast<const XmlNode*>(xml_node)->text_.empty())
+                {
+                    sot << static_cast<const XmlNode*>(xml_node)->text_;
+                }
+                if (element_name)
+                {
+                    sot << "</" << element_name << ">\n";
+                }
+            } 
+        }
+        else if (xml_node->subCategory()==XML_ELEMENT)
+        {
+            for (auto child: xml_node->children())
+            {
+                auto n = static_cast<const PooledNamedNode*>(child);
+                if (n->subCategory()==XML_NODE)
+                {
+                    print_node (n, indent);
+                }
+            }
         }
         else
         {
-            if (!static_cast<XmlNode*>(xml_node)->text_.empty())
+            for (auto child: xml_node->children())
             {
-                sot << static_cast<XmlNode*>(xml_node)->text_;
-            }
-            sot << "</" << element_name << ">\n";
-        } 
-    }
-    else if (xml_node->subCategory()==XML_ELEMENT)
-    {
-        for (auto child: xml_node->children())
-        {
-            auto n = static_cast<NamedNode*>(child);
-            if (n->subCategory()==XML_NODE)
-            {
-                print (sot, n, indent);
+                auto n = static_cast<const PooledNamedNode*>(child);
+                if (n->subCategory()==XML_ELEMENT)
+                {
+                    sot << '\n';
+                    print_node (n, indent);
+                }
             }
         }
-    }
-    else
-    {
-        for (auto child: xml_node->children())
-        {
-            auto n = static_cast<NamedNode*>(child);
-            if (n->subCategory()==XML_ELEMENT)
-            {
-                sot << '\n';
-                print (sot, n, indent);
-            }
-        }
-    }
+    };
+
+    print_node(this, "");
 }
 
 } // namespace alt

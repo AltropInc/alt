@@ -1,5 +1,20 @@
 #pragma once
 
+//**************************************************************************
+// Copyright (c) 2021-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file TreeNode.h
+ * @library alt_util
+ * @brief Defines tree nodes to form a hierarchical tree structure with a
+ * root and subtrees of children with a parent.
+ *    - TreeNodeBase defines the base class of a tree node
+ *    - TreeNode defines a template with an allocator parameter
+ *    - PooledTreeNode defines tree nodes allocated in fixed pools
+ */
+
 #include "LinkedList.h"
 #include <vector>
 #include <functional>
@@ -58,6 +73,10 @@ class ALT_UTIL_PUBLIC TreeNodeBase: public LinkedNode
     const bool isMyParent(const TreeNodeBase *n) const
     { return n && parent_==n; }
 
+    /// \brief set the parent as a detached child.
+    /// \note the parent does not have access to this node utile this node is attached
+    void setParent(TreeNodeBase* parent) { parent_ = parent; }
+
     const bool isRoot() const { return parent_==nullptr; }
     const bool isLeaf() const { return children_.empty(); }
 
@@ -65,7 +84,9 @@ class ALT_UTIL_PUBLIC TreeNodeBase: public LinkedNode
     bool isMyAncestor (const TreeNodeBase * n) const;	// not include me!
     bool isMySibling (const TreeNodeBase * n) const;	// include me!
     bool isAncestorOf (const TreeNodeBase * n) const { return isMyOffspring(n); }
-    TreeNodeBase * leastCommonAncestor (TreeNodeBase * n, TreeNodeBase* root=nullptr);  
+    const TreeNodeBase * leastCommonAncestor (const TreeNodeBase * n, const TreeNodeBase* root=nullptr) const;  
+    TreeNodeBase * leastCommonAncestor (TreeNodeBase * n, TreeNodeBase* root=nullptr)
+    { return const_cast<TreeNodeBase*>(const_cast<TreeNodeBase*>(this)->leastCommonAncestor(n,root)); }
 
     /// \return Range between this node and the node at the given
     /// distance at most. If the distance is negative, the range is
@@ -301,6 +322,43 @@ class TreeNode: public TreeNodeBase
 };
 
 using PooledTreeNode = TreeNode<PooledAllocator>;
+
+/**
+ * \class ScopedTreeNode
+ * \ingroup Core
+ * \brief Encapsulates temporary treenode in a scope
+ */
+template <class T> 
+class ScopedTreeNode
+{
+  public:
+    constexpr ScopedTreeNode(T* ptr ) noexcept : ptr_(ptr) { }
+    explicit   ScopedTreeNode() noexcept : ptr_(nullptr) { }
+    ~ScopedTreeNode()
+    {
+        freeObj();
+    }
+    void reset(T* ptr) noexcept { freeObj(); ptr_ = ptr; }
+    const T* operator->() const noexcept { return ptr_; }
+    T* operator->() noexcept { return ptr_; }
+    const T* get() const noexcept { return ptr_; }
+    T* get() noexcept { return ptr_; }
+    explicit operator bool() const noexcept { return ptr_!=nullptr; }
+  private:
+    void freeObj()
+    {
+        if (ptr_)
+        {
+            T::releaseNode(ptr_);
+            ptr_ = nullptr;
+        }
+    }
+    ScopedTreeNode(const ScopedTreeNode&) = delete;
+	ScopedTreeNode(ScopedTreeNode&&) = delete;
+	ScopedTreeNode& operator = (const ScopedTreeNode&) = delete;
+	ScopedTreeNode& operator = (ScopedTreeNode&&) = delete;
+    T* ptr_;
+};
 
 }
 

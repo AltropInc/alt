@@ -1,5 +1,17 @@
 #pragma once
 
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file StringHashMap.h
+ * @library alt_util
+ * @brief Defines a string key hash using fixed pools to reduce heap allocation at
+ * run time. The key is a char pointer that points to the position in a string pool
+ */
+
 #include <util/Defs.h>              // for ALT_UTIL_PUBLIC
 #include "Allocator.h"
 #include "util/string/StrBuffer.h"
@@ -10,8 +22,9 @@ namespace alt
 {
 
 /**
- * \brief implements a string key hash using fixed pools to reduce heap allocation at
- * run time. The key is a char pointer that points to the position in a string pool
+ * \brief Defines a string key hash using fixed pools. This is a wrapper of
+ * std::unordered_map with a string pool to store the key.
+ * TODO: consider to use PooledHash for more efficiency?
  */
 template <typename T, class Allocator = StdFixedPoolAllocator< std::pair<const StrRef, T> > >
 class ALT_UTIL_PUBLIC StringHashMap

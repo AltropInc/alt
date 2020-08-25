@@ -1,15 +1,29 @@
 #pragma once
 
-#include <util/system/Platform.h>
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file FixeMemPool.h
+ * @library alt_util
+ * @brief definition of fixed-size blocks allocation for memory management that
+ * allows dynamic memory allocation more efficeint and less fragments. The memory
+ * pool conatains a number of slabs that are allocated dynamically and each slab
+ * holds a number of slots in a fixed size as an allocation unit.
+ *   - FixedMemPool - an expandable pool for heterogenous data
+ *   - FixedPool - an expandable pool for a single type
+ *   - FixedMemPoolPrealloc- an preallocated pool suitable for shared memory
+ */
+
 #include <util/Defs.h>                 // for ALT_UTIL_PUBLIC
-#include <util/numeric/Intrinsics.h>
-#include <util/ipc/SharedMemory.h>
+#include <util/ipc/SharedMemory.h>     // For SharedMemory
 #include <util/system/SysConfig.h>     // for CACHE_LINE_ALIGN
 
-#include <vector>
-#include <atomic>
+#include <vector>                      // for vector
+#include <atomic>                      // for atomic
 #include <mutex>                       // for mutex
-
 
 namespace alt
 {
@@ -23,11 +37,12 @@ class PooledAllocator;
  * \struct FixedMemPool
  * \ingroup ContainerUtils
  * \brief An growable memory pool with fix-sized slots. The pool is expanded
- * by slab which hold a number of slots. Once expanded, the pool will not
- * shrink.
+ * by slabs which hold a number of slots. Once expanded, the pool will not
+ * shrink.  There is no cost of initialize and link all the unused slots when a
+ * new slab is created. It is loop and recursive free.
  * \note thread-safe and non-thread-safe versions should not be mixed in use
  */
-class FixedMemPool
+class ALT_UTIL_PUBLIC FixedMemPool
 {
   public:
       
@@ -80,6 +95,9 @@ class FixedMemPool
     /// is used. For using multiple pools, see PooledAllocator in Allocator.h
     static uint16_t getAlloactedBin(void* p);
 
+    /// \brief returns the slot size
+    size_t slotSize() const { return slot_size_; }
+
     /// \brief allocate a memory block that is bigger than the slot in the pool.
     /// \param size the size of space to be allocated
     /// \param bin the number set in the allocated header. Use getAlloactedBin to
@@ -89,22 +107,32 @@ class FixedMemPool
     /// \note this is allocated in heap directly, not in the pool.
     static void* allocateBigSize(size_t size, uint16_t bin);
 
+    /// \brief re-allocate a memory block that is bigger than the slot in the pool.
+    /// \param p the previously allocated address. This must be obtained by allocateBigSize
+    /// \param new_size the new size to re-allocate
+    /// \return a pointer to the reallocated memory block, which may be either the same
+    /// as p or a new location.
+    static void* reallocateBigSize(void* p, size_t new_size, uint16_t bin);
+
     /// \brief deallocate a memory block allocated by allocateBigSize
+    /// \param p the previously allocated address. This must be obtained by allocateBigSize
     static void deallocateBigSize(void* p);
 
   private:
     friend class PooledAllocator;
 
-    void initSlab(void* slab);
+    void initSlab(uint8_t* slab);
 
     struct EntryHeader;
     EntryHeader* newSlab()    noexcept(false);
-    EntryHeader*              head_ { nullptr };
-    size_t                    value_size_ { 0 };
-    size_t                    slot_size_ { 0 };
-    size_t                    slot_num_per_slab_ { 0 };
-    std::vector<void*>        slab_list_;
-    std::mutex                mutex_;
+
+    EntryHeader*                                head_ { nullptr };
+    size_t                                      value_size_ { 0 };
+    size_t                                      slot_size_ { 0 };
+    size_t                                      slot_num_per_slab_ { 0 };
+    size_t                                      slab_size_;
+    std::vector<std::pair<uint8_t*, size_t>>    slab_list_;
+    std::mutex                                  mutex_;
 };
 
 //-----------------------------------------------------------------------------
@@ -172,10 +200,14 @@ class FixedPool: public FixedMemPool
  * \brief A preallocated memory pool with fix-sized slots. When the pool is full,
  * allocation will fail. This is used for the case where maximum number of slots are
  * known or the case where the memory cannot be expanded (e.g. in a shared memory).
- * This is not thread safe.
+ * Because the pool is preallocated, the cost of initialize and link all the unused
+ * slots are done only during initialization, this helps to simplify the allocation in
+ * an atomic way so ths pool can be shared among threads and process (if in shared
+ * memory)
  */
-// TODO: justify usage of this and then decide whether to keep it or remove it
-class FixedMemPoolPrealloc
+// TODO: justify usage of this and then decide whether to keep it or remove it. Not
+// tested yet
+class ALT_UTIL_PUBLIC FixedMemPoolPrealloc
 {
   public:
       
@@ -191,7 +223,7 @@ class FixedMemPoolPrealloc
     FixedMemPoolPrealloc(size_t value_size, size_t slot_num);
 
     /// \brief Empty constructor. setAddr must be called to set the memory address
-    FixedMemPoolPrealloc();
+    FixedMemPoolPrealloc() = default;
 
     /// \brief Destructor
     ~FixedMemPoolPrealloc();

@@ -1,4 +1,25 @@
 
+#pragma once
+
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file TimerQueue.h
+ * @library alt_util
+ * @brief Implements a time event manager per thread sitting within a reactor to manage
+ * timeout events. For the purpose of performance and the need to support busy poll
+ * running on dedicated core, it is normally not protected by a mutex, assuming it is
+ * used only by the thread that owns the reactor. However, if a thread wants to add
+ * time events for a listener that runs in a different thread, for instance,
+ * an object preloading thread loading and constructing an object to be delivered for
+ * a different thread to run and the constructed object has timers defined, call addPending
+ * on behalf of the constructed object. After the preloading thread finshed its job,
+ * notify the thread that owns the listener to merge the pending events.
+ */
+
 #include <util/Defs.h>                  // for ALT_UTIL_PUBLIC
 #include <util/types/Clock.h>           // for Clock
 #include <util/storage/LinkedList.h>    // for FixPooledLinkList
@@ -14,7 +35,7 @@ class TimeEventListener
 {
   public:
     /// \brief tells if the listener is in incepient status when it cannot handle any
-    /// timeout event yet. For instance, it is in a prealoding status by a different thread.
+    /// timeout event yet. For instance, it is in a preloading status by a different thread.
     /// If the listener calls addTimeEvent in incepient status, the time event will be added
     /// in the pending_time_queue_
     virtual bool isIncipient() const { return false; }
@@ -25,14 +46,7 @@ class TimeEventListener
 /**
  * \class TimerQueue
  * \ingroup Util
- * \brief A time event (timer) manager per thread sitting within a reactor to manage
- * timeout events. For the purpose of performance and the need to support busy poll
- * running on dedicated core, it is normally not protected by a mutex, assuming it is
- * used only by the thread that owns the reactor. However, if a thread wants to add
- * time events for a listener that will run from a different thread, for instance,
- * an object preloading thread loading and constructing an object to be delivered for
- * a different thread to run, call addPending. After the thread finshed its job,
- * notify the thread that owns the listener to merge the pending events.
+ * \brief Implements time event (timer) manager 
  */
 class TimerQueue
 {
@@ -45,8 +59,8 @@ class TimerQueue
     /// \param listener the object to be called back on timeout
     /// \param event_data pointer to user provided data that will be passed in the callback
     /// \param initial_delay the time span from now to the time when fire the timeout event
-    /// \param interval the time span to fire repeatitive timeout events after the initial
-    /// timeout event. If this is set to zero, no repeatitive timeout events will follow,
+    /// \param interval the time span to fire repetitive timeout events after the initial
+    /// timeout event. If this is set to zero, no repetitive timeout events will follow,
     /// and the timer will be removed after the initial one fired.
     /// \param time_now the current time. If it is not set, the current time is the clock's
     /// current monotonic nano ticks since the system start up time (excluding the sleep
@@ -67,8 +81,8 @@ class TimerQueue
     /// \param event_data pointer to user provided data that will be passed in the callback
     /// \param initial_delay the time span from the time when the pending timer becomes
     /// active to the time when fire the timeout event
-    /// \param interval the time span to fire repeatitive timeout events after the initial
-    /// timeout event. If this is set to zero, no repeatitive timeout events will follow,
+    /// \param interval the time span to fire repetitive timeout events after the initial
+    /// timeout event. If this is set to zero, no repetitive timeout events will follow,
     /// and the timer will be removed after the initial one fired.
     /// \return the timer id of the pending timer added. It will be the same timer id when
     /// it becomes active
@@ -82,10 +96,10 @@ class TimerQueue
     /// \brief activate all pending timers
     void mergePending ();
 
-    /// \brief reset the repeatitive interval. This does not work for pending timers
+    /// \brief reset the repetitive interval. This does not work for pending timers
     /// \param timer_id the id of the timer
-    /// \param new_interval the new repeatitive interval
-    /// \return 0 if the repeatitive interval is updated, -1 if the timer is not active
+    /// \param new_interval the new repetitive interval
+    /// \return 0 if the repetitive interval is updated, -1 if the timer is not active
     /// or it does not exist.
     int resetInterval
         ( int64_t timer_id,
@@ -94,7 +108,7 @@ class TimerQueue
 
     /// \brief delete the timer. This does not work for pending timers
     /// \param timer_id the id of the timer
-    /// \param new_interval the new repeatitive interval
+    /// \param new_interval the new repetitive interval
     /// \return 0 if the timer is deleted, -1 if the timer is not active
     /// or it does not exist.
     int delTimer

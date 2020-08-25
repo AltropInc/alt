@@ -6,13 +6,13 @@
 
 namespace alt
 {
-    class MyNamedNode: public NamedNode
+    class MyNamedNode: public PooledNamedNode
     {
         static int s_instance_cnt_;
         public:
-            MyNamedNode(const char *name, NamedNode* parent, bool is_name_register,
+            MyNamedNode(const char *name, PooledNamedNode* parent, bool is_name_register,
                         const std::string & val)
-                    : NamedNode(name,parent,is_name_register)
+                    : PooledNamedNode(name,parent,is_name_register)
                     , value_(val)
             {
                 ++s_instance_cnt_;
@@ -29,7 +29,7 @@ namespace alt
     int MyNamedNode::s_instance_cnt_ = 0;
 }
 
-TEST_CASE( "NamedNodeTest", "[NamedNode]" )
+TEST_CASE( "NamedNodeTest", "[PooledNamedNode]" )
 {
     //alt::PooledAllocator& mem_pool = alt::PooledAllocator::instance();
     //std::cout << "NamedNodeTest create root" << std::endl;
@@ -48,13 +48,13 @@ TEST_CASE( "NamedNodeTest", "[NamedNode]" )
     //std::cout << "NamedNodeTest create chd3" << std::endl;
     alt::MyNamedNode*  chd3 = alt::PooledTreeNode::create<alt::MyNamedNode>
         ("chd3", root, false, "CHD3");
-    alt::NamedNode*  parent = root->search("root");
+    alt::PooledNamedNode*  parent = root->search("root");
     REQUIRE(parent == root);
     //std::cout << "NamedNodeTest create chd4" << std::endl;
     alt::MyNamedNode*  chd4 = root->create<alt::MyNamedNode>
         ("chdx", root, false, "CHD4");
     chd4->rename("chd4");
-    alt::NamedNode*  chd = root->search("chd4");
+    alt::PooledNamedNode*  chd = root->search("chd4");
     REQUIRE(chd == chd4);
     REQUIRE(root->childrenNum() == 4);
 }

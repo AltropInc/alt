@@ -1,6 +1,18 @@
 
 #pragma once
 
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file EventPoller.h
+ * @library alt_util
+ * @brief Implements an event poller for system (file descriptor) events. It uses epoll if
+ * supported (linux), or poll if epoll is not supported in other operating system
+ */
+
 #include "OS.h"                         // for FdId (File Descriptor type)
 #include <util/Defs.h>                  // for ALT_UTIL_PUBLIC
 #include <util/types/EnumSet.h>         // for EnumSet

@@ -1,5 +1,26 @@
 #pragma once
 
+//**************************************************************************
+// Copyright (c) 2020-present, Altrop Software Inc. and Contributors.
+// SPDX-License-Identifier: BSL-1.0
+//**************************************************************************
+
+/**
+ * @file Enum.h
+ * @library alt_util
+ * @brief Defines reflective Enum Type that supports:
+ *    - obtaining enum value from string (fromString)
+ *    - obtaining enum value sequence (enum_values) for iteration
+ *    - getting number of enum values (count)
+ *    - getting maximum enum value (max)
+ *    - getting invalid enum value (invalid)
+ *    - checking if the value is valid (isValid)
+ *    - obtaining enum value from underlying type (fromUnderlying)
+ *    - converting to underlying type (toUnderlying)
+ *    - converting to string (toString)
+ *    - ostream operators for enums
+ */
+
 #include "ValueWrapper.h"
 
 #include <stdint.h>
@@ -11,12 +32,13 @@ namespace alt
 {
 /**
  * \class EnumBase
- * \brief Base of Enum for handling enum names
+ * \brief Base of Enum to sort enum name for efficient search. These functions are lazy
+ * invoked
  */
 class EnumBase
 {
   protected:
-    static int fromString(const char** name_list, const int* nmae_indice, const char* enum_name, size_t enum_number);
+    static int fromString(const char** name_list, const int* name_indice, const char* enum_name, size_t enum_number);
     static void setEnumNames(const char *names_buf, const char**names, size_t enum_num);
 };
 

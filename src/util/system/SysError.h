@@ -1,12 +1,13 @@
 #pragma once
 
-#include <iostream>         // For std::cout
-#include <sstream>          // For stringstream
-#include <exception>        // for exception
-#include <string>           // for stirng
-#include <array>            // for array
-#include <string.h>         // for strerror
-#include <error.h>          // errno
+#include <util/string/StrUtils.h>       // For strToNameId and strFromNameId
+#include <iostream>                     // For std::cout
+#include <sstream>                      // For stringstream
+#include <exception>                    // for exception
+#include <string>                       // for stirng
+#include <array>                        // for array
+#include <string.h>                     // for strerror
+#include <error.h>                      // errno
 
 namespace alt {
 
@@ -43,35 +44,25 @@ class AltException: public std::exception
 
 	AltException(const std::string& msg) : what_msg_(msg) { }
 	const char* what() const throw()  override {  return what_msg_.c_str(); }
-    static const char* const name() throw()  { if (!name_[0]) setName(); return name_; }
+    static const char* const name() throw()
+    {
+        if (name_[0]=='\0') name_ = strFromNameId(ExceptionId);
+        return std::begin(name_);
+    }
 
   private:
 
-    static void setName()
-    {
-        uint64_t id = ExceptionId;
-        int i = 0;
-        int j = 0;
-        for (; i<8; ++i)
-        {
-            char ch = char ((id & 0xFF00000000000000UL) >> 56);
-            if (ch) name_[j++] = ch;
-            id <<= 8;
-        }
-        if (j<8) name_[j] = 0;
-    }
-
-	std::string     what_msg_;
-    inline static char     name_[9] {0};
+	std::string                          what_msg_;
+    inline static std::array<char,9>     name_ {0};
 };
 
 // Common system error exceptions
-using SysException = AltException<AltExceptionID({'S','Y','S'})>;
-using NetException = AltException<AltExceptionID({'N','E','T'})>;
-using IOException = AltException<AltExceptionID({'I','O'})>;
-using TimeoutException = AltException<AltExceptionID({'T','I','M','E','O','U','T'})>;
-using FileException = AltException<AltExceptionID({'F','I','L','E'})>;
-using ThreadException = AltException<AltExceptionID({'T','H','R','E','A','D'})>;
+using SysException = AltException<strToNameId({'S','Y','S'})>;
+using NetException = AltException<strToNameId({'N','E','T'})>;
+using IOException = AltException<strToNameId({'I','O'})>;
+using TimeoutException = AltException<strToNameId({'T','I','M','E','O','U','T'})>;
+using FileException = AltException<strToNameId({'F','I','L','E'})>;
+using ThreadException = AltException<strToNameId({'T','H','R','E','A','D'})>;
 
 } // namespace alt
 
