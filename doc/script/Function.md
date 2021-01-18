@@ -5,7 +5,7 @@
 The Functional class is an abstract class for callable objects which are instantiated by
 "function call".  An Functional class is used to create a callable object that performs the
 functionality described in the class' enter body (the implementation block). The callable
-object is deleted after it finishes its performanc. Examples of functional instantiations are a
+object is deleted after it finishes its performance. Examples of functional instantiations are a
 function to open a file, a process to display an image, a thread to deal with an event,
 a scientific calculation, and an activity to generate a signal. For instance,
 
@@ -83,7 +83,10 @@ A value parameter is constant and temporary. It is the in the scope of the funct
 by the function call). Therefore, the value assiciated with the value parameter will be destroyed
 upon the completion of the execution.
 
-## Function Output
+Note, even if the actual value passed to a value paramter does not require conversion, a clone (copy) will still
+be used. Therefore, value parameter could be expensive for large data.
 
+## Function Output
+ [to be completed]
 
 
