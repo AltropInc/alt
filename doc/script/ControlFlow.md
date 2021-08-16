@@ -180,7 +180,7 @@ array, stream, tuple, and string. In the above example, the type of the result i
 Each element in the pattern represents an element in the tuple type. The tuple elements can be named by the expression
 "=> <name>".
 
-The type of the result is the same tyoe of control_expression if the type of the control_expression is a non-composite
+The type of the result is the same type of control_expression if the type of the control_expression is a non-composite
 type. For instance:
  
 ```altscript
@@ -212,7 +212,7 @@ can be repeatively used:
 ```altscript
 on {6...}          // match any number of elements that has the value 6, including the case of no match
 on {6...2}         // match any up to 2 elements that has the value 6, including the case of no match
-on {6:2}           // match any exacly 2 elements that has the value 6
+on {6:2}           // match exacly 2 elements that has the value 6
 ``` 
 A match pattern can be nested for nested composite data structure. For example:
  
@@ -221,7 +221,7 @@ s : string... ...;   // a stream of stream string
 t :string...;        // a stream of string
 match (s)
 {
-   on {*:2 => first, {*, "mnf"}:2 => second, t:2 => third, ... => rest} => results:
+   on {* => first, {*, "mnf"} => second, t:2 => third, ... => rest} => results:
    {
        x := results.first;            // x is the first string stream in s
        y := results.second;           // y is the second string stream in s where the second string equal to "mnf"
@@ -233,4 +233,22 @@ match (s)
        }
    }
 }
-```        
+```  
+ 
+The notation ... for any number of match as well as the notion ... for any number of repeating match can only be used
+for string, stream and array, i.e. the container has the same element type. It can not be used for tuple. This is
+because the result from the match with notation ... is a stream that requires the same element type.
+ 
+Either regular expressions or match patterns can be used for a string. For instance:
+```altscript
+s: string;
+match (s)
+{
+   on {*:2 => first, ['A'..'F', 'a'..'f', '0'..'9']...2 => second} => result:
+   {
+       s1 := result.first;   // s is the tuple of (char, char) that contains the first two characters of s
+       s2 := result.second;  // s2 is the string that contains zero or up to 2 characters from the third characters in s
+                             // each character is a valid hexical digit
+   }
+}
+``` 
