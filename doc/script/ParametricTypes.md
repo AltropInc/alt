@@ -30,7 +30,7 @@ Once a type parameter is bound, it cannot be rebound or reconstrained to form a 
 array #(type element_type=numeric);    // (3)
 array #(type element_type=integral);   // (4) 
 ```
-Where (4) is not a subtype of (3), but both (3) and (4) are subtypes of (1), and (4) is a subtype of (1) and (2). int[4] is subtype of (2) but not a subtype of (4). array #(type element_type=numeric) defines a heterougenous numeric which contains numbers mixed of any numeric types, while array #(type element_type : numeric) is an abstract array that represnts any numeric array whose element type can be bound to any numeric type, for instance, a double array with all elements in double precision, a long integer array with all elements in long inetgers, or a numeric array with elements mixed of any numeric types (when the element type is bound to numeric.)
+Where (4) is not a subtype of (3), but both (3) and (4) are subtypes of (1), and (4) is a subtype of (1) and (2). int[4] is subtype of (2) but not a subtype of (4). array #(type element_type=numeric) defines a heterougenous numeric which contains numbers mixed of any numeric types, while array #(type element_type : numeric) is an abstract array that represents any numeric array whose element type can be bound to any numeric type, for instance, a double array with all elements in double precision, a long integer array with all elements in long inetgers, or a numeric array with elements mixed of any numeric types (when the element type is bound to numeric.)
 
 Examples:
 
@@ -58,15 +58,15 @@ An array is a container for elements of the given element type, you can only set
 z : array;       // a polymophic reference to any array
 z[0] = "text"    // error, cannot decide whether typeof(z).element_type is string
 if (z[0] is string => z0) z0 = "text"   // okay
-func ele_assign(x: array, uint index, ele: typeof(x).element_type)
+func ele_assign #(type T: array)(x: T, uint index, ele: T.element_type)
 {
-    if (index <= typeof(x).length)
+    if (index <= T.length)
     {
         x[index] = ele;   // okay
     }
 }
 x: string[4];
-ele_assign(x,0,"text");   // okay
-ele_assign(x,0,3.14);     // error
+ele_assign(x, 0, "text");   // okay
+ele_assign(x, 0, 3.14);     // error
 ```
 
