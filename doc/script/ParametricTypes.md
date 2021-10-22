@@ -68,11 +68,13 @@ class test
     z : array = x;                   // a polymophic reference to any array
     enter()
     {
-        z[0] = "text";               // error,  type mismatch
+        z[0] = "text";               // error: type mismatch
         if (z[0] => z0 is string)
         {
             z0 = "text";             // okay
         }
+        ele_assign(x, 0, "xyz");     // oaky
+        ele_assign(x, 0, 2);         // error:  no matched IO interface is found to call ele_assign
     }
 }
 ```
