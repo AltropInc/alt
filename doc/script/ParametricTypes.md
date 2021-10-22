@@ -73,7 +73,7 @@ class test
         {
             z0 = "text";             // okay
         }
-        ele_assign(x, 0, "xyz");     // oaky
+        ele_assign(x, 0, "xyz");     // okay
         ele_assign(x, 0, 2);         // error:  no matched IO interface is found to call ele_assign
     }
 }
