@@ -55,19 +55,25 @@ IntArray.element_type is a valid expression that represents the element type of 
 An array is a container for elements of the given element type, you can only set the element to the value of its element_type. For instance:
 
 ```altscript
-z : array;                              // a polymophic reference to any array
-z[0] = "text"                           // error, cannot decide whether typeof(z).element_type is string
-if (z[0] is string => z0) z0 = "text"   // okay
-
-func ele_assign #(type T: array)(x: T; uint index; ele: T.element_type)
+class test
 {
-    if (index <= T.length)
+    func ele_assign #(type T: array)(x: T; index: uint; ele: T.element_type)
     {
-        x[index] = ele;   // okay
+        if (index <= T.length)
+        {
+            x[index] = ele;          // okay
+        }
+    }
+    x : string[4];
+    z : array = x;                   // a polymophic reference to any array
+    enter()
+    {
+        z[0] = "text";               // error,  type mismatch
+        if (z[0] => z0 is string)
+        {
+            z0 = "text";             // okay
+        }
     }
 }
-x: string[4];
-ele_assign(x, 0, "text");   // okay
-ele_assign(x, 0, 3.14);     // error
 ```
 
