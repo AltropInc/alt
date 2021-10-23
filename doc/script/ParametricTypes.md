@@ -15,13 +15,13 @@ Alt parametric types will have positive answers for these.
 
 ### Parametric Type Declaration
 
-Parameters in a parametric type are introduced in a pair of parentheses prefixed with #:
+Since a parametric type is a type, we do not need any keyward such as generic or template to distinguish between a type and a parametric type, simply introduce parameters in a parametric type in a pair of parentheses prefixed with #:
 
 ```altscript
 class array #(type element_type: any; length: uint);
 ```
 
-This declaration defines a new parametric type, `array`, with two parameters: a type parameter `element_type`, and a constant value parameter `length`. The parametric type `array` defines a family of containers hodling a given number of elements of the given type, where `length` is given the number, and `element_type` is the given element type. All types derived from `array` are subtypes of `array` - and this is not possible in other programming languages where parametric types are not true types and there is no base for the concept of subtype on parametric types.
+This declaration defines a new parametric type, a class `array`, with two parameters: a type parameter `element_type`, and a constant value parameter `length`. The parametric type `array` defines a family of containers hodling a given number of elements of the given type, where `length` is given the number, and `element_type` is the given element type. All types derived from `array` are subtypes of `array` - and this is not possible in other programming languages where parametric types are not true types and there is no base for the concept of subtype on parametric types.
 
 A type parameter has the `type` specifier in the declareation:
 
@@ -31,37 +31,51 @@ type element_type: any
 
 What, one may ask, is the role of `: any` in the declareation? Well, that's the point of constrained type parameter: it specifies that the `element_type` can be any subtype of 'any', and in this case, it can be any type at all.
 
-A type paramether can be re-constrained in a subtype:
+Consider another example:
+
+```altscript
+class Point #(type UnitT: numeric) { x: UnitT; y: UnitT; };
+```
+
+This defines a parametric type, a class `Point`, which has two member elements, `x` and `y`, both in a subtype of the `numeric` type.
+
+### Parametric Type Refinement
+
+A parametric type can be refined into subtypes by re-constraining or binding its parameters. A parametric type becomes a concrete type, that is, a type that can used to instantiate objects/values, when all its parameters are bound to a type or a constant value.
+
+A type paramether can be re-constrained in a subtype by providing a subtype of the constraining type given in the base type:
 
 ```altscript
 type numeric_array = array #(type element_type: numeric);
 ```
 
-This defines a numeric array, a subtype of array, where the element type is re-constrained to any numeric type.
+This defines a numeric array, a subtype of array, where the element type is re-constrained to any numeric type, where `numeric` is a subtype of `any`, a constraining type given in the base type `array`.
 
-A type paramether can also be bound to a type in a subtype:
+A type paramether can also be bound to a type in a subtype. In most cases, the given type for the binding is a concrete type, but can also be an abstract type.
 
 ```altscript
 type integer_array = array #(type element_type = int);
 ```
-or simply put as,
+or simply put,
 ```altscript
 type integer_array = array #(int);
 ```
 
-This defines an integer array, a subtype of numeric_array, where the element type is bound to the type `int`. In a concrete subtype of a parametric type, all paramters must be bound either to a type or a constant value. The bound type is not necessarily concrete. We can also bind a type parameter to an abstract type or a parametric type:
+This defines an integer array, a subtype of numeric_array, where the element type is bound to the type `int`, which is a concrete type. This is a homogeneous array in which all elements are in the same integer type.  We can also bind a type parameter to an abstract type:
 
 ```altscript
 type mixed_numeric_array = array #(type element_type = numeric);
 ```
-or simply put as,
+or simply put,
 ```altscript
 type mixed_numeric_array = array #(numeric);
 ```
 
-This defines a mixed numeric array, a subtype of array, where the element type is bound to the abstract type `numeric`. It may contain values of any type of numbers, as long as they are values in the subtype of numeric, such as values of integer, long integer, float, double, etc.
+This defines a mixed numeric array, a subtype of array, where the element type is bound to the abstract type `numeric`. This is a hetrougeneous array which may contain values of any type of numbers, as long as they are values in a subtype of `numeric`, or in other words, it can contains mixed values such as short integers, long integer, floats, and doubles.
 
-Once a type parameter is bound, it cannot be re-bound in a subtype. Therefore, `integer_array` is a subtype of `numeric_array`, but not a subtype of `mixed_numeric_array` because the element type is already bound in `mixed_numeric_array`.
+### Parametric Subtype
+
+Subtypes of a parametric type are generated by refining parameters. However, once a type parameter is bound, it cannot be re-bound in a subtype. Therefore, `integer_array` is a subtype of `numeric_array`, but not a subtype of `mixed_numeric_array` because the element type is already bound in `mixed_numeric_array`.
 
 Consider:
 
@@ -87,7 +101,18 @@ foo(double4, 4);                   // okay, 4 is converted to double value
 foo(double4, "string");            // error, "string" cannot be converted to the element type of double4
 ```
 
-On a side note for the expression `T.element_type`, parameters of a parametric type are member names declared in the type scope and they can be accessed through the parametric type name using the operator `.` (the scope name selector).
+On a side note for the expression `T.element_type`, parameters of a parametric type are member names declared in the type scope and they can be accessed through the parametric type name using the operator `.` (the scope name selector). This notation makes it easier to represent a deep type dependnecy among arguments and we will explains this point later.
+
+More subtype examples:
+
+ * Point#(type T: integral) is a subtype of Point;
+ * Point#(int) is a subtype of Point;
+ * Point#(int) is a subtype of Point#(type T: integral);
+ * Point#(int) is not a subtype of Point#(integral);
+ * #(type T: integral) (x: T; y: T) is a subtype of #(type T: numeric) (x: T; y: T);
+ * #(type T=integral) (x: T; y: T) is a subtype of #(type T: integral) (x: T; y: T);
+ * (int; int) is a subtype of #(type T: integral) (x: T; y: T);
+ * (int; int) is not a subtype of #(type T=integral) (x: T; y: T);
 
 ### Parametric Type Inheritance
 
