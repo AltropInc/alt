@@ -1,56 +1,98 @@
 ## Parametric Types
 
-A parametric type is an abstract type. This definition differs from the concept of parametric type in all other programming langauges. Here, a parametric type is a type,
-an abstract type, which has its position in the type system's subtype hierarchy and can be used to declare a polymorphic variable. For instance, array is an parametric type with two parameters: element_type and Length:
+### Overview
+
+A parametric type is the type that takes parameters to introduce a family of types – one for each possible combination of parameter values. For instance, an array is an parametric type with two parameters: element_type and length. An array of four integers is one of the array types in the family of the parametric array type, with a parameter value combination where element_type=int and length=4. There are many languages that support some version of parametric mechanism (or generic programming), but none supports true parametric polymorphism.
+
+An Alt parametric type is a true type. It can be used as an abstract type for polymorphic variable declarations, wherein the type parameters may be left undetermined. A parametric type has its position in the type system's subtype hierarchy. This gives a whole new horizon of applications on generic programming to address many traditional unanswered questions in static parametric type systems, just to name a few:
+
+ * Can we consider an array of integers a subtype of an array of numeric numbers because an integer is a subtype of numeric number?
+ * Can we covariantly define the input interface in subtype?
+ * Can we easily specify type dependency among input and output in an interface?
+ * Can we override a parametric interface (make it virtual) in a subtype?
+
+Alt parametric types will have positive answers for these.
+
+### Parametric Type Declaration
+
+Parameters in a parametric type are introduced in a pair of parentheses prefixed with #:
 
 ```altscript
-class array #(type element_type: any, length: uint);
+class array #(type element_type: any; length: uint);
 ```
 
-All concrete array types are subtypes of array:
+This declaration defines a new parametric type, `array`, with two parameters: a type parameter `element_type`, and a constant value parameter `length`. The parametric type `array` defines a family of containers hodling a given number of elements of the given type, where `length` is given the number, and `element_type` is the given element type. All types derived from `array` are subtypes of `array` - and this is not possible in other programming languages where parametric types are not true types and there is no base for the concept of subtype on parametric types.
+
+A type parameter has the `type` specifier in the declareation:
 
 ```altscript
-array #(type element_type=int, length=4);  // (0)  or simply,
-int[4]
+type element_type: any
 ```
 
-In a concrete type of a parametric type, all type paramters are bound either to a type or a value. Type parameters of parametric type can also be reconstrained,
-insted of being bound, to form a subtype. For instance:
+What, one may ask, is the role of `: any` in the declareation? Well, that's the point of constrained type parameter: it specifies that the `element_type` can be any subtype of 'any', and in this case, it can be any type at all.
+
+A type paramether can be re-constrained in a subtype:
 
 ```altscript
-array #(type element_type: numeric);   // (1)
-array #(type element_type: integral);  // (2)
+type numeric_array = array #(type element_type: numeric);
 ```
 
-Where (2) is a subtype of (1), and (1) is a subtype of array (0). Therefore, Alt's type parameters are covariant.
+This defines a numeric array, a subtype of array, where the element type is re-constrained to any numeric type.
 
-Once a type parameter is bound, it cannot be rebound or reconstrained to form a subtype. Therefore,
+A type paramether can also be bound to a type in a subtype:
 
 ```altscript
-array #(type element_type=numeric);    // (3)
-array #(type element_type=integral);   // (4) 
+type integer_array = array #(type element_type = int);
 ```
-Where (4) is not a subtype of (3), but both (3) and (4) are subtypes of (1), and (4) is a subtype of (1) and (2). int[4] is subtype of (2) but not a subtype of (4). array #(type element_type=numeric) defines a heterougenous numeric which contains numbers mixed of any numeric types, while array #(type element_type : numeric) is an abstract array that represents any numeric array whose element type can be bound to any numeric type, for instance, a double array with all elements in double precision, a long integer array with all elements in long inetgers, or a numeric array with elements mixed of any numeric types (when the element type is bound to numeric.)
+or simply put as,
+```altscript
+type integer_array = array #(int);
+```
 
-Examples:
+This defines an integer array, a subtype of numeric_array, where the element type is bound to the type `int`. In a concrete subtype of a parametric type, all paramters must be bound either to a type or a constant value. The bound type is not necessarily concrete. We can also bind a type parameter to an abstract type or a parametric type:
 
 ```altscript
-x : int[4];      // array #(type element_type=int; length=4)
-y : numeric[4];  // array #(type element_type=numeric; length=4)
-z : array #(type element_type: numeric);
-z = x;  // okay, z is a polymorphic array reference and now refers to a value of int[4]
-y = x;  // error, int[4] is not a subtype of array #(type element_type=numeric, length=4)
-        // note: y is not a polymorphic reference although its elements are polymorphic references
-z = y;  // okay, z refers to a value of numeric[4];
+type mixed_numeric_array = array #(type element_type = numeric);
+```
+or simply put as,
+```altscript
+type mixed_numeric_array = array #(numeric);
 ```
 
-A type parameter is a member of a type. Therefore element_type can be accessed through a type. For instance:
+This defines a mixed numeric array, a subtype of array, where the element type is bound to the abstract type `numeric`. It may contain values of any type of numbers, as long as they are values in the subtype of numeric, such as values of integer, long integer, float, double, etc.
+
+Once a type parameter is bound, it cannot be re-bound in a subtype. Therefore, `integer_array` is a subtype of `numeric_array`, but not a subtype of `mixed_numeric_array` because the element type is already bound in `mixed_numeric_array`.
+
+Consider:
 
 ```altscript
-type IntArray = array #(type element_type = int; length=4); // or IntArray = int[4];
+x: array #(int, 4);
+z: array #(numeric) = x;                        // error, array #(int, 4) is not a subtype of array #(type element_type=numeric)
+y: array #(type element_type: numeric) = x;     // okay, array #(int, 4) is a subtype of array #(type element_type: numeric)
 ```
 
-IntArray.element_type is a valid expression that represents the element type of IntArray, and it is int in this case.
+Let's consider the case of assignment of `x` to `z`. `z` is declared as a mixed numerical array that is able to hold all kinds of numeric values. Apparently, `x` does not meet what is declared for `z`. If we make `z` to refer to the value in `x`, the assignment of `z[0]=4.0` is legal by what we declare for `z`, but will fail to comply with what we assume for `x`.
+
+Now we consider the case of assignment of `x` to `y`. `y` is polymorphic variable declared to hold any numeric array in which the element type is determined by the actual array type assigned to `y`. When `x` is assigned to `y`, `y` gets the actual type of array #(int, 4). Therefore, `y` can only take an element value which is in the element type of the actual array type of `y`:
+
+```altscript
+func foo #(type T: array #(type element_type: numeric))(y: T; e: T.element_type)
+{
+    y[0] = e;                      // okay, because e is the element type of array value that y holds
+}
+int4:    int[4] = (1,2,3,4);       // int[4] is a syntax sugar for array#(int, 4)
+double4: double[4] = (1,2,3,4);    // double[4] is a syntax sugar for array#(double, 4)
+foo(int4, 4);                      // okay, 4 is the element type of int4
+foo(double4, 4);                   // okay, 4 is converted to double value
+foo(double4, "string");            // error, "string" cannot be converted to the element type of double4
+```
+
+On a side note for the expression `T.element_type`, parameters of a parametric type are member names declared in the type scope and they can be accessed through the parametric type name using the operator `.` (the scope name selector).
+
+### Parametric Type Inheritance
+
+### Parametric Interface Type
+
 
 An array is a container for elements of the given element type, you can only set the element to the value of its element_type. For instance:
 
