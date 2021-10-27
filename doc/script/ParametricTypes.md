@@ -150,24 +150,71 @@ It is considered as a usage case when we use a parametric class for a base class
 
 ### Parametric Interface Type
 
-The input and output interface of a function or the input interface of a constructor can be parameterized:
+The input and output interface of a function or the input interface of a constructor can be parameterized. Unlike generic or template functions in other programming languages, aa ALT function with parametric interface type is a true callable type that can be called and executed directly without a static instantiation. Example:
 
 ```altscript
-func copy_array_to_stream #(type ArrayT: array)(a: ArrayT; s: stream#(ArrayT.element_type))
+func append_array_to_stream #(type ArrayT: array)(a: ArrayT; s: stream#(ArrayT.element_type))
 {
     foreach (e: a) s.append(e);
 }
 ```
 
-The function `copy_array_to_stream` copies the contents of an array into a stream. The interface type is parameterized by an array type parameter, and the element type of the stream is specified to be the same type of the array type:
+The function `append_array_to_stream` append the contents of an array into a stream. The interface type is parameterized by an array type parameter, and the element type of the stream is specified to be the same type of the array type:
 
 ```altscript
 str_array : string[4];
 int_array : int[4];
 str_stream : string...;
 int_stream : int...;
-copy_array_to_stream(str_array, str_stream);   // okay
-copy_array_to_stream(int_array, int_stream);   // okay
-copy_array_to_stream(int_array, str_stream);   // error
+append_array_to_stream(str_array, str_stream);   // okay
+append_array_to_stream(int_array, int_stream);   // okay
+append_array_to_stream(int_array, str_stream);   // error
 ```
+
+Because a parametric function is a true callable type, its parametric interfaces is overridable in subclass:
+
+```altscript
+class test
+{
+    class base
+    {
+        virtual func fill #(type T: numeric)(v: T; a: array#(T))
+        {
+            foreach (e: a) e = v;
+        }
+    }
+    object instance: base
+    {
+        func fill #(type T: numeric)(v: T; a: array#(T))
+        {
+            base::fill(v, a);
+            a.sort();
+        }
+    }
+    y : base;
+    x : int[4];
+    enter
+    {
+        y = instance;
+        y.fill(4, x);
+    }
+}
+```
+
+In the above example, the singleton object, `instance`, override the member function `fill` defined in the its base class. When the function `fill` is called through `y`, a polymorphic reference of `base`, the actual member function `fill` called will be the onc defined in `instance`.
+
+### Covariant subtyping with Parametric Type
+
+By making type construction via composition, inheritance, and parameterization in covariance instead of invariance or contravariance, more meaningful programs can be accepted and well-typed. While programmers often find contravariance unintuitive, they also wonder why an array of cat cannot be intuitively considered as a subtype of an array of animal in a covariant way. See [Covariance and contravariance](https://en.wikipedia.org/wiki/Covariance_and_contravariance_%28computer_science%29) for the complication to make subtyping covariant in other programming languages.
+
+Since we treat a parametric type a true type, subtypes can be created by refining the type parameter covariantly, thus we can have array subtypes covariantly going with its element type:
+
+ * `array#(Cat)` is a subtype of `array#(type element_type: Felidae)`
+ * `array#(type element_type: Felidae)`  is a subtype of `array#(type element_type: Carnivora)` 
+ * ...
+
+Being a subtype, it must hold all promise declared in its base type. The type `array#(type element_type: Felidae)` declared an array type that can only contain cats of a given cat family, and the given cat family in `array#(Cat)` is Cat. However, the covariant chain stops once the type parameter is bound. Therefore, `array#(Cat)` cannot be a subtype of  `array#(Felidae)` because the element type is bound to `Felidae` in `array#(Felidae)`, which is an array that must be able to contain any mixed types of cats such as domestic cats, tigers and lions, and `array#(Cat)` cannot hold this promise.
+
+
+
 
