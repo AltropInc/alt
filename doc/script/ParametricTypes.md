@@ -15,21 +15,21 @@ Alt parametric types will have positive answers for these.
 
 ### Parametric Type Declaration
 
-Since a parametric type is a type, we do not need any keyward such as generic or template to distinguish between a type and a parametric type, simply introduce parameters in a parametric type in a pair of parentheses prefixed with #:
+Since a parametric type is a type, we do not need any keyword such as generic or template to distinguish between a type and a parametric type, simply introduce parameters in a parametric type in a pair of parentheses prefixed with #:
 
 ```altscript
 class array #(type element_type: any; length: uint);
 ```
 
-This declaration defines a new parametric type, a class `array`, with two parameters: a type parameter `element_type`, and a constant value parameter `length`. The parametric type `array` defines a family of containers hodling a given number of elements of the given type, where `length` is given the number, and `element_type` is the given element type. All types derived from `array` are subtypes of `array` - and this is not possible in other programming languages where parametric types are not true types and there is no base for the concept of subtype on parametric types.
+This declaration defines a new parametric type, a class `array`, with two parameters: a type parameter `element_type`, and a constant value parameter `length`. The parametric type `array` defines a family of containers holding a given number of elements of the given type, where `length` is given the number, and `element_type` is the given element type. All types derived from `array` are subtypes of `array` - and this is not possible in other programming languages where parametric types are not true types and there is no base for the concept of subtype on parametric types.
 
-A type parameter has the `type` specifier in the declareation:
+A type parameter has the `type` specifier in the declaration:
 
 ```altscript
 type element_type: any
 ```
 
-What, one may ask, is the role of `: any` in the declareation? Well, that's the point of constrained type parameter: it specifies that the `element_type` can be any subtype of 'any', and in this case, it can be any type at all.
+What, one may ask, is the role of `: any` in the declaration? Well, that's the point of the constrained type parameter: it specifies that the `element_type` can be any subtype of 'any', and in this case, it can be any type at all.
 
 Consider another example:
 
@@ -41,9 +41,9 @@ This defines a parametric type, a class `Point`, which has two member elements, 
 
 ### Parametric Type Refinement
 
-A parametric type can be refined into subtypes by re-constraining or binding its parameters. A parametric type becomes a concrete type, that is, a type that can used to instantiate objects/values, when all its parameters are bound to a type or a constant value.
+A parametric type can be refined into subtypes by re-constraining or binding its parameters. A parametric type becomes a concrete type, that is, a type that can be used to instantiate objects/values, when all its parameters are bound to a type or a constant value.
 
-A type paramether can be re-constrained in a subtype by providing a subtype of the constraining type given in the base type:
+A type parameter can be re-constrained in a subtype by providing a subtype of the constraining type given in the base type:
 
 ```altscript
 type numeric_array = array #(type element_type: numeric);
@@ -51,7 +51,7 @@ type numeric_array = array #(type element_type: numeric);
 
 This defines a numeric array, a subtype of array, where the element type is re-constrained to any numeric type, where `numeric` is a subtype of `any`, a constraining type given in the base type `array`.
 
-A type paramether can also be bound to a type in a subtype. In most cases, the given type for the binding is a concrete type, but can also be an abstract type.
+A type parameter can also be bound to a type in a subtype. In most cases, the given type for the binding is a concrete type, but can also be an abstract type.
 
 ```altscript
 type integer_array = array #(type element_type = int);
@@ -71,7 +71,7 @@ or simply put,
 type mixed_numeric_array = array #(numeric);
 ```
 
-This defines a mixed numeric array, a subtype of array, where the element type is bound to the abstract type `numeric`. This is a hetrougeneous array which may contain values of any type of numbers, as long as they are values in a subtype of `numeric`, or in other words, it can contains mixed values such as short integers, long integer, floats, and doubles.
+This defines a mixed numeric array, a subtype of array, where the element type is bound to the abstract type `numeric`. This is a heterogeneous array which may contain values of any type of numbers, as long as they are values in a subtype of `numeric`, or in other words, it can contain mixed values such as short integers, long integers, floats, and doubles.
 
 ### Parametric Subtype
 
@@ -87,7 +87,7 @@ y: array #(type element_type: numeric) = x;     // okay, array #(int, 4) is a su
 
 Let's consider the case of assignment of `x` to `z`. `z` is declared as a mixed numerical array that is able to hold all kinds of numeric values. Apparently, `x` does not meet what is declared for `z`. If we make `z` to refer to the value in `x`, the assignment of `z[0]=4.0` is legal by what we declare for `z`, but will fail to comply with what we assume for `x`.
 
-Now we consider the case of assignment of `x` to `y`. `y` is polymorphic variable declared to hold any numeric array in which the element type is determined by the actual array type assigned to `y`. When `x` is assigned to `y`, `y` gets the actual type of array #(int, 4). Therefore, `y` can only take an element value which is in the element type of the actual array type of `y`:
+Now we consider the case of assignment of `x` to `y`. `y` is a polymorphic variable declared to hold any numeric array in which the element type is determined by the actual array type assigned to `y`. When `x` is assigned to `y`, `y` gets the actual type of array #(int, 4). Therefore, `y` can only take an element value which is in the element type of the actual array type of `y`:
 
 ```altscript
 func foo #(type T: array #(type element_type: numeric))(y: T; e: T.element_type)
@@ -101,7 +101,7 @@ foo(double4, 4);                   // okay, 4 is converted to double value
 foo(double4, "string");            // error, "string" cannot be converted to the element type of double4
 ```
 
-On a side note for the expression `T.element_type`, parameters of a parametric type are member names declared in the type scope and they can be accessed through the parametric type name using the operator `.` (the scope name selector). This notation makes it easier to represent a deep type dependnecy among arguments and we will explains this point later.
+On a side note for the expression `T.element_type`, parameters of a parametric type are member names declared in the type scope and they can be accessed through the parametric type name using the operator `.` (the scope name selector). This notation makes it easier to represent a deep type dependency among arguments and we will explain this point later.
 
 More subtype examples:
 
@@ -116,7 +116,7 @@ More subtype examples:
 
 ### Parametric Type Inheritance
 
-A parametric type can generate subtypes by refining parameters. However, a parametric type, as an abstract type, is often used as a base class (or super-class) to derive sub-classes in which more features than just parameter refinement are required. This is quite common when we need to add more member data and functions in a subtype. When a parametric class is used as a base class in inheritance, parameters of the parametric class can be bound to a type or a value to make the parametric class a concrete base type:
+A parametric type can generate subtypes by refining parameters. However, a parametric type, as an abstract type, is often used as a base class (or superclass) to derive subclasses in which more features than just parameter refinement are required. This is quite common when we need to add more member data and functions in a subtype. When a parametric class is used as a base class in inheritance, parameters of the parametric class can be bound to a type or a value to make the parametric class a concrete base type:
 
 ```altscript
 class IntPoint is Point #(int) { }
@@ -130,7 +130,7 @@ If the derived class is a parametric class, the type parameter of its parametric
 class IntegralPoint #(type UnitT: integral) is Point #(UnitT) { }
 ```
 
-This defines a subtype of Point in which the x and y diementsions are measured by a subtype of integral. It is still an abstract type because the type of the integral is not concrete yet. Here, the sybtype relation is explicitly established by class inheritance: `IntegralPoint` is a subtype of `Point`, `IntPoint` is a subtype of `Point`, but `IntPoint` is not a subtype of `IntegralPoint` although by pure parameter refinement, Point #(int) is a subtype of Point #(type UnitT: integral):
+This defines a subtype of Point in which the x and y dimensions are measured by a subtype of integral. It is still an abstract type because the type of the integral is not concrete yet. Here, the subtype relation is explicitly established by class inheritance: `IntegralPoint` is a subtype of `Point`, `IntPoint` is a subtype of `Point`, but `IntPoint` is not a subtype of `IntegralPoint` although by pure parameter refinement, Point #(int) is a subtype of Point #(type UnitT: integral):
 
 ```altscript
 x: Point #(int);
@@ -138,7 +138,7 @@ y: Point #(type UnitT: integral);
 y = x;   // okay, Point #(int) is a subtype of Point #(type UnitT: integral)
 ```
 
-Because class inheritance can add more refinements and extentions than parameter refinements, the subtype relationship must follow the inheritance hierarchy. Only when we derive `IntPoint` from `IntegralPoint`:
+Because class inheritance can add more refinements and extensions than parameter refinements, the subtype relationship must follow the inheritance hierarchy. Only when we derive `IntPoint` from `IntegralPoint`:
 
 ```altscript
 class IntPoint is IntegralPoint #(int) { }
@@ -146,11 +146,11 @@ class IntPoint is IntegralPoint #(int) { }
 
 can `IntPoint` be the subtype of `IntegralPoint`.
 
-It is considered as a usage case when we use a parametric class for a base class to derive subclass. Therefore, all parameters of the parametric class must be bound in the base class, either to a type or a value, or to a parameter of the derived class. This resembles the case of a function call in which you must provide all actual parameters, although you can use formal parameter in the outer function that encloses the function call.
+It is considered as a usage case when we use a parametric class for a base class to derive subclass. Therefore, all parameters of the parametric class must be bound in the base class, either to a type or a value, or to a parameter of the derived class. This resembles the case of a function call in which you must provide all actual parameters, although you can use formal parameters in the outer function that encloses the function call.
 
 ### Parametric Interface Type
 
-The input and output interface of a function or the input interface of a constructor can be parameterized. Unlike generic or template functions in other programming languages, aa ALT function with parametric interface type is a true callable type that can be called and executed directly without a static instantiation. Example:
+The input and output interface of a function or the input interface of a constructor can be parameterized. Unlike generic or template functions in other programming languages, an ALT function with parametric interface type is a true callable type that can be called and executed directly without a static instantiation. Example:
 
 ```altscript
 func append_array_to_stream #(type ArrayT: array)(a: ArrayT; s: stream#(ArrayT.element_type))
@@ -159,7 +159,7 @@ func append_array_to_stream #(type ArrayT: array)(a: ArrayT; s: stream#(ArrayT.e
 }
 ```
 
-The function `append_array_to_stream` append the contents of an array into a stream. The interface type is parameterized by an array type parameter, and the element type of the stream is specified to be the same type of the array type:
+The function `append_array_to_stream` appends the contents of an array into a stream. The interface type is parameterized by an array type parameter, and the element type of the stream is specified to be the same type of the array type:
 
 ```altscript
 str_array : string[4];
@@ -201,7 +201,7 @@ class test
 }
 ```
 
-In the above example, the singleton object, `instance`, override the member function `fill` defined in the its base class. When the function `fill` is called through `y`, a polymorphic reference of `base`, the actual member function `fill` called will be the onc defined in `instance`.
+In the above example, the singleton object, `instance`, overrides the member function `fill` defined in its base class. When the function `fill` is called through `y`, a polymorphic reference of `base`, the actual member function `fill` called will be the onc defined in `instance`.
 
 ### Covariant subtyping with Parametric Type
 
@@ -213,7 +213,49 @@ Since we treat a parametric type a true type, subtypes can be created by refinin
  * `array#(type element_type: Felidae)`  is a subtype of `array#(type element_type: Carnivora)` 
  * ...
 
-Being a subtype, it must hold all promise declared in its base type. The type `array#(type element_type: Felidae)` declared an array type that can only contain cats of a given cat family, and the given cat family in `array#(Cat)` is Cat. However, the covariant chain stops once the type parameter is bound. Therefore, `array#(Cat)` cannot be a subtype of  `array#(Felidae)` because the element type is bound to `Felidae` in `array#(Felidae)`, which is an array that must be able to contain any mixed types of cats such as domestic cats, tigers and lions, and `array#(Cat)` cannot hold this promise.
+Being a subtype, it must hold all promises declared in its base type. The type `array#(type element_type: Felidae)` declared an array type that can only contain cats of a given cat family by the type parameter `element_type` which is a subtype of `Felidae`, and the given cat family for the `element_type` in `array#(Cat)` is Cat. However, the covariant chain stops once the type parameter is bound. Therefore, `array#(Cat)` cannot be a subtype of  `array#(Felidae)` because the element type is bound to `Felidae` in `array#(Felidae)`, which is an array that must be able to contain any mixed types of cats such as domestic cats, tigers and lions, and `array#(Cat)` cannot hold this promise.
+
+By making a parametric class an abstract class, we can have a polymorphic variable to call virtual functions defined in the abstract class, and the interface of the virtual functions can be covariantly redefined in subclasses. In conntrast, covariant overriding of function interface is only allowed for the output but not for the input in other traditional programming languages. Consider the following `Animal` class:
+
+```altscript
+class Food {}
+class Animal #(type FoodType: Food)
+{
+    virtual func digest(food: FoodType)
+    {
+    }
+}
+```
+
+The input of the `digest` function in the `Animal` class is specified to take the only food suitable for this animal - not any type of food, otherwise, a subclass of `Animal` cannot not override `digest` with a naroowing type because a concrete animal cannot digest any type of food. When the function `digest` is called, the input food must be the food type that the animal takes:
+
+```altscript
+func feed #(type AT: Animal) (a: AT; f: AT.FoodType)
+{
+    a.digest(f);
+}
+
+func try_feed (a: Animal; f: Food)
+{
+    if (f => food is typeof(a).FoodType)
+    {
+        a.digest(food);
+    }
+}
+```
+
+A subclass of `Animal' can override the `digest` function with a narrowing food type:
+
+```altscript
+class CowFood is Food { }
+class Cow is Animal #(CowFood)
+{
+    final func digest(food: CowFood)
+    {
+    }
+}
+```
+
 
 
 
