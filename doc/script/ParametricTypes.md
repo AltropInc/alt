@@ -4,18 +4,15 @@
 
 A parametric type is the type that takes parameters to introduce a family of types – one for each possible combination of parameter values. For instance, an array is an parametric type with two parameters: element_type and length. An array of four integers is one of the array types in the family of the parametric array type, with a parameter value combination where element_type=int and length=4. There are many languages that support some version of parametric mechanism (or generic programming), but none supports true parametric polymorphism.
 
-An Alt parametric type is a true type. It can be used as an abstract type for polymorphic variable declarations, wherein the type parameters may be left undetermined. A parametric type has its position in the type system's subtype hierarchy. This gives a whole new horizon of applications on generic programming to address many traditional unanswered questions in static parametric type systems, just to name a few:
+An ALT parametric type is a true type. It can be used as an abstract type for polymorphic variable declarations, wherein the type parameters may be left undetermined. A parametric type has its position in the type system's subtype hierarchy. This gives a whole new horizon of applications on generic programming to address many traditional unanswered questions in static parametric type systems:
 
- * Can we consider an array of integers a subtype of an array of numeric numbers because an integer is a subtype of numeric number?
- * Can we covariantly define the input interface in subtype?
- * Can we easily specify type dependency among input and output in an interface?
- * Can we override a parametric interface (make it virtual) in a subtype?
-
-Alt parametric types will have positive answers for these.
+ * Covariant subtyping - can we treat an array of integers a subtype of an array of numeric numbers because an integer is a subtype of numeric number?
+ * Parametric interface override - can we override a parametric interface (make it virtual) in a subtype?
+ * Covariant input interfce - can we covariantly override the input interface of a member function in subtype?
 
 ### Parametric Type Declaration
 
-Since a parametric type is a type, we do not need any keyword such as generic or template to distinguish between a type and a parametric type, simply introduce parameters in a parametric type in a pair of parentheses prefixed with #:
+Since a parametric type is a type, we do not need any keyword such as generic or template to distinguish between a type and a parametric type, simply introduce parameters in a parametric type by a pair of parentheses prefixed with #:
 
 ```altscript
 class array #(type element_type: any; length: uint);
@@ -146,7 +143,7 @@ class IntPoint is IntegralPoint #(int) { }
 
 can `IntPoint` be the subtype of `IntegralPoint`.
 
-It is considered as a usage case when we use a parametric class for a base class to derive subclass. Therefore, all parameters of the parametric class must be bound in the base class, either to a type or a value, or to a parameter of the derived class. This resembles the case of a function call in which you must provide all actual parameters, although you can use formal parameters in the outer function that encloses the function call.
+It is considered as a usage case when we use a parametric class for a base class to derive subclass. Therefore, all parameters of the parametric class must be bound in the base class, either to a type or a value, or to a parameter of the derived class. This resembles the case of a function call in which you must provide all actual parameters, although you can use formal parameters in the outer function where the function call is enclosed.
 
 ### Parametric Interface Type
 
