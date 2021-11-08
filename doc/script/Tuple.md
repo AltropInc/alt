@@ -1,4 +1,109 @@
-# Tuple
+# Class
+
+A class describes a set of objects that have a common structure and a common set of behaviours. The object belonging to the class is called an instance of the class. In ALT, a class is also referred to as a type. They are the same concept.
+
+The object structure tells how the structural representation of the object is composed in terms of a set of member objects. While this definition is recursive, there are a set of primitive classes whose structural representations are built-in values without member objects. Examples are classes for integers, floating-point numbers, enumeration values, and characters. Take the example of a `ParticleSystem`, it contains a set of particles as its member objects. while each particle is composed of primitive values to represents its size, color, and other attributes:
+
+```altscript
+class Partcle
+{
+  size: int;
+  color: Color;
+  position: (float, float, float);
+  life: duration;
+}
+class ParticleSystem
+{
+  particles: Particle...;
+  emit_position: (float, float, float);
+  emit_direction: (float, float, float);
+}
+```
+
+The object behaviour tells how the object can act in response to a set of inputs in terms of a set of member classes. The class `ParticleSystem`, for example, may use a member class of `MyParticle` to describe the composition of its own specialized version of particle, and a functional member class `emit` (member function) to tell how a set of particles can be generated:
+
+```altscript
+class ParticleSystem
+{
+  class MyParticle is Partcle
+  {
+    enter (minmum_to_life_span, maximum_to_life_span: int)
+    {
+      // construct MyParticle
+    }
+  }
+  class emit is func
+  {
+    enter (minmum_to_generate, maxmum_to_generate: int)
+    {
+      // generate partciles
+    }
+  }
+  particles: MyParticle...;
+  emit_position: (float, float, float);
+  emit_direction: (float, float, float);
+}
+```
+
+A simple form can be used for a class that does not introduce more members. As in the above example, member classes `MyParticle` and `emit` can use the simple form as shown below:
+
+```altscript
+class ParticleSystem
+{
+  Partcle MyParticle (minmum_life_span, maximum_life_span: int)
+  {
+    // construct MyParticle
+  }
+  func emit (minmum_to_generate, maxmum_to_generate: int)
+  {
+    // generate partciles
+  }
+  particles: MyParticle...;
+  emit_position: (float, float, float);
+  emit_direction: (float, float, float);
+}
+```
+
+## Defining a Class
+
+A class always starts with the keyword `class` followed by the name of the class:
+
+```altscript
+class ClassName
+{
+}
+```
+
+A class class can be created or derived from a existing class. The existing class from which the derived class is created through the process of inheritance is known as a base class or superclass:
+
+```altscript
+class DerivedClassName is ClassName
+{
+}
+```
+
+or
+
+```altscript
+class DerivedClassName: ClassName
+{
+}
+```
+
+By using a base class to derive a new class, all of the members in the base can be reused to make the new class and the only thing need to care is the extension part the new class and the existing part needs to be chnaged in base.
+
+A class can specify a set of constructor interfaces to use different inputs to create the instance of the class:
+
+```altscript
+type position = (x, y: float);
+type area_size = (width, height: float);
+class Rectangle
+{
+  enter(origin: position; size: area_size) { }
+  enter(pos1, pos2: position) { }
+  enter(x, y, width, height: float) { }
+}
+```
 
 ## Tuple type
 
@@ -8,26 +113,26 @@ The tuple elements can be either named or unamed, but all tuple elements must be
 A tuple is written in a list of element types with round brackets, for instance:
 
 ```altscript
-(int, string, double)
-(position: (x:int, y: int), height: int);
+(int; string; double)
+(position: (x, y: int); height: int);
 ```
 
 A tuple type can be parameterized. The list of type paramters is written with round brackets prefixex with #. For instance,
 
 ```altscript
-#(type ElementType: Numeric)(first: ElementType, second: ElementType)
+#(type ElementType: Numeric)(first, second: ElementType)
 ```
 A paramterized tuple type is often used to specify the type dependeny among tuple elements. In the above example, the type of the first
-and the second elements are related. Althong it tells you that tehy can be any numeric types, but once the ElementType is bound to
-a concreted numeric type, say, int, they has to be both in int. Example:
+and the second elements are related. Althong it tells you that they can be any numeric types, but once the ElementType is bound to
+a concrete numeric type, say, int, they has to be both in int. Example:
 
 ```altscript
-#(type ArrayType: array)(first: second: ArrayType, second: ArrayType.ElementType, )
+#(type ArrayType: array)(first: second: ArrayType; second: ArrayType.element_type, )
 ```
 Here the type of the second tuple element must be the element type of the array type for the first tuple element. Consider another example:
 
 ```altscript
-#(type T1, T2: Any, size: int)(first: array#(T1, size), second: array#(T2, size))
+#(type T1, T2: Any, size: int)(first: array#(T1, size); second: array#(T2, size))
 ```
 
 Here the second array is the tuple must have the same size of the first array.
