@@ -214,17 +214,17 @@ A functional class is used to create callable objects that perform some function
 class sum: func
 {
   enter (values: int...): int
-	{
+  {
     sum := 0;
-	  foreach (v in values) sum += v;
+    foreach (v in values) sum += v;
     return sum;
-	}
+  }
   enter (strs: string...): string
-	{
+  {
     sum: string;
-	  foreach (str in strs) sum.append(str);
+    foreach (str in strs) sum.append(str);
     return sum;
-	}
+  }
 }
 ```
 
@@ -245,6 +245,54 @@ func sum(strs: string...): string
 }
 ```
 
+## Member Class Overriding
+
+A member class can have a virtual constructor interface defined in the base class that can be overridden in a derived class. When you refer to a derived class object using a variable declared in the base class, you can use the virtual constructor interface for that object and execute the overridden version of the constructor in derived class to create a member object:
+
+```altscript
+class base
+{
+  class member
+  {
+    virtual enter(x: int) {}
+  }
+}
+class derived: base
+{
+  class member
+  {
+    virtual enter(x: int) {}
+  }
+}
+```
+
+When a variable of the base class, `x`, refers to a derived class object:
+
+```altscript
+x: base = derived();
+x.member(3);
+```
+
+`x.member(3)` creates a member object using the member class declared in the `derived` class.
+
+The virtual constructor interface can only be used for member classes, and the overridden process is done through their enclosing class hierarchy. The ALT virtual constructor interface is more general than the virtual functions in other traditional programming languages. When member classes are written in simple forms, the virtual constructor interface looks exactly like the traditional virtual functions:
+
+```altscript
+class base
+{
+  virtual func print()
+  {
+     // print base class information
+  }
+};
+class derived: base
+{
+  virtual func print()
+  {
+     // print derived class information
+  }
+}; 
+```
 
 
 ## Tuple type
