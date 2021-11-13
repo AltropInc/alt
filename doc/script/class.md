@@ -293,3 +293,13 @@ class derived: base
   }
 }; 
 ```
+
+## self, selfclass, owner, ownerclass
+
+The keyword `self' is the reserved object name used within a class body to represent the actual instance created by this class or by a derived class of this class. It is similar to Java's `this' reference or C++'s `this` pointer. However, there is a major distinction: `self' appearing in a function body refers to the instance of the function instead of the instance of the class that encloses the function. The reason for this distinction is that ALT treats a member function the same as a member class. The function body is just a simple form of member class. To access the instance of the class that encloses the function within the function body, use the keyword `owner', which is the reserved object name to represent the enclosing object of the `self' instance.
+
+The keyword `selfclass` represents the actual type of the instance represented by  `self'. Therefore, `selclass` appearing in a class body may refer to the type of this class or a subclass of this class. The keyword `ownerclass` represents the actual type of the instance represented by `owner'.
+
+
+
+
