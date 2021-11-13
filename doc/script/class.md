@@ -2,7 +2,7 @@
 
 A class describes a set of objects that have a common structure and a common set of behaviours. The object belonging to the class is called an instance of the class. In ALT, a class is also referred to as a type. They are the same concept.
 
-The object structure tells how the structural representation of the object is composed in terms of a set of member objects. While this definition is recursive, there are a set of primitive classes whose structural representations are built-in values without member objects. Examples are classes for integers, floating-point numbers, enumeration values, and characters. Take the example of a `ParticleSystem`, it contains a set of particles as its member objects. while each particle is composed of primitive values to represents its size, color, and other attributes:
+The object structure tells how the structural representation of the object is composed in terms of a set of member object/value declarations. While this definition is recursive, there are a set of primitive classes whose structural representations are built-in values without member object/value declarations. Examples are classes for integers, floating-point numbers, enumeration values, and characters. Take the example of a `ParticleSystem`, it contains a set of particles as its member objects. while each particle is composed of primitive values to represents its size, color, and other attributes:
 
 ```altscript
 class Partcle
@@ -20,11 +20,15 @@ class ParticleSystem
 }
 ```
 
-The object behaviour tells how the object can act in response to a set of inputs in terms of a set of member classes. The class `ParticleSystem`, for example, may use a member class of `MyParticle` to describe the composition of its own specialized version of particle, and a functional member class `emit` (member function) to tell how a set of particles can be generated:
+The object behaviour tells how the object can act in response to a set of inputs in terms of a set of member classes. A member class is an inner class nested in its enclosing class. The class `ParticleSystem`, for example, has a member class of `MyParticle` to describe the composition of its own specialized version of particle, and a functional member class `emit` (member function) to tell how a set of particles can be generated:
 
 ```altscript
 class ParticleSystem
 {
+  particles: MyParticle...;
+  emit_position: (float, float, float);
+  emit_direction: (float, float, float);
+  
   class MyParticle is Partcle
   {
     enter (minmum_to_life_span, maximum_to_life_span: int)
@@ -39,10 +43,21 @@ class ParticleSystem
       // generate partciles
     }
   }
-  particles: MyParticle...;
-  emit_position: (float, float, float);
-  emit_direction: (float, float, float);
 }
+```
+
+Objects that are instances of an member class exist within an instance of the enclosing class class. A member class has access to other members of its enclosing class. Therefore, An instance of `MyParticle` or `emit` can exist only within an instance of `ParticleSystem` and has direct access to members defined in the enclosing instance of `ParticleSystem`:
+
+```altscript
+  class emit is func
+  {
+    enter (minmum_to_generate, maxmum_to_generate: int)
+    {
+      // generate partciles
+      particles.append(MyParticle(10, 60));
+      particles.append(MyParticle(15, 45));
+    }
+  }
 ```
 
 ## Defining a Class
@@ -127,7 +142,7 @@ class Derived: Base
 }
 ```
 
-Because the `Base` class explicitly defines a constructor that takes an integer value as input, the `Derived' must call the constructor in the base unless the `Base' provides a default constructor. Either,
+Because the `Base` class explicitly defines a constructor that takes an integer value as input, the `Derived` must call the constructor in the base unless the `Base' provides a default constructor. Either,
 
 ```altscript
 class Base
@@ -228,7 +243,7 @@ class sum: func
 }
 ```
 
-The base class `func' is a built-in functional class that supports traditional function call protocol, which is an efficient and sequential procedure using the same stack frame technique. Because `func' is a sealed class, we can use simple class form to define function classes:
+The base class `func` is a built-in functional class that supports traditional function call protocol, which is an efficient and sequential procedure using the same stack frame technique. Because `func` is a sealed class, we can use simple class form to define function classes:
 
 ```altscript
 func sum(values: int...): int
@@ -296,9 +311,9 @@ class derived: base
 
 ## self, selfclass, owner, ownerclass
 
-The keyword `self' is the reserved object name used within a class body to represent the actual instance created by this class or by a derived class of this class. It is similar to Java's `this' reference or C++'s `this` pointer. However, there is a major distinction: `self' appearing in a function body refers to the instance of the function instead of the instance of the class that encloses the function. The reason for this distinction is that ALT treats a member function the same as a member class. The function body is just a simple form of member class. To access the instance of the class that encloses the function within the function body, use the keyword `owner', which is the reserved object name to represent the enclosing object of the `self' instance.
+The keyword `self` is the reserved object name used within a class body to represent the actual instance created by this class or by a derived class of this class. It is similar to Java's `this` reference or C++'s `this` pointer. However, there is a major distinction: `self` appearing in a function body refers to the instance of the function instead of the instance of the class that encloses the function. The reason for this distinction is that ALT treats a member function the same as a member class. The function body is just a simple form of member class. To access the instance of the class that encloses the function within the function body, use the keyword `owner`, which is the reserved object name to represent the enclosing object of the `self` instance.
 
-The keyword `selfclass` represents the actual type of the instance represented by  `self'. Therefore, `selclass` appearing in a class body may refer to the type of this class or a subclass of this class. The keyword `ownerclass` represents the actual type of the instance represented by `owner'.
+The keyword `selfclass` represents the actual type of the instance represented by  `self`. Therefore, `selfclass` appearing in a class body may refer to the type of this class or a subclass of this class. The keyword `ownerclass` represents the actual type of the instance represented by `owner`.
 
 
 
