@@ -1,14 +1,43 @@
 # Built-in Classes
 
-Built-in types provide a set of primitive types that serve as fundamental classes to build user-defined classes.
+Built-in types provide a set of primitive types that serve as fundamental classes to build user-defined classes. The instance value representation of a primitive type and the operation on the value are interpreted by the script interpreter or the compiler. Therefore, members of a primitive type are not necessarily defined in the class. For example, the instance of a `float' type has a 32-bit value representation in the [IEEE 754 single-precision binary floating-point format](https://en.wikipedia.org/wiki/Single-precision_floating-point_format), and can perform arithmetic operations such as +, -, *, /, and etc. However, the 32-bit representation and the arithmetic operations on the representation are not specified in the class `float'.
 
 ## Class any
 
-The class `any` is the root class. It is an abstract class and cannot be instantiated. All other classes are subclasses of the root class.
-A variable of `any` type can be used to refer to 
+The class `any` is the root class. It is an abstract class and cannot be instantiated. All other classes are subclasses of the root class. A variable of `any` type can be used to refer to an instance of any class:
 
+```altscript
+x: any = 2;
+x = "string";
+x = (3.1, "text");
+```
 
+The class 'any' has `equality` operator capibility, thta is, for any objects, they can be compared with equality (==) or inequality (!=):
 
+```altscript
+x: any = 2;
+y: any = "string;
+compare_result := x==y;  // compare_result gets value false
+```
+
+## Class comparable
+
+The abstract class `comparable` is a subclass of `any`. It is used for the natural ordering of a type. In addition to equality operators, for comparable instance, they can be compared with comparison operators <, <=, >, and >= to establish the order of two instances:
+
+```altscript
+class comparable: any
+{
+  deferred func <=> (other: ownerclass): int;
+}
+```
+
+A user-defined subclass of `comparable` must implement the virtual function `<=>'. However, the function `<=>' of a primitive comparable type is interpreted by the script interpreter. The function `<=>' is used to compare the other instance with `owner`, the instance of the of the owner of this function: if owner > other, it return 1; if owner < other,  it return -1; if owner == other, it return 0. For user-defined subclass, operations of <, <=, >, and >= are translated to use `<=>', while for primitive comparable types, operations of <, <=, >, and >= are interpreted by the script interpreter. 
+
+## Class enumerable
+
+The abstract class `enumerable` is a subclass of `comparable`.
+
+## Class tuple
 
 A tuple is a container of fixed number of heterogeouns elements arranged in a specified order that cannot be changed.
 
