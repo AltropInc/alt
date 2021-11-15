@@ -112,11 +112,11 @@ Using this simple form,  the member class `emit` in `ParticleSystem` can be writ
   }
 ```
 
-where `func' is the base class, `emit` is the derived class, `(minmum_to_generate, maxmum_to_generate: int)` is the constructor interface, and `{ }` is the constructor body. We will discuss this simple form in detail later.
+where `func` is the base class, `emit` is the derived class, `(minmum_to_generate, maxmum_to_generate: int)` is the constructor interface, and `{ }` is the constructor body. We will discuss this simple form in detail later.
 
 ## Constructor and Destructor
 
-Constructors defined in a class are used in the process of creating instances of the class. A class can specify a set of constructor interfaces with different inputs to create the instance of the class. A constructor is introduced by the keyword `enter`:
+Constructors defined in a class are used in the process of creating instances of the class. A class can specify a set of constructor interfaces (interface overloading) with different inputs to create the instance of the class. A constructor is introduced by the keyword `enter`:
 
 ```altscript
 type position = (x, y: float);
@@ -260,7 +260,7 @@ func sum(strs: string...): string
 }
 ```
 
-## Member Class Overriding
+## Member Interface Overriding, Deferred Member Interface and Abstract Class
 
 A member class can have a virtual constructor interface defined in the base class that can be overridden in a derived class. When you refer to a derived class object using a variable declared in the base class, you can use the virtual constructor interface for that object and execute the overridden version of the constructor in derived class to create a member object:
 
@@ -308,6 +308,74 @@ class derived: base
   }
 }; 
 ```
+
+A member class can have a deferred constructor interface, which is a virtual constructor interface without the implementation block:
+
+```altscript
+class abstract_base
+{
+  deferred func print();
+};
+class abstract_derived: abstract_base
+{
+  func print(x: int)
+  {
+     // print derived class information
+  }
+};
+class derived: abstract_base
+{
+  func print()
+  {
+     // print derived class information
+  }
+};
+```
+
+An abstract class is a class that cannot be instantiated, but they can be subclassed. If a class contains a member class with any deferred constructor interface, this class is an abstract class. If its derived class does not override this deferred constructor interface with an implementation block, the derived class is an abstract  class too. In the above example, the class `abstract_base` and `abstract_derived` are abstract classes, and only the class `derived` can be used to instantiate objects. A class can also be declared abstract using the keyword `abstract` even though it does not have any member classes with deferred constructor interfaces. In addition, a parametric class (see [Parametric Class](@ref man-parametric-classes)) is also an abstract class. In summary, a class is abstract if
+
+ * It contains a member class with any deferred constructor interface or inherits such interface that is not overriden
+ * It is declared abstract using the keyword `abstract`.
+ * It is a parametric class (see [Parametric Class](@ref man-parametric-classes))
+
+## Interface Class and Its Implementation
+
+A class can be declared as an interface class using the keyword `interface`. In addition, an interface class cannot have any member object/value declaration. It cannot have any constructor or destructor either. An interface class can only have member classes with deferred constructor interfaces, thhough the keyword `deferred` is not required. 
+
+```altscript
+interface class ButtonInterface
+{
+   func onButtonPress();
+   func onButtonRelease();
+};
+```
+
+The interface of member class (function) `onButtonClick` is deferred and does not have implementation. An interface class is an abstract class because all member class constructor interfaces are deferred.
+
+An interface class can inherit multiple interfaces (multiple bases). However, an interface class cannot be inherited by non-interface derived classes, it can only be implemented by non-interface derived classes:
+
+```altscript
+class Drawable2DButton is Drawable2D implements ButtonInterface
+{
+   func onButtonPress()
+   {
+   }
+   func onButtonRelease();
+   {
+   }
+};
+class Drawable3DButton is Drawable3D implements ButtonInterface
+{
+   func onButtonPress()
+   {
+   }
+   func onButtonRelease();
+   {
+   }
+};
+```
+
+A derived class can have only one base class by inheritance but can implement multiple interfaces. The derived class is a subclass of its base class, and also a subclass of any interface class that is implemented. `Drawable2DButton` is a subclass of `Drawable2D` and is also a subclass of `ButtonInterface`.
 
 ## self, selfclass, owner, ownerclass
 
