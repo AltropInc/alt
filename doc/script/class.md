@@ -36,28 +36,38 @@ class ParticleSystem
       // construct MyParticle
     }
   }
-  class emit is func
+  func emit(minmum_to_generate, maxmum_to_generate: int)
   {
-    enter (minmum_to_generate, maxmum_to_generate: int)
-    {
-      // generate partciles
-    }
+    // generate partciles
+    particles.append(MyParticle(10, 60));
+    particles.append(MyParticle(15, 45));
   }
 }
 ```
 
+Note: the functional member class `emit` is written in a simple class form where `emit` is the member class name and `func` is its base class. It is conceptually equivalent to the following pseudo code:
+
+```altscript
+class emit is func
+{
+  enter (minmum_to_generate, maxmum_to_generate: int)
+  {
+    // generate partciles
+  }
+}
+```
+
+The above pseudo code is used to illustrate the concept of functional class `emit` and is actually not a valid code because `func` is a sealed class. We will explain this later.
+
 Objects that are instances of an member class exist within an instance of the enclosing class class. A member class has access to other members of its enclosing class. Therefore, An instance of `MyParticle` or `emit` can exist only within an instance of `ParticleSystem` and has direct access to members defined in the enclosing instance of `ParticleSystem`:
 
 ```altscript
-  class emit is func
-  {
-    enter (minmum_to_generate, maxmum_to_generate: int)
-    {
-      // generate partciles
-      particles.append(MyParticle(10, 60));
-      particles.append(MyParticle(15, 45));
-    }
-  }
+func emit(minmum_to_generate, maxmum_to_generate: int)
+{
+   // generate partciles
+   particles.append(MyParticle(10, 60));
+   particles.append(MyParticle(15, 45));
+}
 ```
 
 ## Defining a Class
@@ -196,7 +206,7 @@ The destructor should not have any input, and is automatically invoked, includin
 
 ## Simple Class Form and Sealed Class
 
-If a derived class does not have any member extension or modification and only provide constructors to create instances of the class, the class definition can use a simple form for each constructor interface. For instance:
+If a derived class does not have any member extension or modification and only provides constructors to create instances of the class, the class definition can use a simple form for each constructor interface. For instance:
 
 ```altscript
 class Base
@@ -221,7 +231,7 @@ Base Derived(x, y: int) { }
 Base Derived(x, y, z:: int) { }
 ```
 
-In particular, a sealed class is a class that cannot be extended with new members in derived classes. However, new constructors with different interfaces can be added to a sealed class. Therefore, we cannot use a sealed class as a base class in class inheritance, but we can use simple class form to generate derived class from a sealed base class for a selt of different constructors:
+In particular, a sealed class is a class that cannot be extended with new members in derived classes. However, new constructors with different interfaces can be added to a sealed class. Therefore, we cannot use a sealed class as a base class in class inheritance, but we can use simple class form to generate derived class from a sealed base class with a set of different constructors:
 
 ```altscript
 sealed class SealedBase
@@ -279,7 +289,7 @@ func sum(strs: string...): string
 
 The class `func` a built-in functional class that supports traditional function call protocol, which is an efficient and sequential procedure using the same stack frame technique.
 
-## Member Interface Overriding, Deferred Member Interface and Abstract Class
+## Member Interface Overriding, Deferred Member Interface, and Abstract Class
 
 A member class can have a virtual constructor interface defined in the base class that can be overridden in a derived class. When you refer to a derived class object using a variable declared in the base class, you can use the virtual constructor interface for that object and execute the overridden version of the constructor in derived class to create a member object.
 
@@ -324,7 +334,7 @@ An abstract class is a class that cannot be instantiated, but they can be subcla
  * It is declared abstract using the keyword `abstract`.
  * It is a parametric class (see [Parametric Class](@ref man-parametric-classes))
 
-The ALT virtual constructor interface is more general than the virtual functions in other traditional programming languages, becuase the overriding is not just limited to functions:
+The ALT virtual constructor interface is more general than the concept of virtual functions in other traditional programming languages, because the overriding mechanism is not just limited to functions:
 
 ```altscript
 sealed class sealed_base
@@ -340,10 +350,10 @@ object derived is base    // a singleton derived from base
     {
     }
 }
-x: base = derived;
+x: base = derived;   // a polymorphic variable of 'base' and it actually refers to the 'derived' object
 enter ()
 {
-    x.member(3);  // create a 'member' object in the 'derived' object using the constructor provided in the 'derived' object
+    x.member(3);     // create a 'member' object in the 'derived' object using the constructor provided in the 'derived' object
 }
 ```
 
@@ -394,15 +404,15 @@ sealed class sealed_base
     y: int;
     z: int;
 }
-interface class base1
+interface class interface1
 {
     deferred sealed_base member1 (x: int)
 }
-interface class base2
+interface class interface2
 {
     deferred sealed_base member2 (x: int)
 }
-object derived is Drawable implements base1, base2
+object derived is Drawable implements interface1, interface2
 {
     sealed_base member1(x: int)
     {
@@ -413,8 +423,8 @@ object derived is Drawable implements base1, base2
         z = x;
     }
 }
-x1: base1 = derived;
-x2: base2 = derived;
+x1: interface1 = derived;
+x2: interface2 = derived;
 enter ()
 {
     x1.member1(3);
