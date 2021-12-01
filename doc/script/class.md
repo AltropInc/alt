@@ -99,30 +99,13 @@ class Mammal: Vertebrate
     // adjust metabolism to maintain body temperature in a given range
   }
 }
-class Mammal: Vertebrate
+class Reptile: Vertebrate
 {
   object Scales: FlattenedRigidBodyCovering {}
 }
 ```
 
 If a class can have only one instance, the class is a singleton class, and the unique instance is called singleton. The instance is defined together with its class. A singleton starts with the keyword `object` followed by the name of the singleton, as shown in the above example. `Backbone`, `Hairs`, and `Scales` are singletons. The definition of a singleton body is the same as the definition of a class body except for a few limitations, for example, the constructor of a singleton should have no input because the singleton is created in-place and its constructor cannot be called from the outside.
-
-Also please note that the function `breathe` and `thermoRegulate` use a different format than the function `emit' used in the `ParticleSystem` example. The member class `breathe` and `thermoRegulate` use a simple form to define derived classes:
-
-```altscript
-BaseClassName DerivedClassName ConstructorInterface ConstructorBoday
-```
-
-Using this simple form,  the member class `emit` in `ParticleSystem` can be written as below:
-
-```altscript
-  func emit (minmum_to_generate, maxmum_to_generate: int)
-  {
-    // generate partciles
-  }
-```
-
-where `func` is the base class, `emit` is the derived class, `(minmum_to_generate, maxmum_to_generate: int)` is the constructor interface, and `{ }` is the constructor body. We will discuss this simple form in detail later.
 
 ## Constructor and Destructor
 
