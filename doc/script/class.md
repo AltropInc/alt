@@ -183,6 +183,19 @@ class Derived: Base(0)        // <- the constructor that takes an integer value 
 }
 ```
 
+The destructor, on the other hand, is used to destroy the class instance. A destructor is introduced by the keyword `exit`:
+
+```altscript
+class ClassName
+{
+  exit() {}
+}
+```
+
+The destructor should not have any input, and is automatically invoked, including all destructors in bases classes, when the instance of the class is in destroy. The destructor in the derived class is invoked first, then, the one defined in the base.
+
+## Simple Class Form and Sealed Class
+
 If a derived class does not have any member extension or modification and only provide constructors to create instances of the class, the class definition can use a simple form for each constructor interface. For instance:
 
 ```altscript
@@ -197,7 +210,7 @@ class Derived: Base
 }
 ```
 
-Only constructors are provided in the `Derived` class. Therefore, we can use set of a simple forms for the `Derived` class:
+Only constructors are provided in the `Derived` class. Therefore, we can use set of a simple form for the `Derived` class:
 
 ```altscript
 class Base
@@ -208,18 +221,22 @@ Base Derived(x, y: int) { }
 Base Derived(x, y, z:: int) { }
 ```
 
-In particular, a sealed class is a class that can only be used to derive subclasses with new constructors. Therefore, we can always use simple forms to derive classes from a sealed base class.
-
-The destructor, on the other hand, is used to destroy the class instance. A destructor is introduced by the keyword `exit`:
+In particular, a sealed class is a class that cannot be extended with new members in derived classes. However, new constructors with different interfaces can be added to a sealed class. Therefore, we cannot use a sealed class as a base class in class inheritance, but we can use simple class form to generate derived class from a sealed base class for a selt of different constructors:
 
 ```altscript
-class ClassName
+sealed class SealedBase
 {
-  exit() {}
+    y: int;
+    z: int;
 }
+class Derived: SealedBase           // Error: Sealed class cannot be inherited
+{
+    enter(a: int) { y=a; z=a; }
+    enter(a, b: int) { y=a; z=b; }
+}
+SealedBase Derived (a: int) { y=a; z=a; }      // okay
+SealedBase Derived (a, b: int) { y=a; z=b; }   // okay
 ```
-
-The destructor should not have any input, and is automatically invoked, including all destructors in bases classes, when the instance of the class is in destroy. The destructor in the derived class is invoked first, then, the one defined in the base.
 
 ## Functional Class
 
@@ -243,7 +260,7 @@ class sum: func
 }
 ```
 
-The base class `func` is a built-in functional class that supports traditional function call protocol, which is an efficient and sequential procedure using the same stack frame technique. Because `func` is a sealed class, we can use simple class form to define function classes:
+The above code cannot be compiled because the base class `func` is sealed class. We can only use simple class form to define function classes:
 
 ```altscript
 func sum(values: int...): int
@@ -260,37 +277,13 @@ func sum(strs: string...): string
 }
 ```
 
+The class `func` a built-in functional class that supports traditional function call protocol, which is an efficient and sequential procedure using the same stack frame technique.
+
 ## Member Interface Overriding, Deferred Member Interface and Abstract Class
 
-A member class can have a virtual constructor interface defined in the base class that can be overridden in a derived class. When you refer to a derived class object using a variable declared in the base class, you can use the virtual constructor interface for that object and execute the overridden version of the constructor in derived class to create a member object:
+A member class can have a virtual constructor interface defined in the base class that can be overridden in a derived class. When you refer to a derived class object using a variable declared in the base class, you can use the virtual constructor interface for that object and execute the overridden version of the constructor in derived class to create a member object.
 
-```altscript
-class base
-{
-  class member
-  {
-    virtual enter(x: int) {}
-  }
-}
-class derived: base
-{
-  class member
-  {
-    virtual enter(x: int) {}
-  }
-}
-```
-
-When a variable of the base class, `x`, refers to a derived class object:
-
-```altscript
-x: base = derived();
-x.member(3);
-```
-
-`x.member(3)` creates a member object using the member class declared in the `derived` class.
-
-The virtual constructor interface can only be used for member classes, and the overridden process is done through their enclosing class hierarchy. The ALT virtual constructor interface is more general than the virtual functions in other traditional programming languages. When member classes are written in simple forms, the virtual constructor interface looks exactly like the traditional virtual functions:
+The virtual constructor interface can only be used for member classes derived from a sealed class, and the overridden process is done through their enclosing class hierarchy. Since the member class is derived from a sealed class, only simple class form can be used for virtual member interface:
 
 ```altscript
 class base
@@ -309,19 +302,12 @@ class derived: base
 }; 
 ```
 
-A member class can have a deferred constructor interface, which is a virtual constructor interface without the implementation block:
+A member class can have a deferred virtual constructor interface, which is a virtual constructor interface without the implementation block:
 
 ```altscript
 class abstract_base
 {
   deferred func print();
-};
-class abstract_derived: abstract_base
-{
-  func print(x: int)
-  {
-     // print derived class information
-  }
 };
 class derived: abstract_base
 {
@@ -338,9 +324,32 @@ An abstract class is a class that cannot be instantiated, but they can be subcla
  * It is declared abstract using the keyword `abstract`.
  * It is a parametric class (see [Parametric Class](@ref man-parametric-classes))
 
+The ALT virtual constructor interface is more general than the virtual functions in other traditional programming languages, becuase the overriding is not just limited to functions:
+
+```altscript
+sealed class sealed_base
+{
+}
+class base
+{
+    deferred sealed_base member (x: int);
+}
+object derived is base    // a singleton derived from base
+{
+    sealed_base member(x: int)
+    {
+    }
+}
+x: base = derived;
+enter ()
+{
+    x.member(3);  // create a 'member' object in the 'derived' object using the constructor provided in the 'derived' object
+}
+```
+
 ## Interface Class and Its Implementation
 
-A class can be declared as an interface class using the keyword `interface`. In addition, an interface class cannot have any member object/value declaration. It cannot have any constructor or destructor either. An interface class can only have member classes with deferred constructor interfaces, thhough the keyword `deferred` is not required. 
+A class can be declared as an interface class using the keyword `interface`. In addition, an interface class cannot have any member object/value declaration. It cannot have any constructor or destructor either. An interface class can only have member classes with deferred virtual constructor interfaces, although the keyword `deferred` is not required: 
 
 ```altscript
 interface class ButtonInterface
@@ -376,6 +385,43 @@ class Drawable3DButton is Drawable3D implements ButtonInterface
 ```
 
 A derived class can have only one base class by inheritance but can implement multiple interfaces. The derived class is a subclass of its base class, and also a subclass of any interface class that is implemented. `Drawable2DButton` is a subclass of `Drawable2D` and is also a subclass of `ButtonInterface`.
+
+Example of an derived object (singleton) that inherits one base and implements two interfaces:
+
+```altscript
+sealed class sealed_base
+{
+    y: int;
+    z: int;
+}
+interface class base1
+{
+    deferred sealed_base member1 (x: int)
+}
+interface class base2
+{
+    deferred sealed_base member2 (x: int)
+}
+object derived is Drawable implements base1, base2
+{
+    sealed_base member1(x: int)
+    {
+        y = x;
+    }
+    sealed_base member2(x: int)
+    {
+        z = x;
+    }
+}
+x1: base1 = derived;
+x2: base2 = derived;
+enter ()
+{
+    x1.member1(3);
+    x2.member2(4);
+}
+```
+
 
 ## self, selfclass, owner, ownerclass
 
