@@ -121,8 +121,26 @@ The result in `greet_whom` is "Hello, world!".
 You can iterate or loop over all the characters of string in forward, backward direction using `foreach`:
 ```altscript
 greet_世界 := "Hello, 世界!";
-foreach (ch in greet_世界) { /* do something on ch */ } 
+foreach (ch in greet_世界) { /* do something on each character stored in ch */ }
+foreach backward (ch in greet_世界) { /* do something backwards on each character stored in ch */ } 
 ```
+Since strings are not fully indexed containers, we cannot loop over characters in a string throught the byte index. Instead, we use
+string iterator:
+```altscript
+for (ch:=greet_世界.begin(); ch.is_valid(); ch.next())
+{
+    print(ch);
+}
+```
+Or use `rbegin` to loop over backwards:
+```altscript
+for (ch:=greet_世界.rbegin(); ch.is_valid(); ch.next())
+{
+    print(ch);
+}
+```
+Here `ch` is a string iterator and it can be covereted to `char` type automatically whenever it is needed. Since strings are immutable,
+you cannot use string iterator to change the value in the string.
 
 
 
