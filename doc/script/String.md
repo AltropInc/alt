@@ -176,6 +176,20 @@ greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
 ```altscript
 "Hello, 世界!".length();     // returns 14
 ```
+* `func is_basic (): bool` --
+    returns true if the string does not contain any characters with multiple code units
+```altscript
+"Hello, World!".is_basic();    // returns true
+"Hello, 世界!".is_basic();     // returns false
+```
+* `func n_chars (): int` --
+    returns number of characters contained in the string
+* `func n_chars (start: int; end: int =-1): int` --
+    returns number of characters between the start nnd the end indices. If end is not given, the defualt is -1, meaning to the end of the string
+```altscript
+"Hello, 世界!".n_chars();     // returns 10
+"Hello, 世界!".n_chars(7);    // returns 3 for 3 characters "世界!"
+```
 * `func begin (): iterator` --
     returns the iterator points to the first character of the string. If the string is empty, it returns an invalid iterator.
 ```altscript
@@ -191,6 +205,12 @@ greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
 ```altscript
 "世界".char_at(3);     // returns the character '界'. Note, both '世' and '界' have 3 bytes in the string
 "世界".char_at(4);     // returns null character, becuase the byte at index 4 is not a valid leading byte of a character
+```
+* `func char_units_at (index: int): char` --
+    returns the number of [code units](https://en.wikipedia.org/wiki/Character_encoding#Terminology) of the character at the byte index position. If the character at the given index is not a valid character, it returns 0. 
+```altscript
+"世界".char_units_at(3);     // returns 3. The character '界' have 3 code units (bytes) in the string
+"世界".char_at(4);           // returns 0 becuase it is not a valid leading byte of a character at index 4
 ```
 * `func next_char_pos (index: int): int` --
     returns the index of the next character starting from the current position given by `index`. If there is no valid character after the given position,
@@ -220,4 +240,22 @@ greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
 "世界".back();     // returns 0x8C which is the last byte in the encoding of '界' (\xE7\x95\x8C)
 "世界".front();    // returns 0xE4 which is the first byte in the encoding of '世' (\xE4\xB8\x96)
 ```
-
+* `func occurs (str: string; start: int=0): int` --
+    returns the index position where this string occurs first time as a substring from the start index in the given string `str`. Returns -1 if it does not occur.
+* `func find (str: string; start: int=0): int` --
+    returns the index position where given string `str` is found first time from the start index in this string. Returns -1 if it is not found.
+```altscript
+"Hello, 世界".find("世界");      // returns 7
+"世界".occurs("Hello, 世界");    // returns 7
+`
+* `func rfind (str: string; end: int=-1): int` --
+    returns the index position where given string `str` is found first time backwards from the end index. Returns -1 if it is not found. If the end index is not given or is given to -1, the search starts from the end of the string
+```altscript
+"Hello, Hello".rfind("世界");         // returns 7
+"Hello, Hello".rfind("世界", 7);      // returns 0
+`
+* `func to_stream (): char...` --
+    convert this string in a char stream
+```altscript
+"Hello, 世界".to_stream();     // returns a stream contains ('H', 'e', 'l', 'l', 'o', 'w', ',', ' ', '世', '界')
+```
