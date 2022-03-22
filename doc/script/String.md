@@ -124,7 +124,7 @@ greet_世界 := "Hello, 世界!";
 foreach (ch in greet_世界) { /* do something on each character stored in ch */ }
 foreach backward (ch in greet_世界) { /* do something backwards on each character stored in ch */ } 
 ```
-Since strings are not fully indexed containers, we cannot loop over characters in a string throught the byte index. Instead, we use
+Since strings are not fully indexed containers, you cannot simply loop over characters in a string through a byte index. Instead, you use
 string iterator:
 ```altscript
 for (ch:=greet_世界.begin(); ch.is_valid(); ch.next())
@@ -139,8 +139,85 @@ for (ch:=greet_世界.rbegin(); ch.is_valid(); ch.next())
     print(ch);
 }
 ```
-Here `ch` is a string iterator and it can be covereted to `char` type automatically whenever it is needed. Since strings are immutable,
+Here `ch` is a string iterator and it is automatically covereted to the value of `char` whenever it is needed. Since strings are immutable,
 you cannot use string iterator to change the value in the string.
 
+To loop over characters in a string through a byte index, you need to make sure that the index is at the starting position of a character
+in the string:
+```altscript
+greet_世界 := "Hello, 世界!";
+for ( i:=0;
+      i < greet_世界.length();
+      i = greet_世界.next_char_pos(i))
+{
+    print(greet_世界.char_at(i));
+}
+```
+`char_at` returns a null character if the position at i is not the start of a valid character.
 
+### String Methods
+
+Here is the list of all string methods:
+
+* `func + (ch: char; repeat: int=1): string` --
+    creates a new string by concatenation of this string with a number of given characters. `ch` is the given character and 'repeat'
+    is the repeat number with default set to 1.
+```altscript
+greet_world := "Hello, world" + '!';     // "Hello, world!"
+greet_world2 := greet_world + ('!', 2);  // "Hello, world!!!"
+```
+* `func + (str: string): string` --
+    creates a new string by concatenation of this string with another string
+```altscript
+greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
+```
+* `func length (): int` --
+    returns byte length (number of bytes) used to store the string
+```altscript
+"Hello, 世界!".length();     // returns 14
+```
+* `func begin (): iterator` --
+    returns the iterator points to the first character of the string. If the string is empty, it returns an invalid iterator.
+```altscript
+"Hello, 世界".begin();     // returns an iterator that points to the first character 'H'
+```
+* `func rbegin (): iterator` --
+    returns the iterator points to the last character of the string. If the string is empty, it returns an invalid iterator.
+```altscript
+"Hello, 世界".rbegin();     // returns a backwards iterator that points to the last character '界'
+```
+* `func char_at (index: int): char` --
+    returns the character at the byte index position. If the character at the given index is not a valid character, it returns a null character. 
+```altscript
+"世界".char_at(3);     // returns the character '界'. Note, both '世' and '界' have 3 bytes in the string
+"世界".char_at(4);     // returns null character, becuase the byte at index 4 is not a valid leading byte of a character
+```
+* `func next_char_pos (index: int): int` --
+    returns the index of the next character starting from the current position given by `index`. If there is no valid character after the given position,
+    it returns the length of the string (an index that points to the end of the string). The given current index is not necessarily at the valid
+    character position.
+```altscript
+"世界".next_char_pos(0);     // returns 3, which is the positon of '界'
+"世界".next_char_pos(1);     // returns 3, which is the positon of '界'
+```
+* `func prev_char_pos (index: int): int` --
+    returns the index of the previous character starting from the current position given by `index`. If there is no valid character prior to the given position,
+    it returns -1. The given current index is not necessarily at the valid character position.
+```altscript
+"世界".prev_char_pos(3);     // returns 0, which is the positon of '世'
+"世界".prev_char_pos("世界".length());     // returns 3, which is the positon of '界'
+```
+* `func at (index: int): utiny` --
+    returns the byte value (in unsigned tiny integer) at the given index position.
+```altscript
+"世界".at(4);     // returns 0x95 which is the second byte in the encoding of '界' (\xE7\x95\x8C)
+```
+* `func front (): utiny` --
+    returns the first byte value of the string.
+* `func back (): utiny` --
+    returns the last byte value of the string.
+```altscript
+"世界".back();     // returns 0x8C which is the last byte in the encoding of '界' (\xE7\x95\x8C)
+"世界".front();    // returns 0xE4 which is the first byte in the encoding of '世' (\xE4\xB8\x96)
+```
 
