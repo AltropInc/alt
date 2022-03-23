@@ -247,15 +247,38 @@ greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
 ```altscript
 "Hello, 世界".find("世界");      // returns 7
 "世界".occurs("Hello, 世界");    // returns 7
-`
+```
 * `func rfind (str: string; end: int=-1): int` --
     returns the index position where given string `str` is found first time backwards from the end index. Returns -1 if it is not found. If the end index is not given or is given to -1, the search starts from the end of the string
 ```altscript
 "Hello, Hello".rfind("世界");         // returns 7
 "Hello, Hello".rfind("世界", 7);      // returns 0
-`
+```
 * `func to_stream (): char...` --
     convert this string in a char stream
 ```altscript
 "Hello, 世界".to_stream();     // returns a stream contains ('H', 'e', 'l', 'l', 'o', 'w', ',', ' ', '世', '界')
+```
+* `func starts_with (str: string): bool` --
+    returns true if this string starts with the given string `str`.
+* `func ends_with (str: string): bool` --
+    returns true if this string ends with the given string `str`.
+```altscript
+"Hello, 世界".starts_with("Hello");   // returns true
+"Hello, 世界".ends_with("世界");      // returns true
+```
+* `func compare (str:string; ignore_case:bool=false; number_as_whole:bool=false): int` --
+    returns 0 if this string is equal to `str`, a negative value if this string is smaller than `str`, and a positive value if this string is greater that `str`.
+    If `ignore_case` is true, do the caseless comparison. This does not support the case of comparsion involving multiple characters vs. single character
+    such as between "ss" and “ß” in German, and in these cases they are considered not equal. If `number_as_whole` is true and a number starts at the same
+    position of two strings, the compare will use the number as whole instead of comparing digits individually. For instance, "item(12)" is greater than "item(3)"
+```altscript
+"item(12)".compare("Item(3)", true, true);   // returns true
+```
+* `func split (separator:char=','; terminator:char='\0'; skip_leading_sp:bool=true; skip_trailing_sp:bool=true): string...` --
+    returns a splitted string stream. `separator` is the character to divide substrings. `terminator` is character at which the split process stops.
+    `skip_leading_sp` indicates whether the leading spaces of the substring should be skipped. and `skip_trailing_sp` indicates whether the trailing
+    spaces of the substring should be skipped.
+```altscript
+"item(1), item(2), item(3)".split();   // returns a string stream ("item(1)", "item(2)", "item(3)")
 ```
