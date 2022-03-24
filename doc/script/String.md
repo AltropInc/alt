@@ -306,22 +306,66 @@ The operator ~= or ≅ can be used to check if a string matches to a regular exp
 "foo.txt" ≅ "([a-z]+)\\.([a-z]+)"    // the result is true.
 ```
 This operator simply returns true or false, indicating whether a match for the given regex in a string. However, we want to know not just
-whether a string is matched, but also how it is matched. To capture this information about a match, we need to create a 'regex' object:
+whether a string is matched, but also how it is matched. To capture this information about a match, we need to create a 'regex' object. The
+'regex' object has a constructor that takes a string with the regular expression (the pattern):
+```altscript
+regex(str: string; opts: regex_opt=(); grammar: regex_grammar=regex_grammar::ECMAScript);
+```
+`opts` contains a number of options used to interpret how the regular expression is executed in performing match:
+```altscript
+enum regex_opt (
+    IgnoreCase,         // Regular expressions match without regard to case
+    Optimize,           // Matching efficiency is preferred over efficiency constructing regex objects
+    Collate             // Character ranges, like "[a-b]", are affected by locale.
+);
+type regex_opts = set of regex_opt;
+```
+`grammar` determines the syntax format used in the regular expression string, and the default is ECMAScript:
+```altscript
+enum regex_grammar (
+    ECMAScript,   // ECMAScript grammar
+    Basic,        // Basic POSIX grammar
+    Extended,     // Extended POSIX grammar
+    Awk,          // Awk POSIX grammar
+    Grep,         // Grep POSIX grammar
+    Egrep         // Egrep POSIX grammar
+);
+```
+Here are examples of regex object creation:
+```altscript
+re1 := regex("([a-z]+)\\.([a-z]+)");
+re2 := regex("\\bd\\w+", regex_opts(IgnoreCase), regex_grammar::ECMAScript);
+```
+A regex object can also be obtained by converting from a string directly:
 ```altscript
 re : regex = "([a-z]+)\\.([a-z]+)";
 ```
-Here a regex object is created from the string "([a-z]+)\\.([a-z]+)" and assigned to the name `re`. The regex object
-provides the follinwg methods to perform pattern matching within strings:
+The regex object povides the follinwg methods to perform pattern matching within strings:
 
-* `func match (str:string): string...` --
+* `func match (str:string, flags:regex_flags=()) string...` --
    performs the match to the entire target of the given string. If it matches, it returns a string stream in which the first element is
    the same string given in the input, and the rest elements give substrings that match all subpatterns given in the regular expression.
-   If itdoes not match, an empty string stream is reurned.
+   If itdoes not match, an empty string stream is reurned. `flags` is a set of flags for match/replacement options, which are defined as:
+```altscript
+enum regex_flag (
+    NotBOL,             // The first character will be ignored. (i.e. ^ will not match the first)
+    NotEOL,             // The last character will be ignored. (i.e. $ will not match the first)
+    NotBOW,             // The first character will not match word boundary (\b)
+    NotEOW,             // The last character will not match word boundary (\b)
+    NotNull,            // Do not match empty sequences
+    MatchAny,           // If more than one match is possible, then any match is an acceptable result
+    AtStartOnly,        // find the match at the start position only
+    FirstMatchOnly,     // replace-only flag - replace the first match only
+    CopyMatchedOnly     // replace-only flag - do not copy un-matched strings into to the result
+);
+type regex_flags = set of regex_flag;
+```
+Example of using regex match:
 ```altscript
 re : regex = "([a-z]+)\\.([a-z]+)";
 re.match("foo.txt");  // returns a string stream ("foo.txt", "foo", "txt")
 ```
-* `func search (str:string): string...` --
+* `func search (str:string, flags:regex_flags=()): string...` --
    performs the match to some subsequence in the given string. If it finds a match, it returns a string stream in which the first element is
    the unsearched part of the given input, the second element is the substring that mactchs the enire regular expression, and the rest elements
    give substrings that match all subpatterns given in the regular expression. If it does not find any macth, an empty string stream is reurned.
@@ -334,7 +378,7 @@ while (ma.length() > 0)
     ma = p.search(ma[0]);   // returns a string stream ("", "bar.txt", "bar", "txt")
 }
 ```
-* `func findall (str:string): string......` --
+* `func findall (str:string, flags:regex_flags=()): string......` --
    performs the match to all subsequence in the given string. If it finds any match, it returns a stream of string stream, in which each
    string stream gives the result of a macth to the subsequence in the given string. 
 ```altscript
@@ -342,22 +386,14 @@ re : regex = "([a-z]+)\\.([a-z]+)";
 str := "foo.txt bar.txt";
 ma := p.findall(str);          // returns a string stream stream (("foo.txt", "foo", "txt"), ("bar.txt", "bar", "txt"))
 ```
-* `func replace (str:string, substitute:string, ops:regex_replace_opts): string` --
+* `func replace (str:string, substitute:string, flags:regex_flags=()): string` --
    performs the match to all subsequence in the given string. If it finds a match, it replaces the subsequence with the given substitute and
-   returns the substituted string. If it does not find a match, it returns a null string. `ops` are flags for replacement options, which is defined as:
-```altscript
-enum regex_replace_opt (
-    FirstMatchOnly,      // replace the first match only
-    AtStartOnly,         // find the from start of the string only
-    CopyMatchedOnly      // Do not copy un-matched strings into to the result
-);
-type regex_replace_opts = set of regex_replace_opt;
-```
+   returns the substituted string. If it does not find a match, it returns a null string.
 ```altscript
 re : regex = "([a-z]+)\\.([a-z]+)";
 str := "foo.txt bar.txt";
-re.replace(str, "[$&]");                                                        // returns a string "[foo.txt] [bar.txt]"
-re.replace(str, "[$&]", regex_replace_opts(FirstMatchOnly));                    // returns a string "[foo.txt] bar.txt"
-re.replace(str, "[$&]", regex_replace_opts(FirstMatchOnly,CopyMatchedOnly));    // returns a string "[foo.txt]"
+re.replace(str, "[$&]");                                                 // returns a string "[foo.txt] [bar.txt]"
+re.replace(str, "[$&]", regex_flags(FirstMatchOnly));                    // returns a string "[foo.txt] bar.txt"
+re.replace(str, "[$&]", regex_flags(FirstMatchOnly,CopyMatchedOnly));    // returns a string "[foo.txt]"
 ```
 
