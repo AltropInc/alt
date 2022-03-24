@@ -372,10 +372,10 @@ re.match("foo.txt");  // returns a string stream ("foo.txt", "foo", "txt")
 ```altscript
 re : regex = "([a-z]+)\\.([a-z]+)";
 str := "file_names: foo.txt bar.txt";
-ma := p.search(str);          // returns a string stream (" bar.txt", "foo.txt", "foo", "txt")
+ma := re.search(str);          // returns a string stream (" bar.txt", "foo.txt", "foo", "txt")
 while (ma.length() > 0)
 {
-    ma = p.search(ma[0]);   // returns a string stream ("", "bar.txt", "bar", "txt")
+    ma = re.search(ma[0]);   // returns a string stream ("", "bar.txt", "bar", "txt")
 }
 ```
 * `func findall (str:string, flags:regex_flags=()): string......` --
@@ -384,7 +384,7 @@ while (ma.length() > 0)
 ```altscript
 re : regex = "([a-z]+)\\.([a-z]+)";
 str := "foo.txt bar.txt";
-ma := p.findall(str);          // returns a string stream stream (("foo.txt", "foo", "txt"), ("bar.txt", "bar", "txt"))
+ma := re.findall(str);          // returns a string stream stream (("foo.txt", "foo", "txt"), ("bar.txt", "bar", "txt"))
 ```
 * `func replace (str:string, substitute:string, flags:regex_flags=()): string` --
    performs the match to all subsequence in the given string. If it finds a match, it replaces the subsequence with the given substitute and
