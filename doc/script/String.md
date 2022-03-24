@@ -28,7 +28,7 @@ A long string can be broken up by string literal concatenation:
 "Καλημέρα κόσμε or "
 "こんにちは 世界"
 ```
-is equivalent to
+The above is equivalent to
 ```altscript
 "Hello World or Καλημέρα κόσμε or こんにちは 世界"
 ```
@@ -38,7 +38,7 @@ New lines can be contained in a string literal:
 Καλημέρα κόσμε or 
 こんにちは 世界"
 ```
-is equivalent to
+This is equivalent to
 ```altscript
 "Hello World or \nΚαλημέρα κόσμε or \nこんにちは 世界"
 ```
@@ -90,8 +90,7 @@ A string object can also be created by an function output or by automatic conver
 char_pair := ('世', '界');
 greeting :string = char_pair;
 ```
-In this case, the type `char_pair` is deducted to a tuple `(char; char)`. Since the name `greeting` is declared to be in `string` type, when the tuple value
-of `char_pair` is assigned to `greeting`, a new string object is created for the name `greeting`.
+In this case, the type of the name `char_pair` is deducted to a tuple `(char; char)`. Since the name `greeting` is declared to be in `string` type, when the tuple value of `char_pair` is assigned to `greeting`, a new string object is created for the name `greeting` by converting the value of string pair.
 
 ## Common String Operations
 
@@ -139,10 +138,10 @@ for (ch:=greet_世界.rbegin(); ch.is_valid(); ch.next())
     print(ch);
 }
 ```
-Here `ch` is a string iterator and it is automatically covereted to the value of `char` whenever it is needed. Since strings are immutable,
+Here `ch` is a string iterator and it is automatically converted to the value of `char` whenever it is needed. Since strings are immutable,
 you cannot use string iterator to change the value in the string.
 
-To loop over characters in a string through a byte index, you need to make sure that the index is at the starting position of a character
+To loop over characters in a string through a byte index, you need to make sure that the index is at the start position of a character
 in the string:
 ```altscript
 greet_世界 := "Hello, 世界!";
@@ -153,7 +152,6 @@ for ( i:=0;
     print(greet_世界.char_at(i));
 }
 ```
-`char_at` returns a null character if the position at i is not the start of a valid character.
 
 ### String Methods
 
@@ -227,7 +225,7 @@ greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
     returns the number of [code units](https://en.wikipedia.org/wiki/Character_encoding#Terminology) of the character at the byte index position. If the character at the given index is not a valid character, it returns 0. 
 ```altscript
 "世界".char_units_at(3);     // returns 3. The character '界' have 3 code units (bytes) in the string
-"世界".char_at(4);           // returns 0 because it is not a valid leading byte of a character at index 4
+"世界".char_units_at(4);     // returns 0 because it is not a valid leading byte of a character at index 4
 ```
 * `func next_char_pos (index: int; nth: int=1): int` --
     returns the index of the next nth character starting from the current position given by `index`. If there is no valid character after the given position,
@@ -239,7 +237,7 @@ greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
 "Hello, 世界".next_char_pos(0,8)   // return 10 for the 8th characte,r which is '界' from the start position 0
 ```
 * `func prev_char_pos (index: int; nth: int=1): int` --
-    returns the index of theb nth previous character starting from the current position given by `index`. If there is no valid character prior to the given position,
+    returns the index of the nth previous character starting from the current position given by `index`. If there is no valid character prior to the given position,
     it returns -1. The given current index is not necessarily at the valid character position.
 ```altscript
 "世界".prev_char_pos(3);     // returns 0, which is the positon of '世'
@@ -257,7 +255,7 @@ greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
 * `func occurs (str: string; start: int=0): int` --
     returns the index position where this string occurs first time as a substring from the start index in the given string `str`. Returns -1 if it does not occur.
 * `func find (str: string; start: int=0): int` --
-    returns the index position where given string `str` is found first time from the start index in this string. Returns -1 if it is not found.
+    returns the index position where the given string `str` is found first time from the start index in this string. Returns -1 if it is not found.
 ```altscript
 "Hello, 世界".find("世界");      // returns 7
 "世界".occurs("Hello, 世界");    // returns 7
