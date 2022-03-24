@@ -157,7 +157,7 @@ for ( i:=0;
 
 ### String Methods
 
-Here is the list of all string methods:
+In addition to methods with common comparison operatiors < > >= <= == != ~=, string has the floowing methods:
 
 * `func + (ch: char; repeat: int=1): string` --
     creates a new string by concatenation of this string with a number of given characters. `ch` is the given character and 'repeat'
@@ -170,6 +170,29 @@ greet_world2 := greet_world + ('!', 2);  // "Hello, world!!!"
     creates a new string by concatenation of this string with another string
 ```altscript
 greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
+```
+* `func [(index: int)]: char`
+* `func char_at (index: int): char` --
+    returns the character at the given byte index position. The byte index can be in any position within a encoded byte sequence of a character.
+    If the given index is invalid, it returns a null character. 
+```altscript
+"世界"[3];     // returns the character '界'. Note, both '世' and '界' have 3 bytes in the string
+"世界"[4];     // returns the character '界'. Note, the byte at index 4 is at the second byte of '界'
+"世界".char_at(2);  // returns the character '世'.
+```
+* `func byte_at (index: int): utiny` --
+    returns the byte value (in unsigned tiny integer) at the given index position.
+```altscript
+"世界".byte_at(4);     // returns 0x95 which is the second byte in the encoding of '界' (\xE7\x95\x8C)
+```
+* `func [(start: int) .. (end: int)]: string`
+* `func substring (start:int; end:int=-1): string` --
+    returns a substring indexed from start to end. The character at the end position is not included. If the end position is given to -1,
+    the end position is at the end of the string. Note, if the start or end position is in the middle of a character, it will be adjusted to the beginning
+    character position before the substring is sliced.
+```altscript
+"世界"[0..5];   // returns "世". Note the end index 5 is in the middle of "界" and is adjusted to 4 pointing the first byte of '界'.
+"世界".substring(3);   // returns "界".
 ```
 * `func length (): int` --
     returns byte length (number of bytes) used to store the string
@@ -185,7 +208,7 @@ greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
 * `func n_chars (): int` --
     returns number of characters contained in the string
 * `func n_chars (start: int; end: int =-1): int` --
-    returns number of characters between the start nnd the end indices. If end is not given, the defualt is -1, meaning to the end of the string
+    returns number of characters between the start and the end indices. If end is not given, the defualt is -1, meaning to the end of the string
 ```altscript
 "Hello, 世界!".n_chars();     // returns 10
 "Hello, 世界!".n_chars(7);    // returns 3 for 3 characters "世界!"
@@ -200,45 +223,36 @@ greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
 ```altscript
 "Hello, 世界".rbegin();     // returns a backwards iterator that points to the last character '界'
 ```
-* `func char_at (index: int): char` --
-    returns the character at the byte index position. If the character at the given index is not a valid character, it returns a null character. 
-```altscript
-"世界".char_at(3);     // returns the character '界'. Note, both '世' and '界' have 3 bytes in the string
-"世界".char_at(4);     // returns null character, becuase the byte at index 4 is not a valid leading byte of a character
-```
 * `func char_units_at (index: int): char` --
     returns the number of [code units](https://en.wikipedia.org/wiki/Character_encoding#Terminology) of the character at the byte index position. If the character at the given index is not a valid character, it returns 0. 
 ```altscript
 "世界".char_units_at(3);     // returns 3. The character '界' have 3 code units (bytes) in the string
-"世界".char_at(4);           // returns 0 becuase it is not a valid leading byte of a character at index 4
+"世界".char_at(4);           // returns 0 because it is not a valid leading byte of a character at index 4
 ```
-* `func next_char_pos (index: int): int` --
-    returns the index of the next character starting from the current position given by `index`. If there is no valid character after the given position,
+* `func next_char_pos (index: int; nth: int=1): int` --
+    returns the index of the next nth character starting from the current position given by `index`. If there is no valid character after the given position,
     it returns the length of the string (an index that points to the end of the string). The given current index is not necessarily at the valid
     character position.
 ```altscript
-"世界".next_char_pos(0);     // returns 3, which is the positon of '界'
-"世界".next_char_pos(1);     // returns 3, which is the positon of '界'
+"世界".next_char_pos(0)     // returns 3, which is the positon of '界'
+"世界".next_char_pos(1)     // returns 3, which is the positon of '界'.
+"Hello, 世界".next_char_pos(0,8)   // return 10 for the 8th characte,r which is '界' from the start position 0
 ```
-* `func prev_char_pos (index: int): int` --
-    returns the index of the previous character starting from the current position given by `index`. If there is no valid character prior to the given position,
+* `func prev_char_pos (index: int; nth: int=1): int` --
+    returns the index of theb nth previous character starting from the current position given by `index`. If there is no valid character prior to the given position,
     it returns -1. The given current index is not necessarily at the valid character position.
 ```altscript
 "世界".prev_char_pos(3);     // returns 0, which is the positon of '世'
 "世界".prev_char_pos("世界".length());     // returns 3, which is the positon of '界'
+"Hello, 世界".prev_char_pos("Hello, 世界".length(), 2)   // returns 7 for 2nd character from the end of the string, which is '世'
 ```
-* `func at (index: int): utiny` --
-    returns the byte value (in unsigned tiny integer) at the given index position.
+* `func front (): char` --
+    returns the first character of the string.
+* `func back (): char` --
+    returns the last character of the string.
 ```altscript
-"世界".at(4);     // returns 0x95 which is the second byte in the encoding of '界' (\xE7\x95\x8C)
-```
-* `func front (): utiny` --
-    returns the first byte value of the string.
-* `func back (): utiny` --
-    returns the last byte value of the string.
-```altscript
-"世界".back();     // returns 0x8C which is the last byte in the encoding of '界' (\xE7\x95\x8C)
-"世界".front();    // returns 0xE4 which is the first byte in the encoding of '世' (\xE4\xB8\x96)
+"世界".back();     // returns '界'
+"世界".front();    // returns '世'
 ```
 * `func occurs (str: string; start: int=0): int` --
     returns the index position where this string occurs first time as a substring from the start index in the given string `str`. Returns -1 if it does not occur.
@@ -251,8 +265,8 @@ greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
 * `func rfind (str: string; end: int=-1): int` --
     returns the index position where given string `str` is found first time backwards from the end index. Returns -1 if it is not found. If the end index is not given or is given to -1, the search starts from the end of the string
 ```altscript
-"Hello, Hello".rfind("世界");         // returns 7
-"Hello, Hello".rfind("世界", 7);      // returns 0
+"Hello, Hello".rfind("Hello");         // returns 7
+"Hello, Hello".rfind("Hello", 7);      // returns 0
 ```
 * `func to_stream (): char...` --
     convert this string in a char stream
@@ -273,7 +287,8 @@ greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
     such as between "ss" and “ß” in German, and in these cases they are considered not equal. If `number_as_whole` is true and a number starts at the same
     position of two strings, the compare will use the number as whole instead of comparing digits individually. For instance, "item(12)" is greater than "item(3)"
 ```altscript
-"item(12)".compare("Item(3)", true, true);   // returns true
+"item(12)".compare("Item(3)", fasle, true);   // returns a positive integer, because "12" is greater than "3"
+"item(12)".compare("Item(3)", fasle, fasle);  // returns a negative integer, because '1' is smaller than '3'
 ```
 * `func split (separator:char=','; terminator:char='\0'; skip_leading_sp:bool=true; skip_trailing_sp:bool=true): string...` --
     returns a splitted string stream. `separator` is the character to divide substrings. `terminator` is character at which the split process stops.
@@ -282,3 +297,69 @@ greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
 ```altscript
 "item(1), item(2), item(3)".split();   // returns a string stream ("item(1)", "item(2)", "item(3)")
 ```
+
+### Regular Expression
+
+Regular expression (regex) is used to perform pattern matching within strings. A regular expression can be represented by a string conatining
+both special and ordinary characters. See [Regular expression](https://en.wikipedia.org/wiki/Regular_expression) for the format of regex.
+
+The operator ~= or ≅ can be used to check if a string matches to a regular expression:
+```altscript
+"foo.txt" ≅ "([a-z]+)\\.([a-z]+)"    // the result is true.
+```
+This operator simply returns true or false, indicating whether a match for the given regex in a string. However, we want to know not just
+whether a string is matched, but also how it is matched. To capture this information about a match, we need to create a 'regex' object:
+```altscript
+re : regex = "([a-z]+)\\.([a-z]+)";
+```
+Here a regex object is created from the string "([a-z]+)\\.([a-z]+)" and assigned to the name `re`. The regex object
+provides the follinwg methods to perform pattern matching within strings:
+
+* `func match (str:string): string...` --
+   performs the match to the entire target of the given string. If it matches, it returns a string stream in which the first element is
+   the same string given in the input, and the rest elements give substrings that match all subpatterns given in the regular expression.
+   If itdoes not match, an empty string stream is reurned.
+```altscript
+re : regex = "([a-z]+)\\.([a-z]+)";
+re.match("foo.txt");  // returns a string stream ("foo.txt", "foo", "txt")
+```
+* `func search (str:string): string...` --
+   performs the match to some subsequence in the given string. If it finds a match, it returns a string stream in which the first element is
+   the unsearched part of the given input, the second element is the substring that mactchs the enire regular expression, and the rest elements
+   give substrings that match all subpatterns given in the regular expression. If it does not find any macth, an empty string stream is reurned.
+```altscript
+re : regex = "([a-z]+)\\.([a-z]+)";
+str := "file_names: foo.txt bar.txt";
+ma := p.search(str);          // returns a string stream (" bar.txt", "foo.txt", "foo", "txt")
+while (ma.length() > 0)
+{
+    ma = p.search(ma[0]);   // returns a string stream ("", "bar.txt", "bar", "txt")
+}
+```
+* `func findall (str:string): string......` --
+   performs the match to all subsequence in the given string. If it finds any match, it returns a stream of string stream, in which each
+   string stream gives the result of a macth to the subsequence in the given string. 
+```altscript
+re : regex = "([a-z]+)\\.([a-z]+)";
+str := "foo.txt bar.txt";
+ma := p.findall(str);          // returns a string stream stream (("foo.txt", "foo", "txt"), ("bar.txt", "bar", "txt"))
+```
+* `func replace (str:string, substitute:string, ops:regex_replace_opts): string` --
+   performs the match to all subsequence in the given string. If it finds a match, it replaces the subsequence with the given substitute and
+   returns the substituted string. If it does not find a match, it returns a null string. `ops` are flags for replacement options, which is defined as:
+```altscript
+enum regex_replace_opt (
+    FirstMatchOnly,      // replace the first match only
+    AtStartOnly,         // find the from start of the string only
+    CopyMatchedOnly      // Do not copy un-matched strings into to the result
+);
+type regex_replace_opts = set of regex_replace_opt;
+```
+```altscript
+re : regex = "([a-z]+)\\.([a-z]+)";
+str := "foo.txt bar.txt";
+re.replace(str, "[$&]");                                                        // returns a string "[foo.txt] [bar.txt]"
+re.replace(str, "[$&]", regex_replace_opts(FirstMatchOnly));                    // returns a string "[foo.txt] bar.txt"
+re.replace(str, "[$&]", regex_replace_opts(FirstMatchOnly,CopyMatchedOnly));    // returns a string "[foo.txt]"
+```
+
