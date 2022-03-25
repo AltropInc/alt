@@ -22,6 +22,11 @@ String literals are delimited by double quotes or triple double quotes:
 "Hello World or Καλημέρα κόσμε or こんにちは 世界"
 """Hello World or Καλημέρα κόσμε or こんにちは 世界"""
 ```
+Note, in triple double quoted string, all consecutive double quotes after the leading triple double quotes and all consecutive double quotes
+before the ending triple double quotes are considered part of the string:
+```altscript
+""""Hello World" or "Καλημέρα κόσμε" or "こんにちは 世界""""
+```
 A long string can be broken up by string literal concatenation:
 ```altscript
 "Hello World or "
