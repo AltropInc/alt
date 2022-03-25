@@ -295,6 +295,13 @@ greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
 ```altscript
 "item(1), item(2), item(3)".split();   // returns a string stream ("item(1)", "item(2)", "item(3)")
 ```
+* `func join (strings: string...; start:int=0; end:int=-1; separator:string=null; tail:string=null): string` --
+    returns a merged string from the given string stream in the ranged of \[strat, end). 
+    `separator` is the optional string to be inserted between two strings in the stream and `tail` is the optional string to be appended at the end of the
+    output.
+```altscript
+"【".join(strings=("Hello", "World"), separator=", ", tail="】"); // returns "【Hello, World】"
+```
 
 ### Regular Expression
 
@@ -396,4 +403,22 @@ re.replace(str, "[$&]");                                                 // retu
 re.replace(str, "[$&]", regex_flags(FirstMatchOnly));                    // returns a string "[foo.txt] bar.txt"
 re.replace(str, "[$&]", regex_flags(FirstMatchOnly,CopyMatchedOnly));    // returns a string "[foo.txt]"
 ```
+
+### Use Match Pattern on String
+
+Because strings are streams, like other type of streams and arrays, they can be used in match statement to be compared with match patterns:
+```altscript
+s := "abcd4545xyz";
+match (s)
+{
+    on {.:2 -> first, ... -> second, *('4','5'):2 -> third, ... -> fourth} -> r:
+    {
+        // do something on r, which has the value (('a', 'b'), "cd", ('4', '5', '4', '5'), "xyz")
+        // and r is in the type of  (first: (char; char); second: string; third: (char; char; char; char); fourth: string) 
+    }
+};
+```
+Instead of giving a string stream in match result, match pattern gives a tuple structure and each element in the tuple can be optionally named
+for convenient access to segment values. For a complete discussion anout match pattern, see Match Statement.
+
 
