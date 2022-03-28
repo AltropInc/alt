@@ -1,6 +1,6 @@
 # Stream
 
-A stream is a varaible-length sequence of elements of the same type that are arraged in an order in which can be accessed through an index starting from 0.
+A stream is a variable-length sequence of elements of the same type, in which elements are arraged in an order that can be accessed through an index starting from 0.
 The `stream` type is subtype of `iterable`, a paramterized class with type parameter `element_type`:
 ```altscript
 class stream #(element_type: any): iterable #(element_type);
@@ -19,7 +19,7 @@ int......    // a stream of integer streams
 
 ## Creating Streams
 
-A stream object(or value) can be created by constructor:
+A stream object (or value) can be created by the stream constructor:
 ```altscript
 s:= stream#(int)((1,2,3,4,5,6));  // or s:= int...((1,2,3,4,5,6));
 ```
@@ -27,8 +27,8 @@ A stream object can also be created by automatic conversion from an object in a 
 ```altscript
 s: int... = (1,2,3,4,5,6);      // convert a tuple value (1,2,3,4,5,6) into a int stream
 ```
-When all exparessions in tuple value are constant literals, you can add a keyword `lit` to tell the parser to read the value directly into the stream
-without a tuple conversion:
+When all exparessions in a tuple value are constant literals, you can add a keyword `lit` to tell the parser to read the value directly into the stream
+without a tuple-to-stream conversion:
 ```altscript
 s: int... = lit (1,2,3,4,5,6);      // convert a tuple value (1,2,3,4,5,6) into a int stream
 ```
@@ -40,14 +40,14 @@ Streams are mutable objects. You can add and delete elements in a stream. When y
 ```altscript
 s := range(0, 10).gen();
 ```
-In this case, a stream is generated from range \[0,10) and asiigned to name `s`. The name `s' owns the stream.
+In this case, a stream is generated from range \[0,10) and asigned to name `s`. The name `s` owns the stream.
 
 Stream objects follow the [pass-by-reference](https://en.wikipedia.org/wiki/Evaluation_strategy#Call_by_reference) property. When you provide stream value referred by a name to another name, the name that recevies the passed stream value is just a reference to the same stream value owned by some one else.
 For instance, when the stream owned by `s` is passed to another name:
 ```altscript
 t := s;
 ```
-the name `t' refers to the same stream but does not own the value. When new elements added in the stream via either of the names:
+the name `t` refers to the same stream but does not own the value. When new elements added in the stream via either of the names:
 ```altscript
 s.append(10,11,12);
 t.append(13,14);
@@ -58,17 +58,16 @@ When a non-owner name owns or receves a different stream value, it does not affe
 ```altscript
 s : int... = (1,2,3,4);      // `s` owns (1,2,3,4);
 t := s;                      // `t` referes to the same stream (1,2,3,4), which is owned by `s`. But `t` does not own;
-t = (-1, -2, -3);            // `t` is assigned and owns (-1, -2, -3), and `s` still owns (1,2,3,4);
+t = (-1, -2, -3);            // `t` owns (-1, -2, -3), and `s` keeps owning (1,2,3,4);
 ```
-When an owner name owns or receves a different stream value, or the owner name goes out of its scope, its originally owned stream value is destroyed before it accepts the new value or it dies. And in this case, all other alive non-owner names that referred to the destroyed value will become null:
+When an owner name owns or receives a different stream value, or the owner name goes out of its scope, its originally owned stream value is destroyed before it accepts the new value or it dies. And in this case, all other alive non-owner names that referred to the destroyed stream will become empty:
 ```altscript
 s : int... = (1,2,3,4);      // `s` owns (1,2,3,4);
 t := s;                      // `t` referes to the same stream (1,2,3,4) - t.length()==4.
-s = (-1, -2, -3);            // `s` owns (-1, -2, -3). (1,2,3,4) is destroyed, and `t becomes null - t.length()==0;
+s = (-1, -2, -3);            // `s` owns (-1, -2, -3). (1,2,3,4) is destroyed, and `t` becomes empty - t.length()==0;
 ```
 
-The the value from an inside scope passed to a name in the enclosing (outside) scope, the ownership is transferred to the (outside) name. To be more accurate, if the
-destinition name declared in a scope that outlives the scope in which the source name is declared, the destinition name will take the ownership:
+When the the value from an inside scope passed to a name in the enclosing (outside) scope, the ownership is transferred to the outside name. To be more accurate, if the destinition name declared in a scope that outlives the scope in which the source name is declared, the destinition name will take the ownership:
 ```altscript
 s : int...;
 {
