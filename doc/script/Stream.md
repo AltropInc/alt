@@ -67,7 +67,7 @@ t := s;                      // `t` referes to the same stream (1,2,3,4) - t.len
 s = (-1, -2, -3);            // `s` owns (-1, -2, -3). (1,2,3,4) is destroyed, and `t` becomes empty - t.length()==0;
 ```
 
-When the the value from an inside scope passed to a name in the enclosing (outside) scope, the ownership is transferred to the outside name. To be more accurate, if the destinition name declared in a scope that outlives the scope in which the source name is declared, the destinition name will take the ownership:
+When the value from an inside scope passed to a name in the enclosing (outside) scope, the ownership is transferred to the outside name. To be more accurate, if the destinition name declared in a scope that outlives the scope in which the source name is declared, the destinition name will take the ownership:
 ```altscript
 s : int...;
 {
@@ -76,5 +76,34 @@ s : int...;
 }                        // `t` is out of scope; 's' keeps the ownership of (1,2,3,4)
 ```
 
+## Stream Operations
 
-
+* `func [(index: int)]: element_type`
+* `func char_at (index: int): element_type` --
+    returns the element at the given byte index position.
+```altscript
+s : int... = (1,2,3,4);
+s[0];                       // return 1
+s.at(1);                    // return 2
+```
+* `func length (): int` --
+    returns number of elements in the stream
+```altscript
+stream#(numeric)(1, 2.5, 3, 4).length();     // returns 4
+```
+* `func front (): element_type` --
+    returns the first element of the stream.
+* `func back (): element_type` --
+    returns the last element of the stream.
+```altscript
+int...(1,2,3,4).front;     // returns 1
+int...(1,2,3,4).back;     // returns 1
+```
+* `func append (e: element_type; repeat: int): ownerclass` --
+    appends the given element `e` at the end of the stream. `repeat` gives the repeat number with default set to 1. Returns the owner stream.
+* `func append (other: ownerclass): ownerclass` --
+    appends another stream of the same type of the owner stream the end and returns the owner stream.
+```altscript
+s : int... = (1,2,3,4);
+s.append(5,6,7).append(9,10);   // s get the value (1,2,3,4,5,6,7,8,9,10)
+```
