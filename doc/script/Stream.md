@@ -76,6 +76,23 @@ s : int...;
 }                        // `t` is out of scope; 's' keeps the ownership of (1,2,3,4)
 ```
 
+## Stream Iteration
+
+You can iterate or loop over each element of stream in forward, backward direction using `foreach`:
+```altscript
+s : int... = (1, 2, 3, 4);
+sum:int = 0;
+foreach (x in s) { sum += x; }              // sum is added to 10
+foreach backward (x in s) { sum -= x; }     // sum is back to zero
+```
+You can also use stream iterator in any loop statement:
+```altscript
+s : int... = (1, 2, 3, 4);
+sum:int = 0;
+for (x:=s.begin(); x.is_valid(); x.next()) { sum += x; }     // forward, sum is added to 10
+for (x:=s.rbegin(); x.is_valid(); x.next()) { sum -= x; }    // backward, sum is back to zero
+```
+
 ## Stream Operations
 
 * `func [(index: int)]: element_type`
@@ -105,5 +122,15 @@ int...(1,2,3,4).back;     // returns 1
     appends another stream of the same type of the owner stream the end and returns the owner stream.
 ```altscript
 s : int... = (1,2,3,4);
-s.append(5,6,7).append(9,10);   // s get the value (1,2,3,4,5,6,7,8,9,10)
+s.append((5,6,7)).append(8);   // s get the value (1,2,3,4,5,6,7,8)
+```
+* `func begin (): iterator` --
+    returns the iterator points to the first element of the stream. If the stream is empty, it returns an invalid iterator.
+```altscript
+int...(1,2,3,4).begin();     // returns an iterator that points to the first element 1
+```
+* `func rbegin (): iterator` --
+    returns the iterator points to the last element of the stream. If the stream is empty, it returns an invalid iterator.
+```altscript
+int...(1,2,3,4).rbegin();     // returns a reverse iterator that points to the last element 4
 ```
