@@ -92,6 +92,9 @@ sum:int = 0;
 for (x:=s.begin(); x.is_valid(); x.next()) { sum += x; }     // forward, sum is added to 10
 for (x:=s.rbegin(); x.is_valid(); x.next()) { sum -= x; }    // backward, sum is back to zero
 ```
+Be carefore when you add or delete elements of a stream when you're iterating over it, because adding or deleting elements can invalidate all iterators you got
+before the modification.
+
 
 ## Stream Operations
 
@@ -133,4 +136,16 @@ int...(1,2,3,4).begin();     // returns an iterator that points to the first ele
     returns the iterator points to the last element of the stream. If the stream is empty, it returns an invalid iterator.
 ```altscript
 int...(1,2,3,4).rbegin();     // returns a reverse iterator that points to the last element 4
+```
+* `func find (e: element_type; start: int=0; end: int=-1): int` --
+    returns the lowest index starting from 0 in the stream where the given element is first placed. `start` and `end` give the index range where the
+    element to be searched.
+```altscript
+int...(1,2,3,4,3,1).find(3);     // returns 2, the lowest index starting from 0 where the element 3 is placed
+```
+* `func rfind (e: element_type; start: int=0; end: int=-1): int` --
+    returns the highest index starting from 0 in the stream where the given element is first placed. `start` and `end` give the index range where the
+    element to be searched.
+```altscript
+int...(1,2,3,4,3,1).rfind(3);     // returns 4, the highest index starting from 0 where the element 3 is placed
 ```
