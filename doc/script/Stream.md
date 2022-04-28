@@ -99,7 +99,7 @@ before the modification.
 ## Stream Operations
 
 * `func [(index: int)]: element_type`
-* `func char_at (index: int): element_type` --
+* `func at (index: int): element_type` --
     returns the element at the given byte index position.
 ```altscript
 s : int... = (1,2,3,4);
@@ -119,13 +119,23 @@ stream#(numeric)(1, 2.5, 3, 4).length();     // returns 4
 int...(1,2,3,4).front;     // returns 1
 int...(1,2,3,4).back;     // returns 1
 ```
-* `func append (e: element_type; repeat: int): ownerclass` --
-    appends the given element `e` at the end of the stream. `repeat` gives the repeat number with default set to 1. Returns the owner stream.
-* `func append (other: ownerclass): ownerclass` --
+* `func append (e: element_type): ownerclass`, or
+  `func += (e: element_type): ownerclass` --
+    appends the given element `e` at the end of the stream. Returns the owner stream.
+* `func append (other: ownerclass): ownerclass`, or
+  `func += (other: ownerclass): ownerclass` --
     appends another stream of the same type of the owner stream the end and returns the owner stream.
 ```altscript
 s : int... = (1,2,3,4);
-s.append((5,6,7)).append(8);   // s get the value (1,2,3,4,5,6,7,8)
+s.append(5,6,7).append(8);   // s get the value (1,2,3,4,5,6,7,8)
+```
+* `func + (e: element_type): ownerclass` --
+    returns a new stream that combines this stream with a new element at the end
+* `func + (other: ownerclass): ownerclass` --
+    returns a new stream that combines this stream with another stream at the end
+```altscript
+s : int... = (1,2,3,4);
+t := s + (5,6,7) + 8;   // t gets the value (1,2,3,4,5,6,7,8), s is unchanged
 ```
 * `func begin (): iterator` --
     returns the iterator points to the first element of the stream. If the stream is empty, it returns an invalid iterator.
@@ -148,4 +158,33 @@ int...(1,2,3,4,3,1).find(3);     // returns 2, the lowest index starting from 0 
     element to be searched.
 ```altscript
 int...(1,2,3,4,3,1).rfind(3);     // returns 4, the highest index starting from 0 where the element 3 is placed
+```
+* `func remove (e: iterator): iterator` --
+    remove the element pointed by the given iterator and retuens the iterator pointing to the next element. The returned iterator is invalid if
+    next element is not available. 
+```altscript
+s := int...(1,2,3,4,3,1);
+for (e:=s.begin(); e.is_valid();)
+{
+    if (e.value()==3) e = s.remove(); else e.next();
+}
+// removed all 3s in 's', the result is (1,2,4,1)
+```
+* `func erase (start:int; end:int=-1)` --
+    remove the elements from start index until the end index. If the end index is not given, remove elements from start index all the way to the end.
+```altscript
+int...(1,2,3,4,3,1).erase(2,4) // the result is (1,2,3,1)
+```
+* `func [(start: int) .. (end: int)]: ownerclass`
+* `func substream (start:int; end:int=-1): ownerclass` --
+    returns a substream indexed from start to end. The element at the end position is not included. If the end position is given to -1,
+    the end position is at the end of the element.
+```altscript
+int...(1,2,3,4)[1..3];          // returns a substream with elements (2,3).
+int...(1,2,3,4)substream(1);   // returns a substream with elements (2,3,4).
+```
+* `func split (index:int): (ownerclass, ownerclass)` --
+    returns a pair of substream split by the givn index. The element at the index position falls into the second substream of the pair. 
+```altscript
+x, y := int...(0,1,2,3,4).split(2);          // 'x' gets elements (0,1), and 'y' gets elements (2,3,4).
 ```
