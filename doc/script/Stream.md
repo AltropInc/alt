@@ -124,8 +124,9 @@ stream#(int)(1, 2, 3, 4).empty();     // returns false
 * `func back (): ref#(element_type)` --
     returns a reference to the last element in the stream.
 ```altscript
-int...(1,2,3,4).front;     // returns 1
-int...(1,2,3,4).back;     // returns 1
+s := int...(1,2,3,4);
+s.front();    // returns 1
+s.back();     // returns 4
 ```
 * `func append (e: element_type): ownerclass`, or
   `func += (e: element_type): ownerclass` --
@@ -148,12 +149,14 @@ t := s + (5,6,7) + 8;   // t gets the value (1,2,3,4,5,6,7,8), s is unchanged
 * `func begin (): iterator` --
     returns an iterator to the first element of the stream. If the stream is empty, it returns an invalid iterator.
 ```altscript
-int...(1,2,3,4).begin();     // returns an iterator that points to the first element 1
+s := int...(1,2,3,4);
+s.begin();     // returns an iterator that points to the first element 1
 ```
 * `func rbegin (): iterator` --
     returns an iterator to the last element of the stream. If the stream is empty, it returns an invalid iterator.
 ```altscript
-int...(1,2,3,4).rbegin();     // returns a reverse iterator that points to the last element 4
+s := int...(1,2,3,4);
+s.rbegin();     // returns a reverse iterator that points to the last element 4
 ```
 * `func find (e: element_type; start: int=0; end: int=-1): int` --
     returns the lowest index starting from 0 in the stream where the specified element is first placed. `start` and `end` give the index range where the
@@ -189,7 +192,7 @@ int...(1,2,3,4,3,1).erase(2,4) // the result is (1,2,3,1)
     the end position is at the end of the element.
 ```altscript
 int...(1,2,3,4)[1..3];          // returns a substream with elements (2,3).
-int...(1,2,3,4)substream(1);   // returns a substream with elements (2,3,4).
+int...(1,2,3,4).substream(1);   // returns a substream with elements (2,3,4).
 ```
 * `func split (index:int): (ownerclass, ownerclass)` --
     returns a pair of substreams split by the specified index. The element at the index position falls into the second substream of the pair. 
