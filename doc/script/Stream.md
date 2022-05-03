@@ -100,7 +100,7 @@ before the modification.
 
 * `func [(index: int)]: ref#(element_type)`
 * `func at (index: int): ref#(element_type)` --
-    returns the element reference at the specified position given by the byte index. If index is not within the range of the container,
+    returns the element reference at the specified position given by the index. If index is not within the range of the container,
     an exception is raised with error "Index out of boundary".
 ```altscript
 s : int... = (1,2,3,4);
