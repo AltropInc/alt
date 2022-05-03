@@ -98,23 +98,31 @@ before the modification.
 
 ## Stream Operations
 
-* `func [(index: int)]: element_type`
-* `func at (index: int): element_type` --
-    returns the element at the given byte index position.
+* `func [(index: int)]: ref#(element_type)`
+* `func at (index: int): ref#(element_type)` --
+    returns the element reference at the specified position given by the byte index. If index is not within the range of the container,
+    an exception is raised with error "Index out of boundary".
 ```altscript
 s : int... = (1,2,3,4);
-s[0];                       // return 1
-s.at(1);                    // return 2
+s[0];                       // returns 1
+s.at(1);                    // returns 2
+s[0] = 5;                   // sets element at 0 to 5
+s.at(1) = 6                 // sets element at 1 to 6
 ```
 * `func length (): int` --
     returns number of elements in the stream
 ```altscript
 stream#(numeric)(1, 2.5, 3, 4).length();     // returns 4
 ```
-* `func front (): element_type` --
-    returns the first element of the stream.
-* `func back (): element_type` --
-    returns the last element of the stream.
+* `func empty (): bool` --
+    returns true if the stream has no elements.
+```altscript
+stream#(int)(1, 2, 3, 4).empty();     // returns false
+```
+* `func front (): ref#(element_type)` --
+    returns a reference to the first element in the stream.
+* `func back (): ref#(element_type)` --
+    returns a reference to the last element in the stream.
 ```altscript
 int...(1,2,3,4).front;     // returns 1
 int...(1,2,3,4).back;     // returns 1
@@ -138,23 +146,23 @@ s : int... = (1,2,3,4);
 t := s + (5,6,7) + 8;   // t gets the value (1,2,3,4,5,6,7,8), s is unchanged
 ```
 * `func begin (): iterator` --
-    returns the iterator points to the first element of the stream. If the stream is empty, it returns an invalid iterator.
+    returns an iterator to the first element of the stream. If the stream is empty, it returns an invalid iterator.
 ```altscript
 int...(1,2,3,4).begin();     // returns an iterator that points to the first element 1
 ```
 * `func rbegin (): iterator` --
-    returns the iterator points to the last element of the stream. If the stream is empty, it returns an invalid iterator.
+    returns an iterator to the last element of the stream. If the stream is empty, it returns an invalid iterator.
 ```altscript
 int...(1,2,3,4).rbegin();     // returns a reverse iterator that points to the last element 4
 ```
 * `func find (e: element_type; start: int=0; end: int=-1): int` --
-    returns the lowest index starting from 0 in the stream where the given element is first placed. `start` and `end` give the index range where the
+    returns the lowest index starting from 0 in the stream where the specified element is first placed. `start` and `end` give the index range where the
     element to be searched.
 ```altscript
 int...(1,2,3,4,3,1).find(3);     // returns 2, the lowest index starting from 0 where the element 3 is placed
 ```
 * `func rfind (e: element_type; start: int=0; end: int=-1): int` --
-    returns the highest index starting from 0 in the stream where the given element is first placed. `start` and `end` give the index range where the
+    returns the highest index starting from 0 in the stream where the specified element is first placed. `start` and `end` give the index range where the
     element to be searched.
 ```altscript
 int...(1,2,3,4,3,1).rfind(3);     // returns 4, the highest index starting from 0 where the element 3 is placed
