@@ -1,9 +1,9 @@
 # Stream
 
-A stream is a variable-length sequence of elements of the same type, in which elements are arranged in an order that can be accessed through an index starting from 0.
+A stream is a variable-length sequence of elements  in a specified type. Stream elements are arranged in an order that can be accessed through an index starting from 0.
 The `stream` type is subtype of `iterable`, a parameterized class with type parameter `element_type`:
 ```altscript
-class stream #(element_type: any): iterable #(element_type);
+class stream #(type element_type: any): iterable #(element_type);
 ```
 A concrete stream type is created by binding the  type parameter `element_type` to a type. For instance:
 ```altscript
@@ -25,7 +25,7 @@ s:= stream#(int)((1,2,3,4,5,6));  // or s:= int...((1,2,3,4,5,6));
 ```
 A stream object can also be created by automatic conversion from an object in a compatable data structure:
 ```altscript
-s: int... = (1,2,3,4,5,6);      // convert a tuple value (1,2,3,4,5,6) into a int stream
+s: int... = (1,2,3,4,5,6);      // convert a tuple value (1,2,3,4,5,6) into an integer stream
 ```
 When all expressions in a tuple value are constant literals, you can add a keyword `lit` to tell the parser to read the value directly into the stream
 without a tuple-to-stream conversion:
@@ -36,14 +36,15 @@ This will significantly reduce the parsing time.
 
 ## Passing Stream Object
 
-Streams are mutable objects. You can add and delete elements in a stream. When you create a stream value through a constructor, a value conversion or a function output, and assign the value to a name, the name owns the stream value:
+Streams are mutable objects. You can add and delete elements in a stream. You can also change the value of the elements contained in a stream.
+When you create a stream value through a constructor, a value conversion or a function output, and assign the value to a name, the name owns the stream value:
 ```altscript
 s := range(0, 10).gen();
 ```
-In this case, a stream is generated from range \[0,10) and assigned to name `s`. The name `s` owns the stream.
+In this case, a stream is generated from range \[0,10) and assigned to the name `s`. The name `s` owns the stream value.
 
-Stream objects follow the [pass-by-reference](https://en.wikipedia.org/wiki/Evaluation_strategy#Call_by_reference) property. When you provide stream value referred by a name to another name, the name that receives the passed stream value is just a reference to the same stream value owned by someone else.
-For instance, when the stream owned by `s` is passed to another name:
+Stream values follow the [pass-by-reference](https://en.wikipedia.org/wiki/Evaluation_strategy#Call_by_reference) property. When you provide a stream value
+referred by a name `s` to another name `t`, the name `t` is just a reference to the same array value owned by the name `s`:
 ```altscript
 t := s;
 ```
@@ -58,12 +59,12 @@ When a non-owner name owns or receives a different stream value, it does not aff
 ```altscript
 s : int... = (1,2,3,4);      // `s` owns (1,2,3,4);
 t := s;                      // `t` refers to the same stream (1,2,3,4), which is owned by `s`. But `t` does not own;
-t = (-1, -2, -3);            // `t` owns (-1, -2, -3), and `s` keeps owning (1,2,3,4);
+t = (-1, -2, -3);            // `t` owns (-1, -2, -3), and `s` keeps the original value (1,2,3,4);
 ```
 When an owner name owns or receives a different stream value, or the owner name goes out of its scope, its originally owned stream value is destroyed before it accepts the new value or it dies. And in this case, all other alive non-owner names that referred to the destroyed stream will become empty:
 ```altscript
 s : int... = (1,2,3,4);      // `s` owns (1,2,3,4);
-t := s;                      // `t` refers to the same stream (1,2,3,4) - t.length()==4.
+t := s;                      // `t` refers to the same stream (1,2,3,4) - t.length()==4;
 s = (-1, -2, -3);            // `s` owns (-1, -2, -3). (1,2,3,4) is destroyed, and `t` becomes empty - t.length()==0;
 ```
 
@@ -72,13 +73,13 @@ When the value from an inside scope passed to a name in the enclosing (outside) 
 s : int...;
 {
     t := (1,2,3,4);      // `t` owns (1,2,3,4);
-    s := t;              // 's' takes the ownership. `t` still refers to (1,2,3,4) but no longer own
-}                        // `t` is out of scope; 's' keeps the ownership of (1,2,3,4)
+    s := t;              // 's' takes the ownership. `t` still refers to (1,2,3,4) but no longer own;
+}                        // `t` is out of scope; 's' keeps the ownership of (1,2,3,4);
 ```
 
 ## Stream Iteration
 
-You can iterate or loop over each element of stream in forward, backward direction using `foreach`:
+You can iterate or loop over each element of a stream in a forward or backward direction using `foreach`:
 ```altscript
 s : int... = (1, 2, 3, 4);
 sum:int = 0;
@@ -95,19 +96,51 @@ for (x:=s.rbegin(); x.is_valid(); x.next()) { sum -= x; }    // backward, sum is
 Be careful when you add or delete elements of a stream when you're iterating over it, because adding or deleting elements can invalidate all iterators you got
 before the modification.
 
+## Access Stream Elements
+
+You can access an stream element by referring to its index number. The indexes in streams start with 0, meaning that the first element has index 0,
+and the second has index 1 etc. Accessing an stream element is done by using the built-in stream method `[]`:
+```altscript
+func [(index: int)]: element_type
+```
+Here is the example of calling the stream method `[]`:
+```altscript
+s : int... = (1, 2, 3, 4);
+first_ele := s[0];                  // first_ele gets the first element from the stream `s`, i.e. 1;
+second_ele := s[1];                 // second_ele gets the second element from the stream `s`, i.e. 2;
+```
+If an index greater than the stream length is specified when retrieving a stream element, an exception is raised with an error of "Index out of boundary".
+
+To change the element value contained in a stream, the same built-in stream method `[]` is used but using a different interface:
+```altscript
+func [(index: int)]: ref#(element_type)
+```
+In this case, an element reference is returned rather than the element value. Here is the example of using this interface to change the element value:
+```altscript
+s : int... = (1, 2, 3, 4);
+s[0] = -1;                 // the first element is changed to -1;
+s[1] = -2;                 // the second element is changed to -2;
+```
+
+Which interface of the built-in stream method `[]` to use is determined by whether a reference is required in the context of the code. Where ever a name expression
+or an expression of a reference is required, the interface that returns a reference is used and otherwise, the interface that returns the element value is used.
 
 ## Stream Operations
 
-* `func [(index: int)]: ref#(element_type)`
 * `func at (index: int): ref#(element_type)` --
     returns the element reference at the specified position given by the index. If the index is not within the range of the container,
-    an exception is raised with error "Index out of boundary".
+    an exception is raised with an error of "Index out of boundary".
 ```altscript
 s : int... = (1,2,3,4);
-s[0];                       // returns 1
 s.at(1);                    // returns 2
-s[0] = 5;                   // sets element at 0 to 5
 s.at(1) = 6                 // sets element at 1 to 6
+```
+* `func value_at (index: int): element_type` --
+    returns the element reference at the specified position given by the index. If the index is not within the range of the container,
+    an exception is raised with an error of "Index out of boundary".
+```altscript
+int...(1,2,3,4).value_at(1);             // returns 2
+int...(1,2,3,4).value_at(1) = 6;         // error, a name expression is expected at the left of the assignment
 ```
 * `func length (): int` --
     returns number of elements in the stream
@@ -127,6 +160,14 @@ stream#(int)(1, 2, 3, 4).empty();     // returns false
 s := int...(1,2,3,4);
 s.front();    // returns 1
 s.back();     // returns 4
+```
+* `func value_front (): element_type` --
+    returns the first element in the stream.
+* `func value_back (): element_type` --
+    returns the last element in the stream.
+```altscript
+int...(1,2,3,4).value_front();    // returns 1
+int...(1,2,3,4).value_back();     // returns 4
 ```
 * `func append (e: element_type): ownerclass`, or
   `func += (e: element_type): ownerclass` --
