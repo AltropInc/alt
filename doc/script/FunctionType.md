@@ -1,7 +1,7 @@
 # Functor Type
 
 A functor type defines a set of execution objects that have an common input and output interface associated with a block of code used to
-take the inputs, carry out a course of actions, and generate the output as specified.
+take the inputs, carry out a course of actions, and generate the output, if any, as specified.
 
 A functor type starts with the key word `fn`, followed by an input and output interface, and then a block of code:
 ```altscript
@@ -34,7 +34,7 @@ initialized to a concrete functor type that has code block to calculate the inte
 f : fn(x: int...):int = fn(x: int...):int { sum:=0; foreach(e in x) sum+=e; sum }
 sum := f(1,2,3,4);
 ```
-If we already know the interface of the functor type for a augument, we do not need to repeat the interface specification in the concrete functor type
+If we already know the interface of the functor type for an augument, we do not need to repeat the interface specification in the concrete functor type
 that is provided as a value to the augument. Therefore, the following code is also valid:
 ```altscript
 f : fn(x: int...):int = { sum:=0; foreach(e in x) sum+=e; sum }
@@ -61,6 +61,30 @@ func bar(): fn(x: int...): int
 f := bar();
 sum := f(1,2,3,4);
 ```
+
+# Captures
+
+A functor type can capture constants and variables from the surrounding context in which it’s defined. The execution object instantialted by the functor type
+can then refer to and modify the values of those captured values, even if the original scope that defined these values no longer exists.
+Therefore we can do things like this:
+```altscript
+    func check_1s() : fn(i: int): bool
+    {
+        ones: int... = (1, 11, 111, 1111);
+        return { foreach (n in ones) if (i==n) return true; false };
+    }
+    is_1s: bool = check_1s()(111);
+```
+The function `check_1s` returns a functor type `fn(int):bool` to check if the given input `i` is one of the values listed in `ones`. In the execution body of the
+returned functor type, the local value of a local integer stream `ones` is accessed. After the functor type is returned from `check_1s`, the block scope that
+encloses `ones` exits and the local variable `ones` no longer exists. However, the returned functor type captures the ownership of the integer stream, so the destruction of the local variable `ones` will not deallocate the integer stream.
+
+A functor type captures values of primitive types such as integers, enumerations, and booleans. These captured values are copies and the modification of these
+captured values will not alter the original values in the enclosing environment. A functor type captures the ownership of composite types such as arrays, streams
+and tuples if the original composite value is owned by a local variable declared in a block. If a functor type cannot not capture the ownership of a composite
+value becuase the composite value is owned by an object or type (in object or class scope), the composite value captured will become null or empty is the object
+or class that owns the composite value goes away.
+
 
 
 
