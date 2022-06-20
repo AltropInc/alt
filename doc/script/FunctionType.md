@@ -68,23 +68,53 @@ A functor type can capture constants and variables from the surrounding context 
 can then refer to and modify the values of those captured values, even if the original scope that defined these values no longer exists.
 Therefore we can do things like this:
 ```altscript
-    func check_1s() : fn(i: int): bool
-    {
-        ones: int... = (1, 11, 111, 1111);
-        return { foreach (n in ones) if (i==n) return true; false };
-    }
-    is_1s: bool = check_1s()(111);
+func check_1s() : fn(i: int): bool
+{
+    ones: int... = (1, 11, 111, 1111);
+    return { foreach (n in ones) if (i==n) return true; false };
+}
+is_1s: bool = check_1s()(111);
 ```
 The function `check_1s` returns a functor type `fn(int):bool` to check if the given input `i` is one of the values listed in `ones`. In the execution body of the
 returned functor type, the local value of a local integer stream `ones` is accessed. After the functor type is returned from `check_1s`, the block scope that
 encloses `ones` exits and the local variable `ones` no longer exists. However, the returned functor type captures the ownership of the integer stream, so the destruction of the local variable `ones` will not deallocate the integer stream.
 
 A functor type captures values of primitive types such as integers, enumerations, and booleans. These captured values are copies and the modification of these
-captured values will not alter the original values in the enclosing environment. A functor type captures the ownership of composite types such as arrays, streams
-and tuples if the original composite value is owned by a local variable declared in a block. If a functor type cannot not capture the ownership of a composite
-value becuase the composite value is owned by an object or type (in object or class scope), the composite value captured will become null or empty is the object
-or class that owns the composite value goes away.
-
-
+captured values will not alter the original values in the enclosing environment:
+```altscript
+i := 5;
+func bar() : fn():int
+{
+    return {++i};  // return the functor type 'fn():int{++i}' in which 'i' is captured by value (copy)
+                   // the operator ++ increases the capyured value by 1 but does not change the original value
+}
+j := bar()();  // j gets the value 6
+```
+A functor type captures the ownership of composite types such as arrays, streams and tuples if the original composite value is owned by a local variable declared in a block:
+```altscript
+func bar(): fn(): int
+{
+    i := (5,5);          // local tuple value (5,5) is stored in the name 'i'
+    return { ++i[0] };   // the functor type captures the 'i' value by reference and owns the valaue
+                         // The original 'i' no longer owns the tuple value
+}                        // 'i' is out of its scope and goes away, but the tuple value still exists becuase it is
+                         // now owned by the captured name in the returned functor type
+n:=bar()();              // 'n' gets the value 6
+```
+If the composite value is owned by an object or type (in object or class scope), the functor type will not capture the ownership of a composite value
+In case the original composite value goes away, the value captured becomes null or empty too.
+```altscript
+object test
+{
+    i := int...(5,5);       // stream value (5,5) is stored in the name 'i' in the object scope
+    func bar() : fn(): int
+    {
+        return { ++i[0] };  // the functor type captures the 'i' value and owns the valaue  by reference 
+                            // but does not own the value
+    }
+    i = null;               // stream value stored in the name 'i' is cleared
+    n:=bar()();             // An exception of 'Index on empty container' is raised
+}
+```
 
 
