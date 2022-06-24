@@ -120,19 +120,12 @@ object test
 # Pass a Class to Functor Type
 
 A class may contain several enter interfaces (constructors). Each enter interface (non-deferred) is actually a concrete functor type. Here is the example  of a function class `sum`:
-```altscript
-class sum: func
-{
-  enter (values: int...): int { s:=0; foreach (v in values) s += v; s }
-  enter (strs: string...): string  { s:string; foreach (v in strs) s = s+v; s }
-}
-```
-The function class `sum` can also be written in terms of separated simple class forms:
+The function class `sum` has two enter interfaces, one takes the input of an integer stream and another takes the input of a string stream:
 ```altscript
 func sum (values: int...): int { s:=0; foreach (v in values) s += v; s }
 func sum (strs: string...): string  { s:string; foreach (v in strs) s = s+v; s }
 ```
-When we pass a class name to an abstract functor type (a functor type without a block of code), one of the matched enter interfaces of the class will be selected:
+When we pass a class/function name to an abstract functor type (a functor type without a block of code), one of the matched enter interfaces of the class will be selected:
 ```altscript
 for_each_int_do: fn(values: int...): int = sum;  // The sum's interface 'enter(values: int...):int' is selected
                                                  // and is assigned to 'for_each_int_do'
@@ -151,12 +144,45 @@ class test
 In the above example, `multiple` is a member function where the input `x` is multiplied by the class member `factor`. When use `multiple` for the input parameter `f` in the function `apply_f`, the first parameter of `f` is used to match for the owner of `apply_f`. In this case, `apply_f` and `multiple` have the same owner and they match.
 
 When the member is a meta member, however, no owner parameter should be involved in matching a functor type interface because a meta member is defined in class scope, not object scope:
+```altscript
 class test
 {
     meta factor := 5;
     meta func multiple (x: int): int { x*factor }   // multiple x by factor
     func apply_f(x: int; f: fn(x: int): int): int { f(x) }  // apply f to x
     m := apply_f(2, multiple);  // m gets value 10
+}
+```
+Because the enter interface of a non-functional class cannot have an output, a non-functional class can only pass to a functor type that do not have output or have an output in the type of `Object`. Here is an example:
+```altscript
+class test
+{
+    class member_class_1
+    {
+        enter(x:int) { /* initialize instance of member_class_1 using an integer here */}
+        enter(x:string) { /* initialize instance of member_class_1 using a string here */}
+    }
+    func create_member #(type T: any)(x: T; f: fn(ow: ownerclass; x: T):Object) : Object
+    {
+        f(owner, x);
+    }
+    member1 := create_member("A Member Name", member_class_1); // A member object of 'member_class_1' is created in the instance of 'test'
+}
+```
+Here is the version using meta member class:
+```altscript
+class test
+{
+    meta class member_class_1
+    {
+        enter(x:int) { /* initialize instance of member_class_1 using an integer here */}
+        enter(x:string) { /* initialize instance of member_class_1 using a string here */}
+    }
+    func create_member #(type T: any)(x: T; f: fn(x: T):Object) : Object
+    {
+        f(x);
+    }
+    member1 := create_member("A Member Name", member_class_1); // A meta member object of 'member_class_1' is created in the class 'test'
 }
 ```
 
