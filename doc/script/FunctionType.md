@@ -117,6 +117,49 @@ object test
 }
 ```
 
+# Pass a Class to Functor Type
+
+A class may contain several enter interfaces (constructors). Each enter interface (non-deferred) is actually a concrete functor type. Here is the example  of a function class `sum`:
+```altscript
+class sum: func
+{
+  enter (values: int...): int { s:=0; foreach (v in values) s += v; s }
+  enter (strs: string...): string  { s:string; foreach (v in strs) s = s+v; s }
+}
+```
+The function class `sum` can also be written in terms of separated simple class forms:
+```altscript
+func sum (values: int...): int { s:=0; foreach (v in values) s += v; s }
+func sum (strs: string...): string  { s:string; foreach (v in strs) s = s+v; s }
+```
+When we pass a class name to an abstract functor type (a functor type without a block of code), one of the matched enter interfaces of the class will be selected:
+```altscript
+for_each_int_do: fn(values: int...): int = sum;  // The sum's interface 'enter(values: int...):int' is selected
+                                                 // and is assigned to 'for_each_int_do'
+s = for_each_int_do (int...(1,2,3,4));           // 'for_each_int_do' is performed as a summary and 's' gets values of 10
+```
+When a class is member class or a function is a member function, the first parameter in a functor type must match the owner of the member, and the rest parameters in the functor type match to the enter interface of the member class or function. Example:
+```altscript
+class test
+{
+    factor := 5;
+    func multiple (x: int): int { x*factor }   // multiple x by factor
+    func apply_f(x: int; f: fn(owner: ownerclass; x: int): int): int { f(owner, x) }  // apply f to x
+    m := apply_f(2, multiple);  // m gets value 10
+}
+```
+In the above example, `multiple` is a member function where the input `x` is multiplied by the class member `factor`. When use `multiple` for the input parameter `f` in the function `apply_f`, the first parameter of `f` is used to match for the owner of `apply_f`. In this case, `apply_f` and `multiple` have the same owner and they match.
+
+When the member is a meta member, however, no owner parameter should be involved in matching a functor type interface because a meta member is defined in class scope, not object scope:
+class test
+{
+    meta factor := 5;
+    meta func multiple (x: int): int { x*factor }   // multiple x by factor
+    func apply_f(x: int; f: fn(x: int): int): int { f(x) }  // apply f to x
+    m := apply_f(2, multiple);  // m gets value 10
+}
+```
+
 # Generic Functor Type
 
 The input and output interface of a functor type can be parameterized:
