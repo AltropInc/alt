@@ -117,6 +117,33 @@ object test
 }
 ```
 
+# Generic Functor Type
+
+The input and output interface of a functor type can be parameterized:
+```altscript
+stream_sum := fn#(type T:stream#(type element_type: numeric))(x: T): T.element_type;
+stream_sum = { sum: T.element_type; foreach (e in x) sum+=e; sum };
+sum := stream_sum(int...(1,2,3,4));   // sum gets value 10
+stream_sum = { sum: T.element_type; foreach (e in x) sum+=e*e; sum };
+drawable.z_order = foo(double...(1.1,2.2,3.3,4.4));   // sum2 gets value 36.3
+```
+Here `stream_sum` is a generic functor type with type parameter T in the interface. The input `x` can be any stream of numeric numbers, and it returns the sum of all elements contained in the stream.
+
+Sometimes a functor type can appear in a generic interface even though it is not parameterized itself:
+```altscript
+func sum_func #(type T:stream)(x:T; f: fn(e:T.element_type):int): int
+{
+    sum : int = 0;
+    foreach (e in x) sum += f(e);
+    sum
+}
+int_sum := sum_func(int...(1,2,3,4), {e});                            // int_sum gets value of 10
+str_length_sum := apply(string...("1234", "xyz"), {e.length()});      // str_length_sum gets value of 7
+str_sum := sum_func(string...("1234", "xyz"), {e});
+                                               ^ ---------------------// Compile error: Returned type is wrong
+```
+Here `sum_func` has a generic input interface that takes any type of stream and generates an integer output using the functor type 'f', which takes the element type of the stream and convert to an integer that is related to the element. The last `sum_func` call generates a compile error because the return type is string, which is not the output type specified by the functor type 'f'.
+
 # Pass a Class to Functor Type
 
 A class may contain several enter interfaces (constructors). Each enter interface (non-deferred) is actually a concrete functor type. Here is the example  of a function class `sum`:
@@ -153,7 +180,7 @@ class test
     m := apply_f(2, multiple);  // m gets value 10
 }
 ```
-Because the enter interface of a non-functional class cannot have an output, a non-functional class can only pass to a functor type that do not have output or have an output in the type of `Object`. Here is an example:
+Because the enter interface of a non-functional class cannot have an output, a non-functional class can only pass to a functor type that does not have an output or has an output in the type of `Object`. Here is an example where the member is created in object scope using a selected member class:
 ```altscript
 class test
 {
@@ -169,7 +196,7 @@ class test
     member1 := create_member("A Member Name", member_class_1); // A member object of 'member_class_1' is created in the instance of 'test'
 }
 ```
-Here is the version using meta member class:
+Here is the version using meta member class where the member is created in class scope using a selected meta member class:
 ```altscript
 class test
 {
@@ -186,29 +213,3 @@ class test
 }
 ```
 
-# Generic Functor Type
-
-The input and output interface of a functor type can be parameterized:
-```altscript
-stream_sum := fn#(type T:stream#(type element_type: numeric))(x: T): T.element_type;
-stream_sum = { sum: T.element_type; foreach (e in x) sum+=e; sum };
-sum := stream_sum(int...(1,2,3,4));   // sum gets value 10
-stream_sum = { sum: T.element_type; foreach (e in x) sum+=e*e; sum };
-drawable.z_order = foo(double...(1.1,2.2,3.3,4.4));   // sum2 gets value 36.3
-```
-Here `stream_sum` is a generic functor type with type parameter T in the interface. The input `x` can be any stream of numeric numbers, and it returns the sum of all elements contained in the stream.
-
-Sometimes a functor type can appear in a generic interface even though it is not parameterized itself:
-```altscript
-func sum_func #(type T:stream)(x:T; f: fn(e:T.element_type):int): int
-{
-    sum : int = 0;
-    foreach (e in x) sum += f(e);
-    sum
-}
-int_sum := sum_func(int...(1,2,3,4), {e});                            // int_sum gets value of 10
-str_length_sum := apply(string...("1234", "xyz"), {e.length()});      // str_length_sum gets value of 7
-str_sum := sum_func(string...("1234", "xyz"), {e});
-                                               ^ ---------------------// Compile error: Returned type is wrong
-```
-Here `sum_func` has a generic input interface that takes any type of stream and generates an integer output using the functor type 'f', which takes the element type of the stream and convert to an integer that is related to the element. The last `sum_func` call generates a compile error because the return type is string, which is not the output type specified by the functor type 'f'.
