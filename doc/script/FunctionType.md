@@ -180,16 +180,17 @@ class test
     m := apply_f(2, multiple);  // m gets value 10
 }
 ```
-Because the enter interface of a non-functional class cannot have an output, a non-functional class can only pass to a functor type that does not have an output or has an output in the type of `Object`. Here is an example where the member is created in object scope using a selected member class:
+The enter interface of a non-functional class does not have an output specified, and by default, an instance of the non-functional class is created as the output as the result of calling this enter interface. Therefore, a non-functional class can only be passed as a parameter to a functor type that does not have an output or has an output in the type that is the same as or is the super class of the passed non-functional class. Here is an example where the member is created in object scope using a selected member class:
 ```altscript
 class test
 {
-    class member_class_1
+    class member_base {}
+    class member_class_1 is member_base
     {
         enter(x:int) { /* initialize instance of member_class_1 using an integer here */}
         enter(x:string) { /* initialize instance of member_class_1 using a string here */}
     }
-    func create_member #(type T: any)(x: T; f: fn(ow: ownerclass; x: T):Object) : Object
+    func create_member #(type T: any)(x: T; f: fn(ow: ownerclass; x: T):member_base) : member_base
     {
         f(owner, x);
     }
@@ -200,7 +201,8 @@ Here is the version using meta member class where the member is created in class
 ```altscript
 class test
 {
-    meta class member_class_1
+    meta class member_base {}
+    meta class member_class_1 is member_base
     {
         enter(x:int) { /* initialize instance of member_class_1 using an integer here */}
         enter(x:string) { /* initialize instance of member_class_1 using a string here */}
