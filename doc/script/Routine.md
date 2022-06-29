@@ -16,6 +16,8 @@ The way to create executable objects from a routine type is determined by the ki
 
 A construction routine is a routine type prefixed with the keyword `ctor`. It is always specified within a class.
 
+## Object Construction Routine (Constructor)
+
 An `object construction routine`, also referred as `constructor`, is used to create an object from its enclosing class:
 ```altscript
 class Box
@@ -31,13 +33,22 @@ class Box
 ```
 The constructor in the class `Box` is a routine type specified after the key word `ctor`. It takes the input of the box origin, and the width and height of the box, and uses the input parameters to initialize the box by setting the values for the top-left and bottom-right corners of the box.
 
+To use the constructor of a class to create an object, we give the class name and provide a list of expressions for the inputs (if any), thus the expression `Box((0,0), 2, 4)` creates an object of `Box` from the origin (0,0) with width 2 and height 4. This process is often referred as `contructor call`.
+
+The interface of a constructor does not specify output type, however, a constructor always returns an object of the enclosing class. Therefore, the constructor call `Box((0,0), 2, 4)` returns an object of `Box`:
+```altscript
+box := Box((0,0), 2, 4);
+```
+
+## Class Construction Routine (Meta Constructor)
+
 A `class construction routine`, also referred as `meta constructor`, is used to initialize meta members of its enclosing class:
 ```altscript
   class Box
   {
       meta box_count : int;
-      top_left: (double; ouble);
-      bottom_right: (double; ouble);
+      top_left: (double; double);
+      bottom_right: (double; double);
       meta ctor()
       {
           box_count = 0;
@@ -51,6 +62,79 @@ A `class construction routine`, also referred as `meta constructor`, is used to 
   }
 ```
 Meta members belong to the class scope. A meta constructor cannot have any input parameters in the interface, and it cannot be explicitly called.  One class can have only one meta constructor.
+
+## Constructor Interface Overloading
+
+More than one constructor can be used in a class, as long as each constructor has a different list of argument types. This concept is known as `Constructor Overloading`. While creating the object, input arguments must be passed to let the script parser know which constructor routine needs to be called. A constructor routine must be uniquely selected depending upon the number and type of input arguments passed, which must match the specified interface of the constructor. Example:
+```
+class Box
+{
+    top_left: (double; double);
+    bottom_right: (double; double);
+    ctor()
+    {
+        top_left = (0,0);
+        bottom_right = (0,0);
+    }
+    ctor(top, left, bottom, right: double)
+    {
+        top_left = (top, left);
+        bottom_right = (bottom, right);
+    }
+    ctor(origin: (x:double; y:double); width, height: double)
+    {
+        top_left = origin;
+        bottom_right = (origin.x + width, origin.y+ height);
+    }
+}
+empty_box := Box();        // use ctor()
+box1 := Box(0, 0, 2, 4);   // use ctor(top, left, bottom, right: double)
+box2 := Box((0, 0), 2, 4); // use ctor(origin: (x:double; y:double); width, height: double)
+```
+Each constructor must  have a different list of argument types. The argument names are not counted for the difference:
+```
+class Box
+{
+    top_left: (double; double);
+    bottom_right: (double; double);
+    ctor(top, left, bottom, right: double)
+    {
+        top_left = (top, left);
+        bottom_right = (bottom, right);
+    }
+    ctor(top, left, width, height: double)          // Error: Same interface already implemented
+    {
+        top_left = (top, left);
+        bottom_right = (top + bottom, left + right);
+    }
+}
+```
+If a constructor routine cannot be uniquely selected based on the provided input type, an error of ambiguity will be reported by the parser:
+```
+class Box
+{
+    top_left: (double; double);
+    bottom_right: (double; double);
+    ctor(top, left, bottom, right: double)
+    {
+        top_left = (top, left);
+        bottom_right = (bottom, right);
+    }
+    ctor(top, left, bottom, right: int)
+    {
+        top_left = (top, left);
+        bottom_right = (top, left);
+    }
+}
+box1 := Box(0, 0, 2, 4);           // use ctor(top, left, bottom, right: int)
+box2 := Box(0.0, 0.0, 2.0, 4.0);   // use ctor(top, left, bottom, right: double)
+box2 := Box(0.0, 0.0, 2, 4);       // Error: Call of overloaded routine is ambiguous: Box
+box2 := Box(0.0, 0, 2, 4);         // use ctor(top, left, bottom, right: int) because inputs has more integers
+box2 := Box(0.0, 0.0, 2.0, 4);     // use ctor(top, left, bottom, right: double) because inputs has more doubles
+box2 := Box(0l, 0l, 2l, 4l);       // Error: Call of overloaded routine is ambiguous: Box
+                                   // because the distance betwwen long integers and integers  is the same as the one
+                                   // between doubles and integers.
+```
 
 
 
