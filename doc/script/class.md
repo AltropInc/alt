@@ -187,7 +187,7 @@ class ClassName
 
 The destructor should not have any input, and is automatically invoked, including all destructors in bases classes, when the instance of the class is in destroy. The destructor in the derived class is invoked first, then, the one defined in the base.
 
-##Simple Class Form and Sealed Class
+## Simple Class Form and Sealed Class
 
 If a derived class does not have any member extension or modification and only provides constructors to create instances of the class, the class definition can use a simple form for each constructor interface. For instance:
 
