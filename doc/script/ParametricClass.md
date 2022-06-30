@@ -1,4 +1,4 @@
-## [Parametric Class](@id man-parametric-classes)
+## Parametric Class {#parametric-classes}
 
 ### Overview
 
