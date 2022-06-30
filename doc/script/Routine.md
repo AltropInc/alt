@@ -8,17 +8,71 @@ A routing type is specified by an input and output interface followed by a block
 ```
 specifies a routine that takes the input of an integer stream, calculates the sum of the integer stream , and returns the sum as its output. The input is given in a pair of parentheses as in `(x: int...)`. The output type, if any, is given after the colon following the input. The sequence of actions is given by a code block which is a set of statements placed in a pair of curly brackets.
 
+The way to create executable objects (routines) from a routine type is determined by the kinds of routine types. There are two kinds of routine types: `construction routine type` and `function routine type`. A routine type, whether it is a function routine type or a construction routine type, is always specified within a class. The class is the `enclosing class` of the routine type. Routine types specified in the class constitutes the behavior of the class as well the behavior of objects created from the class. A construction routine type tells how the object or class is initialized, and a function routine type tells what the function of the object of the class can perform.
+
+## Construction Routine Type
+
+A construction routine type is a routine type prefixed with the keyword `ctor`. For example, a construction routine type in a `Point` class can be
+```altscript
+class Point
+{
+    ctor (x, y: double) { /* initialize x and y coordinates of the point using the input x and y */ }
+}
+```
+A construction routine is instantiated from the construction routine type to initialize x and y coordinates of the point using the input x and y. This instantiation process is referred to as `constructor call`. The expression of a constructor call is the enclosing class name followed by a set of actual input values:
+```altscript
+Point(0,0)
+```
+This creates a construction routine that initialize x and y coordinates of a `Point` object using the provided input (0,0). Since a construction routine type always returns the initialized object as its output, the construction routine type does not have the output type in its specification.
+
+## Function Routine Type
+
+A function routine accomplishes a specific task by using input data, processing it, and returns a result in the output type as specified. A construction routine type is a routine type prefixed with the keyword `fn`. Consider a function class Σ:
+```altscript
+class Σ
+{
+    fn (x: int...): int { sum:=0; foreach(e in x) sum+=e; sum }
+}
+```
+A function routine is instantiated from the function routine type toto perform the task described in the unction routine type. This instantiation process is referred to as `function call`. The expression of a function call is the object of the enclosing class followed by a set of actual input values:
+```altscript
+Σ()(1,2,3,4)
+```
+where `Σ()` is a constructor call to to generate an object of Σ and the Σ object is used to create a function routine that takes the input (1,2,3,4) and calculate the sum of the integers in the input. The expression `Σ()(1,2,3,4)` returns a value 10.
+
+If the enclosing class of a function routine type is a subclass of `functional` and the enclosing class has no construction routine type or has a default construction routine type that can be called implicitly, the functional call can use the class name directly:
+```altscript
+class Σ implements functional   // Σ is a subclass that implements the functional interface
+{
+    fn (x: int...): int { sum:=0; foreach(e in x) sum+=e; sum }
+}
+sum := Σ(1,2,3,4);  // the function call uses the class name Σ directly
+```
+If we write the Σ class in a [simple class form](#Simple-Class-Form-and-Sealed-Class), it may look more familiar:
+```altscript
+functional Σ (x: int...): int
+{
+    sum:=0; foreach(e in x) sum+=e; sum
+}
+sum := Σ(1,2,3,4);
+```
+This simple form of class declaration makes the class Σ to appear in the same look of a function declaration in other programming laguages.
+
+
+
+
 A routine type without a code block is an abstract routine type which cannot be used to instantiate any executable objects. Therefore, any argument specified by an abstract routine type cannot be used to create an executable unless it is bound to a concrete routine type with a block of code specified.
 
-The way to create executable objects from a routine type is determined by the kinds of routine types. There are two kinds of routines: `function routines` and `construction routines`. A function routine accomplishes a specific task by using input data, processing it, and returns a result as output. A construction routine does the initialization of an object or a class by using the input data, and returns the initialized object as its output if it is an object construction routine. It looks like a construction routine is a special case of function routine by this definition. However, how they are specified and invoked are different.
 
-# Constructor Routine
+The process to create executable objects from a routine type is refered as `routine type call`. The expression of a `routine type call` 
 
-A construction routine is a routine type prefixed with the keyword `ctor`. It is always specified within a class.
+# Construction Routine Type
 
-## Object Construction Routine (Constructor)
+A construction routine type is a routine type prefixed with the keyword `ctor`.
 
-An `object construction routine`, also referred as `constructor`, is used to create an object from its enclosing class:
+## Object Construction Routine Type (Constructor)
+
+An `object construction routine type`, also referred as `constructor`, is used to create an object from its enclosing class:
 ```altscript
 class Box
 {
@@ -185,10 +239,135 @@ class Box
 box := Box();  // Error: Call of overloaded routine is ambiguous: Box
 ```
 
+## Constructor Chaining
 
-If you define any constructor explicitly in a class, then you will have to call one of the constructors with matched inputs to initialize the instance of the class, including a constructor in all of its base classes. For example:
+Constructor chaining occurs through inheritance when subclass constructor calls super class’s constructor:
+```altscript
+class Box
+{
+    top_left: (double; ouble);
+    bottom_right: (double; ouble);
+    ctor (origin: (x:double; y:double); width, height: double)
+    {
+        top_left = origin;
+        bottom_right = (origin.x + width, origin.y+ height);
+    }
+}
+class ColoredBox: Box
+{
+    box_color: Color;
+    ctor (origin: (x:double; y:double); width, height: double; color: Color)
+        super(origin, width, height)   // call the super class Box's ctor here
+    {
+        box_color = color;
+    }
+}
+```
+This ensures the initialization of the data members of the super class on the creation of a subclass object.
+
+If the super class explicitly defines a constructor that is not the default, the subclass must call the constructor in the super:
+```altscript
+class Box
+{
+    top_left: (double; ouble);
+    bottom_right: (double; ouble);
+    ctor (origin: (x:double; y:double); width, height: double)
+    {
+        top_left = origin;
+        bottom_right = (origin.x + width, origin.y+ height);
+    }
+}
+class ColoredBox: Box
+{
+    box_color: Color;
+    ctor (origin: (x:double; y:double); width, height: double; color: Color)
+         // Error: No default constructor in super class. Explicit super constructor call is required
+    {
+        box_color = color;
+    }
+}
+```
+unless the super class provides a default constructor:
+```altscript
+class Box
+{
+    top_left: (double; ouble);
+    bottom_right: (double; ouble);
+    ctor(top, left, bottom, right: double)
+    {
+        top_left = (top, left);
+        bottom_right = (bottom, right);
+    }
+    ctor (origin: (x:double; y:double); width, height: double)
+    {
+        top_left = origin;
+        bottom_right = (origin.x + width, origin.y+ height);
+    }
+}
+class ColoredBox: Box
+{
+    box_color: Color;
+    ctor (origin: (x:double; y:double); width, height: double; color: Color)
+         //  Okay, the default constructor in the super class Box is called automatically
+    {
+        box_color = color;
+    }
+}
+```
+The subclass can also select one of the constructors in the super class as the default constructor:
+```altscript
+class Box
+{
+    top_left: (double; ouble);
+    bottom_right: (double; ouble);
+    ctor (origin: (x:double; y:double); width, height: double)
+    {
+        top_left = origin;
+        bottom_right = (origin.x + width, origin.y+ height);
+    }
+    ctor (origin: (x:double; y:double); width, height: double)
+    {
+        top_left = origin;
+        bottom_right = (origin.x + width, origin.y+ height);
+    }
+}
+class ColoredBox: Box(0,0,0,0)  // The constructor ctor(top, left, bottom, right: double) in super is selected as
+                                // the defulat constructor
+{
+    box_color: Color;
+    ctor (color: Color) // Okay, Box(0,0,0,0) is automatically called as the default constructor in the super class
+    {
+        box_color = color;
+    }
+}
 ```
 
+# Function Routine
+
+A function routine is a routine type prefixed with the keyword `fn`. It is always specified within a class.
+
+## Object Construction Routine (Constructor)
+
+An `object construction routine`, also referred as `constructor`, is used to create an object from its enclosing class:
+```altscript
+class Box
+{
+    top_left: (double; ouble);
+    bottom_right: (double; ouble);
+    ctor (origin: (x:double; y:double); width, height: double)
+    {
+        top_left = origin;
+        bottom_right = (origin.x + width, origin.y+ height);
+    }
+}
+```
+The constructor in the class `Box` is a routine type specified after the key word `ctor`. It takes the input of the box origin, and the width and height of the box, and uses the input parameters to initialize the box by setting the values for the top-left and bottom-right corners of the box.
+
+To use the constructor of a class to create an object, we give the class name and provide a list of expressions for the inputs (if any), thus the expression `Box((0,0), 2, 4)` creates an object of `Box` from the origin (0,0) with width 2 and height 4. This process is often referred as `contructor call`.
+
+The interface of a constructor does not specify output type, however, a constructor always returns an object of the enclosing class. Therefore, the constructor call `Box((0,0), 2, 4)` returns an object of `Box`:
+```altscript
+box := Box((0,0), 2, 4);
 ```
 
 
