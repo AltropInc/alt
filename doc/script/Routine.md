@@ -48,7 +48,7 @@ class Σ implements functional   // Σ is a subclass that implements the functio
 }
 sum := Σ(1,2,3,4);  // the function call uses the class name Σ directly
 ```
-If we write the Σ class in a [simple class form](class.md##Simple-Class-Form-and-Sealed-Class), it may look more familiar:
+If we write the Σ class in a [simple class form](class.md#Simple-Class-Form-and-Sealed-Class), it may look more familiar:
 ```altscript
 functional Σ (x: int...): int
 {
