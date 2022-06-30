@@ -128,15 +128,68 @@ class Box
 }
 box1 := Box(0, 0, 2, 4);           // use ctor(top, left, bottom, right: int)
 box2 := Box(0.0, 0.0, 2.0, 4.0);   // use ctor(top, left, bottom, right: double)
-box2 := Box(0.0, 0.0, 2, 4);       // Error: Call of overloaded routine is ambiguous: Box
-box2 := Box(0.0, 0, 2, 4);         // use ctor(top, left, bottom, right: int) because inputs has more integers
-box2 := Box(0.0, 0.0, 2.0, 4);     // use ctor(top, left, bottom, right: double) because inputs has more doubles
-box2 := Box(0l, 0l, 2l, 4l);       // Error: Call of overloaded routine is ambiguous: Box
-                                   // because the distance betwwen long integers and integers  is the same as the one
-                                   // between doubles and integers.
+box3 := Box(0.0, 0.0, 2, 4);       // Error: Call of overloaded routine is ambiguous: Box
+box4 := Box(0.0, 0, 2, 4);         // use ctor(top, left, bottom, right: int) because inputs has more integers
+box5 := Box(0.0, 0.0, 2.0, 4);     // use ctor(top, left, bottom, right: double) because inputs has more doubles
+box6 := Box(0l, 0l, 2l, 4l);       // Error: Call of overloaded routine is ambiguous: Box
+                                   // because an implicit conversion of long int to int is equally as valid as an
+                                   // implicit conversion of long int to double
+box7 := Box(0, 0, 2l, 4l);         // use ctor(top, left, bottom, right: int)
+```
+
+## Default Constructor
+
+A default constructor is the constructor that either has no input parameters:
+```altscript
+  class Box
+  {
+      top_left: (double; double);
+      bottom_right: (double; double);
+      ctor()    // This is the default constructor
+      {
+          top_left = (0,0);
+          bottom_right = (0,0);
+      }
+  }
+```
+or, if it has parameters, all the parameters have default values:
+```altscript
+class Box
+{
+    top_left: (double; double);
+    bottom_right: (double; double);
+    ctor(top, left, bottom, right: double = 0,0,0,0) // This is the default constructor
+    {
+        top_left = (top, left);
+        bottom_right = (bottom, right);
+    }
+}
+```
+Only one default constructor is allowed in a class. If both the default constructor without any parameter and the default constructor with all the parameters having default values are provided, calling the default constructor without providing any input parameter will cause an error of ambiguity:
+```altscript
+class Box
+{
+    top_left: (double; double);
+    bottom_right: (double; double);
+    ctor ()  // This is the default constructor
+    {
+        top_left = (0, 0);
+        bottom_right = (0, 0);
+    }
+    ctor(top, left, bottom, right: double = 0,0,0,0) // This is another default constructor
+    {
+        top_left = (top, left);
+        bottom_right = (bottom, right);
+    }
+}
+box := Box();  // Error: Call of overloaded routine is ambiguous: Box
 ```
 
 
+If you define any constructor explicitly in a class, then you will have to call one of the constructors with matched inputs to initialize the instance of the class, including a constructor in all of its base classes. For example:
+```
+
+```
 
 
 A functor type starts with the key word `fn`, followed by an input and output interface, and then a block of code:
