@@ -1,6 +1,6 @@
-# Routine Type
+# Routine Type and Routine Call
 
-A routine type defines a set of executable objects that have an common input and output interface associated with a block of code used to take the inputs, carry out a sequence of actions, and generate the output, if any, as specified. There are two kinds of routines: `construction routines` and `function routines`.
+A `routine type` defines a set of executable objects that have an common input and output interface associated with a block of code used to take the inputs, carry out a sequence of actions, and generate the output, if any, as specified. There are two kinds of routines: `construction routines` and `function routines`.
 
 A routing type is specified by an input and output interface followed by a block of code. For example, the following routine type:
 ```altscript
@@ -8,39 +8,48 @@ A routing type is specified by an input and output interface followed by a block
 ```
 specifies a routine that takes the input of an integer stream, calculates the sum of the integer stream , and returns the sum as its output. The input is given in a pair of parentheses as in `(x: int...)`. The output type, if any, is given after the colon following the input. The sequence of actions is given by a code block which is a set of statements placed in a pair of curly brackets.
 
-The way to create executable objects (routines) from a routine type is determined by the kinds of routine types. There are two kinds of routine types: `construction routine type` and `function routine type`. A routine type, whether it is a function routine type or a construction routine type, is always specified within a class. The class is the `enclosing class` of the routine type. Routine types specified in the class constitutes the behavior of the class as well the behavior of objects created from the class. A construction routine type tells how the object or class is initialized, and a function routine type tells what the function of the object of the class can perform.
+A `routine call` is the process to create executable objects (routines) from a routine type. The way to do this is determined by the kinds of routine types. There are two kinds of routine types: `construction routine type` and `function routine type`. A routine type, whether it is a function routine type or a construction routine type, is always specified within a class. The class is the `enclosing class` of the routine type. Routine types specified in the class constitutes the behavior of the class as well the behavior of objects created from the class. A construction routine type tells how the object or class is initialized, and a function routine type tells what the function of the object of the class can perform.
 
-## Construction Routine Type
+## Construction Routine Type and Constructor Call
 
-A construction routine type is a routine type prefixed with the keyword `ctor`. For example, a construction routine type in a `Point` class can be
+A construction routine type is a routine type prefixed with the keyword `ctor`. It is also referered as [constructor](Constructor.md). For example, a construction routine type in a `Point` class can be
 ```altscript
 class Point
 {
     ctor (x, y: double) { /* initialize x and y coordinates of the point using the input x and y */ }
 }
 ```
-A construction routine is instantiated from the construction routine type to initialize x and y coordinates of the point using the input x and y. This instantiation process is referred to as `constructor call`. The expression of a constructor call is the enclosing class name followed by a set of actual input values:
+A construction routine is instantiated from the construction routine type to initialize x and y coordinates of the point using the input x and y. This instantiation process is referred to as `constructor call`. The expression of a constructor call uses the enclosing class name followed by a set of actual input values:
 ```altscript
 Point(0,0)
 ```
 This creates a construction routine that initialize x and y coordinates of a `Point` object using the provided input (0,0). Since a construction routine type always returns the initialized object as its output, the construction routine type does not have the output type in its specification.
 
-## Function Routine Type
+See [Constructor](Constructor.md) for more description.
 
-A function routine accomplishes a specific task by using input data, processing it, and returns a result in the output type as specified. A construction routine type is a routine type prefixed with the keyword `fn`. Consider a function class Σ:
+
+## Function Routine Type and Function Call
+
+A function routine accomplishes a specific task by using input data, processing it, and returns a result in the output type as specified. A function routine type is a routine type prefixed with the keyword `fn`. It is also referered as [functor](Functor.md). Consider a function class Σ:
 ```altscript
 class Σ
 {
     fn (x: int...): int { sum:=0; foreach(e in x) sum+=e; sum }
 }
 ```
-A function routine is instantiated from the function routine type toto perform the task described in the unction routine type. This instantiation process is referred to as `function call`. The expression of a function call is the object of the enclosing class followed by a set of actual input values:
+A function routine is instantiated from the function routine type to perform the task described in the unction routine type. This instantiation process is referred to as `function call`. The expression of a function call uses the object of the enclosing class followed by a set of actual input values:
 ```altscript
 Σ()(1,2,3,4)
 ```
 where `Σ()` is a constructor call to to generate an object of Σ and the Σ object is used to create a function routine that takes the input (1,2,3,4) and calculate the sum of the integers in the input. The expression `Σ()(1,2,3,4)` returns a value 10.
 
-If the enclosing class of a function routine type is a subclass of `functional` and the enclosing class has no construction routine type or has a default construction routine type that can be called implicitly, the functional call can use the class name directly:
+See [Functor](Functor.md) for more description.
+
+## Function Call Using Class Name
+
+In some cases, a function call can use the class name directly.
+
+One case is when the enclosing class is an [immaterial class](ImmaterialClass.md). An immaterial class defines only function routine types and meta members. It has no data/value, class members, or constructors defined in object scope. Therefore  we do not need to create an object of the class to perform the function call. For instance:
 ```altscript
 class Σ implements functional   // Σ is a subclass that implements the functional interface
 {
@@ -48,23 +57,65 @@ class Σ implements functional   // Σ is a subclass that implements the functio
 }
 sum := Σ(1,2,3,4);  // the function call uses the class name Σ directly
 ```
-If we write the Σ class in a [simple class form](#Simple-Class-Form-and-Sealed-Class), it may look more familiar:
+Here the class Σ is an immaterial class and it implements the interface [functional](Interfacefunctional.md). The expression of the function routine type call `Σ(1,2,3,4)` uses the class name `Σ`, instead of `Σ()`.
+
+To make the class Σ to appear in the same look of a function declaration in other programming languages, we can write the Σ class in a [simple class form](class.md#Simple-Class-Form-and-Sealed-Class):
 ```altscript
 functional Σ (x: int...): int
 {
     sum:=0; foreach(e in x) sum+=e; sum
 }
-sum := Σ(1,2,3,4);
+sum := Σ(1,2,3,4); // msum gets the value 80
 ```
-This simple form of class declaration makes the class Σ to appear in the same look of a function declaration in other programming laguages.
+Another case is when the provided input parameters do not match any constructor routine type but a matched function routine type is found. In this case, an object of the class is automatically created to perform the function call. In order to make this possible, the class must provide a [default constructor](DefaultConstructor.md). Example with an explicit default constructor:
+```altscript
+class Σ
+{
+    multiple : int;
+    fn (x: int...):int { sum:=0; foreach(e in x) sum += e * multiple; sum }
+    ctor() { multiple = 8 }
+}
+msum := Σ(1,2,3,4);
+```
+Example with implicit default constructor:
+```altscript
+class Σ
+{
+    multiple : int = 8;
+    fn (x: int...):int { sum:=0; foreach(e in x) sum += e * multiple; sum }
+}
+msum := Σ(1,2,3,4);  // msum gets the value 80
+```
+In either of the above examples, the expression  `Σ(1,2,3,4)` is equivalent to `Σ()(1,2,3,4)`. `Σ` is not an immaterial class because it has a data member `multiple`. An object of `Σ` must be created in order to complete the function call to `fn (x: int...):int`.
 
+# Abstract Routine Type
 
+A routine type without a code block is an `abstract routine type`. It cannot be used to instantiate any executable objects (routine call). Therefore, any argument specified by an abstract routine type cannot be used to create an executable unless it is bound to a concrete routine type with a block of code specified. For instance:
+```altscript
+f : fn(x: int...):int;
+```
+specifies an abstract function type. A call `f(1,2,3,4)` will cause an exception: unless `f` gets a concrete function type 
+```altscript
+f : fn(x: int...):int;
+f = { sum:=0; foreach(e in x) sum += e * multiple; sum }
+stream_sum := f(1,2,3,4);
+```
+A construction route type can also be abstract:
+```altscript
+class test
+{
+    meta class Σ                       // Σ is meta member class of test
+    {
+        multiple : int;
+        ctor(m: int) { multiple = m }  // constructor for member class Σ
+    }
+    creator: ctor(x: int): Σ;          // creator is specified as an abstract constructor that returns an Σ object
+    creator = Σ;                       // creator gets a concrete constructor in class Σ
+    Σ8 := creator(8);                  // constructor call to create an  Σ object
+}
+```
+For more description on what matches an abstract routine type, see [Abstract Routine Type](AbstractRoutineType.md).
 
-
-A routine type without a code block is an abstract routine type which cannot be used to instantiate any executable objects. Therefore, any argument specified by an abstract routine type cannot be used to create an executable unless it is bound to a concrete routine type with a block of code specified.
-
-
-The process to create executable objects from a routine type is refered as `routine type call`. The expression of a `routine type call` 
 
 # Construction Routine Type
 
