@@ -271,6 +271,6 @@ A meta constructor is a `class construction routine type` used to initialize met
 Meta members belong to the class scope. A meta constructor cannot have any input parameters in the interface, and it cannot be explicitly called.  One class can have only one meta constructor.
 
 ## See also:
-[Routine type](Routine.md)
-[Abstract constructor](AbstractRoutineType.md)
-[Constructor in simple class form](SimpleClassForm.md)
+* [Routine type](Routine.md)
+* [Abstract constructor](AbstractRoutineType.md)
+* [Constructor in simple class form](SimpleClassForm.md)
