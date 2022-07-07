@@ -1,6 +1,6 @@
 # Constructor
 
-A constructor (abbreviation: ctor) is a special [routine type](Routine.md) (construction routine type) which called to create an object of the class that contains the constructor:
+A constructor (abbreviation: ctor) is a special [routine type](Routine.md) (construction routine type) which is called to create an object of the class that contains the constructor:
 ```altscript
 class Box
 {
