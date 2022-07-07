@@ -108,11 +108,11 @@ Other [functional class](FunctionalClass.md) such as threads, reactors, remote f
 ## Terminology Summary
 
 * **functor**: a [function routine type](Routine.md) defined in a class to perform a specific task.
-* **function routine**: a functor instance (objejct) created to perform the task specified by the functor.
+* **function routine**: a functor instance (object) created to perform the task specified by the functor.
 * **function call**: an action to use a functor to create a function routine.
 * **function class**: a [class](Class.md) that defines functors only.
 * **function**: a functor written in [simple class form](SimpleClassForm.md).
-* **function overloading**: multiple functions with different input interface for a function class.
+* **function overloading**: multiple functions with different input interfaces for a function class.
 
 ## See also:
 * [Routine type](Routine.md)
