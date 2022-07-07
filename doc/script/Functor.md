@@ -1,6 +1,6 @@
 # Functor
 
-A functor (abbreviation: fn) is a function [routine type](Routine.md) which is called to accomplish a specific task by processing the input data and generating a result, if any, in the output type as specified. A functor is always specified within a class, and the class is called the `enclosing class` of the functor. A functor type starts with the key word `fn`, followed by an input and output interface, and then a block of code. Consider:
+A functor (abbreviation: fn) is a [function routine type](Routine.md) which is called to accomplish a specific task by processing the input data and generating a result, if any, in the output type as specified. A functor is always specified within a class, and the class is called the `enclosing class` of the functor. A functor starts with the key word `fn`, followed by an input and output interface, and then a block of code. Consider:
 ```altscript
 class Σ
 {
@@ -84,9 +84,9 @@ SuperClassName Derived(x: int) { }
 SuperClassName Derived(x, y: int) { }
 SuperClassName Derived(x, y, z:: int) { }
 ```
-Each simple class form of the class `Derived` is a `function`, i.e., The function class `Derived` has three functions. The benefit of using separated simple class forms for a function class is that we can introduce more functions (function overloading) for a function class later whenever as needed.
+Each simple class form of the function class is a `function`. The function class `Derived` has three functions. The benefit of using separated simple class forms for a function class is that we can introduce more functions (function overloading) for a function class later whenever as needed.
 
-The class `func` is a built-in functional class which uses an efficient and sequential procedure based on the call stack technique for a traditional function call protocol. Use the `func` class, we can defines functions such as:
+The class [func](FunctionalClass.md) is a built-in functional class which uses an efficient and sequential procedure based on the call stack technique for a traditional function call protocol. Use the `func` class, we can defines functions as below:
 ```altscript
 func sum(values: int...): int
 {
@@ -101,5 +101,21 @@ func sum(strs: string...): string
     merged
 }
 ```
-Here `sum` is a function. It is derived from the superclass `func` and has two functors, one takes an integer stream and generates output of the summary of the stream elements, the other takes a string stream and generates output of a merged string from the given string stream.
+Here `sum` is a function class. It is derived from the superclass `func`. The `sum` class has two functors, one takes an integer stream and generates output of the summary of the stream elements, the other takes a string stream and generates output of a merged string from the given string stream.
 
+Other [functional class](FunctionalClass.md) such as threads, reactors, remote functions can be derived in the same way.
+
+## Terminology Summary
+
+* **functor**: a [function routine type](Routine.md) defined in a class to perform a specific task.
+* **function routine**: a functor instance (objejct) created to perform the task specified by the functor.
+* **function call**: an action to use a functor to create a function routine.
+* **function class**: a [class](Class.md) that defines functors only.
+* **function**: a functor written in [simple class form](SimpleClassForm.md).
+* **function overloading**: multiple functions with different input interface for a function class.
+
+## See also:
+* [Routine type](Routine.md)
+* [Abstract functor](AbstractRoutineType.md)
+* [Function class in simple class form](SimpleClassForm.md)
+* [Functional class](FunctionalClass.md)
