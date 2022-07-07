@@ -1,6 +1,6 @@
 # Functor
 
-A functor (abbreviation: fn) is a [function routine type](Routine.md) which is called to accomplish a specific task by processing the input data and generating a result, if any, in the output type as specified. A functor is always specified within a class, and the class is called the `enclosing class` of the functor. A functor starts with the key word `fn`, followed by an input and output interface, and then a block of code. Consider:
+A functor (abbreviation: fn) is a [function routine type](Routine.md) which is called to accomplish a specific task by processing the input data and generating a result, if any, in the output type as specified. A functor, unless it is abstract, is always specified within a class, and the class is called the `enclosing class` of the functor. A functor starts with the key word `fn`, followed by an input and output interface, and then a block of code. Consider:
 ```altscript
 class Σ
 {
@@ -105,17 +105,37 @@ Here `sum` is a function class. It is derived from the superclass `func`. The `s
 
 Other [functional class](FunctionalClass.md) such as threads, reactors, remote functions can be derived in the same way.
 
+## Free Functor
+
+A free functor is a function routine type that does not belong to any enclosing class. It can be passed as a first-class object that can be dynamically created, destroyed, passed to a function, returned as a value, and have all the rights as other variables in the programming language have. for instance:
+```altscript
+f := fn(x: int...):int { sum:=0; foreach(e in x) sum+=e; sum }
+sum := f(1,2,3,4);
+```
+Here `f` is a variable intialized with a free functor to calculate the summary of an integer stream. The expression `f(1,2,3,4)` is a function call to use the variale `f` to create an function routine from the free functor stored in the variable. See [Free Functor](FreeFunctor.md) for more details.
+
+## Abstract Free Functor
+
+An abstract free functor is a free functor without a code block associated with its interface and it is often used as a declared type of an argument. Any argument specified by an abstract routine type cannot be used to for a function call unless it is bound to a concrete routine type with a block of code specified. For instance:
+```altscript
+f : fn(x: int...):int;
+sum := f(1,2,3,4);      // Error: Call an abstract routine type f
+```
+See [Free Functor](FreeFunctor.md) for more details.
+
 ## Terminology Summary
 
-* **functor**: a [function routine type](Routine.md) defined in a class to perform a specific task.
+* **functor**: a [function routine type](Routine.md) defined to perform a specific task.
 * **function routine**: a functor instance (object) created to perform the task specified by the functor.
 * **function call**: an action to use a functor to create a function routine.
 * **function class**: a [class](Class.md) that defines functors only.
 * **function**: a functor written in [simple class form](SimpleClassForm.md).
 * **function overloading**: multiple functions with different input interfaces for a function class.
+* **free functor**: a functor that does belong to a function class.
+* **abstract free functor**: a free functor with interface only and without a code block.
 
 ## See also:
 * [Routine type](Routine.md)
-* [Abstract functor](AbstractRoutineType.md)
+* [Free functor](FreeFunctor.md)
 * [Function class in simple class form](SimpleClassForm.md)
 * [Functional class](FunctionalClass.md)
