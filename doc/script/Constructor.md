@@ -273,4 +273,6 @@ Meta members belong to the class scope. A meta constructor cannot have any input
 ## See also:
 * [Routine type](Routine.md)
 * [Abstract constructor](AbstractRoutineType.md)
-* [Constructor in simple class form](SimpleClassForm.md)
+* [Class](Class.md)
+* [Inheritance](Inheritance.md)
+* [Member class](MemberClass.md)
