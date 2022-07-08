@@ -115,7 +115,7 @@ class test
 }
 ```
 
-# Captures
+## Captures
 
 A free functor can capture constants and variables from the surrounding context in which the functor is defined. The routine instantialted by the functor can then refer to and modify the values of those captured values, even if the original scope that defined these values no longer exists. Therefore we can do things like this:
 ```altscript
@@ -168,9 +168,9 @@ object test
 }
 ```
 
-# Functor with Parametric Interface
+## Functor with Parametric Interface
 
-The input and output interface of a functor type can be parameterized:
+The input and output interface of a functor can be parameterized:
 ```altscript
 stream_sum := fn#(type T:stream#(type element_type: numeric))(x: T): T.element_type;
 stream_sum = { sum: T.element_type; foreach (e in x) sum+=e; sum };
@@ -178,7 +178,7 @@ sum := stream_sum(int...(1,2,3,4));   // sum gets value 10
 stream_sum = { sum: T.element_type; foreach (e in x) sum+=e*e; sum };
 drawable.z_order = foo(double...(1.1,2.2,3.3,4.4));   // sum2 gets value 36.3
 ```
-Here `stream_sum` is a generic functor type with type parameter T in the interface. The input `x` can be any stream of numeric numbers, and it returns the sum of all elements contained in the stream.
+Here `stream_sum` is a generic functor with type parameter T in the interface. The input `x` can be any stream of numeric numbers, and it returns the sum of all elements contained in the stream.
 
 Sometimes a functor type can appear in a generic interface even though it is not parameterized itself:
 ```altscript
