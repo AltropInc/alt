@@ -1,6 +1,6 @@
 # Free Functor
 
-A free functor is a [function routine type](Routine.md) ((abbreviation: [functor](Functor.md)) that does not belong to any enclosing class. It can be passed as a first-class object that can be dynamically created, destroyed, passed to a function, returned as a value, and have all the rights as other variables in the programming language have.
+A free functor is a [function routine type](Routine.md) that does not belong to any enclosing class. It can be passed as a first-class object that can be dynamically created, destroyed, passed to a function, returned as a value, and have all the rights as other variables have.
 
 Here is an example to pass a free functor to a variable named as `f`, and then use the name `f` to create function routine ([function call](Functor.md)) to take the input `(1,2,3,4)` and generate a summary of `10`:
 ```altscript
@@ -16,7 +16,7 @@ f := fn(x: int...):int { sum:=0; foreach(e in x) sum+=e; sum };
 ```
 the type of `f` is inferred to `fn(x: int...):int`, which is an abstract free functor. An abstract free functor is a free functor without a code block associated with its interface and it is often used as a declared type of an argument:
 ```altscript
-f := fn(x: int...):int;
+f: fn(x: int...):int;
 ```
 An abstract functor cannot be used to instantiate any routine (routine type call). Therefore, any argument specified by an abstract routine type cannot be used to for a function call:
 ```altscript
@@ -29,7 +29,7 @@ f: fn(x: int...):int;
 f = fn(x: int...):int { sum:=0; foreach(e in x) sum+=e; sum };
 sum := f(1,2,3,4);      // Okay, sum gets value of 10
 ```
-We can pass a concreate free functor with matched interface to an argument of an abstract free functor. In addition, we can alos pass:
+We can pass a concreate free functor with matched interface to an argument of an abstract free functor. In addition, we can also pass:
 * a concreate free functor with an implicit interface
 * a function class
 * a member function class
@@ -77,7 +77,7 @@ and two variables declared using a abstract functor type:
 for_each_int_do: fn(values: int...): int;
 for_each_str_do: fn(values: string...): string;
 ```
-When we pass the function class `sum` tothe variable `for_each_int_do`,  a function with the matched interfaces `(values: int...): int` is selected: 
+When we pass the function class `sum` to the variable `for_each_int_do`,  a function with the matched interfaces `(values: int...): int` is selected: 
 ```altscript
 for_each_int_do = sum;                  // The sum's functor 'fn(values: int...):int' is selected
 s := for_each_int_do (int...(1,2,3,4)); // 's' gets values of 10
@@ -104,7 +104,7 @@ Here, `multiple` is a function of a member function class which multiplies the i
 
 ## Pass a Meta Member Function Class
 
-If the member function class is a meta member function class, however, no owner parameter should be involved in matching a functor type interface because a meta member is defined in class scope, not object scope:
+If the member function class is a meta member function class, however, no owner parameter should be involved in matching a functor type interface because a meta member is defined in the class scope, not the object scope:
 ```altscript
 class test
 {
@@ -117,7 +117,7 @@ class test
 
 ## Captures
 
-A free functor can capture constants and variables from the surrounding context in which the functor is defined. The routine instantialted by the functor can then refer to and modify the values of those captured values, even if the original scope that defined these values no longer exists. Therefore we can do things like this:
+Becuase a free functor is not a member of any class, what if it needs to access values of constants and variables from the surrounding context in which the functor is defined? A free functor can capture these values from the surrounding context where it is defined. The function routine instantialted by the functor can then refer to and modify these captured values, even if the original scope that defined these values no longer exists. Therefore we can do things like this:
 ```altscript
 func check_1s() : fn(i: int): bool
 {
@@ -130,7 +130,7 @@ The function `check_1s` returns a functor `fn(int):bool` to check if the given i
 functor to be returned, the local value of a local integer stream `ones` is accessed. After the functor is returned from `check_1s`, the block scope that
 encloses the variable `ones` exits and the local variable `ones` no longer exists. However, the returned functor captures the ownership of the integer stream, so the destruction of the local variable `ones` will not deallocate the integer stream.
 
-A functor type captures values of primitive types such as integers, enumerations, and booleans. These captured values are copies and the modification of these
+A functor captures values of primitive types such as integers, enumerations, and booleans. These captured values are copies and the modification of these
 captured values will not alter the original values in the enclosing environment:
 ```altscript
 i := 5;
@@ -141,7 +141,7 @@ func bar() : fn():int
 }
 j := bar()();     // j gets the value 6
 ```
-A functor type captures the ownership of composite types such as arrays, streams and tuples if the original composite value is owned by a local variable declared in a block:
+A functor captures the ownership of composite types such as arrays, streams and tuples if the original composite value is owned by a local variable declared in a block:
 ```altscript
 func bar(): fn(): int
 {
@@ -149,10 +149,10 @@ func bar(): fn(): int
     return { ++i[0] };   // the functor captures the 'i' value by reference and owns the value
                          // The original 'i' no longer owns the tuple value
 }                        // 'i' is out of its scope and goes away, but the tuple value still exists because it is
-                         // now owned by the captured name in the returned functor type
+                         // now owned by the captured name in the returned functor
 n:=bar()();              // 'n' gets the value 6
 ```
-If the composite value is owned by an object or type (in object or class scope), the functor type will not capture the ownership of a composite value
+If the composite value is owned by an object or type (in object or class scope), the functor will not capture the ownership of a composite value
 In case the original composite value goes away, the value captured becomes null or empty too.
 ```altscript
 object test
@@ -180,7 +180,7 @@ drawable.z_order = foo(double...(1.1,2.2,3.3,4.4));   // sum2 gets value 36.3
 ```
 Here `stream_sum` is a generic functor with type parameter T in the interface. The input `x` can be any stream of numeric numbers, and it returns the sum of all elements contained in the stream.
 
-Sometimes a functor type can appear in a generic interface even though it is not parameterized itself:
+Sometimes a functor can appear in a parametric interface even though it is not parameterized itself:
 ```altscript
 func sum_func #(type T:stream)(x:T; f: fn(e:T.element_type):int): int
 {
@@ -193,5 +193,5 @@ str_length_sum := apply(string...("1234", "xyz"), {e.length()});      // str_len
 str_sum := sum_func(string...("1234", "xyz"), {e});
                                                ^ ---------------------// Compile error: Returned type is wrong
 ```
-Here `sum_func` has a generic input interface that takes any type of stream and generates an integer output using the functor type 'f', which takes the element type of the stream and convert to an integer that is related to the element. The last `sum_func` call generates a compile error because the return type is string, which is not the output type specified by the functor type 'f'.
+Here `sum_func` has a generic input interface that takes any type of stream and generates an integer output using the functor 'f', which takes the element type of the stream and convert to an integer that is related to the element. The last `sum_func` call generates a compile error because the return type is string, which is not the output type specified by the functor 'f'.
 
