@@ -64,3 +64,23 @@ However, if the non-owner changes its reference to refer to a different value, t
     first_word := s1[0];      // first_word refers to "Hello"
 } 
 ```
+Above examples illustrated the owner rules: each composite value must have an owner (mandatory rule), only one owner at a time (uniqueness rule), only the owner can release the referred value (discard rule), and when the owner discards the value, renters will refer to a null value (nullness rule). In order to keep the uniqueness, when we pass the reference from an owner to another name, the other name refers to the same value but does not own it. However, to keep the uniqueness, we can also:
+* transfer the ownership to another name when we pass the reference, and as a result, the name that takes the reference becomes the new owner and the original owner becomes a renter.
+* copy the value so the reference passed to another name ia a new reference to a copy and the name that takes the new reference is the owner of copy.
+Let’s explore these situations now.
+
+### Ownership Transfer Rules
+
+The ownership transfer rule governs how the ownership is transferred when we pass the reference to another name. Before discussing this, we need to cover the concept of [scope](Scopes.md) first. We have four kinds of scopes: object scope, class scope, input/output scope, and block scope.
+
+The ownership transfer rule governs how the ownership is transferred when we pass the reference to another name. Before discussing this, we need to cover the concept of [scope](Scopes.md) first. We have four kinds of scopes: object scope, class scope, input/output scope, and block scope.
+
+The input/output scope and block scope are local scopes, kind of temporary scopes created for a [routine](Routines.md) call. Names introduced in a local scope are stored in a [call stack](https://en.wikipedia.org/wiki/Call_stack). When the execution enters into a local scope, the space required by the storage of the names within the scope are pushed into the stack. When the execution exits from a local scope, the space pushed for the scope is popped out and all names introduced in the local scope are gone. The stack naturally maintains a nested structure so that local sopes can be nested inside one another.
+
+The object scope or the class scope is an owner scope created for the lifetime of its associated object or class (owner). Names introduced in a full scope are stored in a space allocated in the common value pool for its associated owner. When the owner is created, the space required by the storage of the names within the scope are allocated in the pool. When the owner is deleted, the space allocated for the owner is released and all names introduced in the owner scope are gone.
+
+Here are the ownership transfer rules:
+* 
+* 
+
+
