@@ -232,4 +232,43 @@ s2: string... = s1;
 ```
 The name `s2` is declared as a string stream that can hold a variable number of strings. The name `s1` is inferred as a string pair type (a tuple with two string elements) and owns the string pair value ("Hello", "World"). When we assign `s1` to `s2`, the value ("Hello", "World") must be converted to a string stream value, and this conversion will create a copy in the string stream format: `string...("Hello", "World")`.
 
+## Ownership Rules for Objects
+
+An Altscript application is started along with an automatically created root object. Other objects are always created as child objects through their parents - either by explicitly calling the class [constructor](Constructor.md), or by loading from files. thus, an application consists of an object tree.
+
+Let's say we have an object file `test.alt`, and we also have a class file `ExternalClass.alt` stored in the folder `class`, which is a subfolder in the same place of the file `test.alt`:
+```
+📃test.alt
+📂class
+   📃ExternalClass.alt
+```
+And the object file `test.alt` has the following contents:
+```altscript
+object test
+{
+    type AnExternalClass = ExternalClass at "%/class";  // defines a alias name for the external class
+    object n : AnExternalClass                          // creates a child object of ExternalClass in `test`
+                                                        // using inheritance. The singleton name `n` refers
+                                                        // the child object
+    {
+        // more stuff about this object here            // we can introduce more stuff in the singleton 
+    }
+    vn := AnExternalClass();                            // creates a child object of ExternalClass in `test`
+                                                        // using the constructor. The variable name `vn`
+                                                        // refers to the created object
+}
+```
+A command
+```
+alt test
+```
+will start an application to create a child object `test` in the application root. In the `test` object, a singleton object of the class ExternalClass is created as a child object of `test`. And the child object is referred to by the singleton name `n`. Note that the singleton child is created by using inheritance so that we can add more member stuff within the singleton. Again in the `test` object, another child object of `test` is created using the constructor of the class ExternalClass, and we use a variable name to refer to the child object.
+
+* Each object, except the root, has a parent object that owns the object.
+* Each object can only have one parent object as its owner at a time.
+* When the parent object goes out of life, all child objects go out of life too.
+* The root object has no owner but it is created and destroyed automatically along with the application. The root object has the same life cycle of the application process.
+
+A name that refers to an object can either be a variable name or a singleton name.
+
 
