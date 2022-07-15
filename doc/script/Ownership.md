@@ -7,7 +7,7 @@ The Ownership is a set of rules that governs how these reference values are allo
 
 ## Ownership Rules for Composite Values
 
-### The Owner Rules
+### Owner Rules
 * **Mandatory Rule**: each composite value has an owner which is a declared name or an element inside the composite value.
 * **Uniqueness Rule**: There can only be one owner at a time
 * **Discard Rule**: When the owner goes away (the declared name goes out of scope, or the element inside a composite value that is released),  the value will be released. 
@@ -54,7 +54,7 @@ If the owner changes its reference to refer to a different value, the original v
     first_word := s2[0];      // Error: Index on empty container
 } 
 ```
-However, if the non-owner changes its reference to refer to a different value, the owner and other non-owners will still refer to original value:
+However, if the non-owner changes its reference to refer to a different value, the owner and other non-owners will still refer to the original value:
 ```altscript
 {
     s1 := ("Hello", "World"); // 's1' owns the tuple value ("Hello", "World")
@@ -65,8 +65,9 @@ However, if the non-owner changes its reference to refer to a different value, t
 } 
 ```
 Above examples illustrated the owner rules: each composite value must have an owner (mandatory rule), only one owner at a time (uniqueness rule), only the owner can release the referred value (discard rule), and when the owner discards the value, renters will refer to a null value (nullness rule). In order to keep the uniqueness, when we pass the reference from an owner to another name, the other name refers to the same value but does not own it. However, to keep the uniqueness, we can also:
-* transfer the ownership to another name when we pass the reference, and as a result, the name that takes the reference becomes the new owner and the original owner becomes a renter.
+* Transfer the ownership to another name when we pass the reference, and as a result, the name that takes the reference becomes the new owner and the original owner becomes a renter, or
 * copy the value so the reference passed to another name ia a new reference to a copy and the name that takes the new reference is the owner of copy.
+
 Let’s explore these situations now.
 
 ### Ownership Transfer Rules
@@ -81,7 +82,7 @@ The object scope or the class scope is an owner scope created for the lifetime o
 
 We have following the ownership transfer rules:
 
-**Transfer Rule 1**: The name in owner scope will take the ownership from the name in local scope.
+**Local-to-Owner Transfer Rule**: The name in owner scope will take the ownership from the name in local scope.
 
 Consider:
 ```altscript
@@ -135,9 +136,20 @@ class test
     }
 } 
 ```
-To prevent this from happening, we should avoid to pass the reference from a local rentor to a name in the owner space. In this case, we should use `local_s1` rather than `local_s2`.
+To prevent this from happening, we should avoid to pass the reference from a local rentor to a name in the owner space. In this case, we should use `local_s1` rather than `local_s2`. There is, however, one special case we need to consider. If an owner takes the reference t0 a value that it currently owns, it's ownership will not be changed. Consider:
+```altscript
+class test
+{
+    s := ("Hello", "World");            // a name in object scope that owns ("Hello", "World")
+    func foo ()
+    {
+        local_s := s;                   // A local name refers to but does not own the value owned by 's1'
+        s = local_s;                    // 's' gets the same reference and it's ownership is not changed.
+    }
+} 
+```
 
-**Transfer Rule 2**: The name in an outer block scope will take the ownership from the name in its inner local scope.
+**Local Scope Transfer Rule**: The name in an outer local scope will take the ownership from the name in its inner local scope.
 
 Consider:
 ```altscript
@@ -154,3 +166,70 @@ class test
     }
 } 
 ```
+
+**Output Transfer Rule**: If the output is composite value, the output in an input/output scope will take the ownership from the name in the local scope and the ownship in the output is always taken by the name that takes the output.
+
+Consider:
+```altscript
+class test
+{
+    func foo(): (string; string)
+    {
+        local_s := ("Hello", "World");  // 'local_s' is a name in block scope that owns ("Hello", "World")
+        return local_s;                 // The onwership of 'local_s' is transferred to the output
+    }                                   // theblock scope is over, and 'local_s' is gone but the value
+                                        // ("Hello", "World") is now owned by the output
+    s := foo();                         // 's', a name in object scope, takes the ownership of the value
+                                        // ("Hello", "World") in the output of the function 'foo'
+} 
+```
+
+**Capture Transfer Rule**: If the output is a [free functor](FreeFunctor.md), all captured references in the local scope will take of ownership of their source.
+
+Consider:
+```altscript
+func bar(): fn():(string; string)    // a function returns a free functor 'fn():(string; string)'
+{
+    local_s := ("Hello", "World");   // 'local_s' is a name in block scope that owns ("Hello", "World")
+    return { local_s };              // the functor 'fn():(string; string) {local_s}' captured 'local_s'
+                                     // by reference, and on return, the captured reference takes the
+                                     // ownership from 'local_s'
+}                                    // 'local_s' is out of its scope and goes away, and the captured
+                                     // reference in the returned functor now owns the value ("Hello", "World")
+s:=bar()();                          // 's', a name in object scope, takes the output from the functor
+                                     // returned by calling 'bar', and 's' also takes the ownership of
+                                     // ("Hello", "World") according to the 'Output Transfer Rule'
+```
+
+### Ownership Copy Rules
+
+**Constant Copy Rule**: If a variable name takes a reference from a constant, the variable name will take a reference to a copy of the composite value and own the copy.
+
+A very simple example is:
+```altscript
+s := ("Hello", "World");
+```
+where the literal expression `("Hello", "World")` is a constant and the variable `s` has to take a copy of the constant in order to change  the value:
+```altscript
+s[0] = "你好";
+s[1] = "世界";
+```
+so the change will not affect the original  constant value.
+
+Consider another example:
+```altscript
+const s1 := ("Hello", "World");
+s2 := s1;
+```
+The constant name `s1` takes the reference of the constant `("Hello", "World")` and did not create a copy of the constant. But `s1` does not own the value, that is, if `s1` is gone, the constant ("Hello", "World") is still valid because all literal constants live in an owner scope (object or class scope) in which they appear. When the variable `s2` takes the reference from `s1`, it actually  takes a new reference to a copy of the constant value ("Hello", "World") and owns the copy.
+
+**Convert Copy Rule**: If a variable name takes a reference to a composite value that is in a different but [convertible type](ConvertableType.md), the variable name will take a reference to a copy of the converted composite value and own the copy.
+
+Example:
+```altscript
+s1 := ("Hello", "World");
+s2: string... = s1;
+```
+The name `s2` is declared as a string stream that can hold a variable number of strings. The name `s1` is inferred as a string pair type (a tuple with two string elements) and owns the string pair value ("Hello", "World"). When we assign `s1` to `s2`, the value ("Hello", "World") must be converted to a string stream value, and this conversion will create a copy in the string stream format: `string...("Hello", "World")`.
+
+
