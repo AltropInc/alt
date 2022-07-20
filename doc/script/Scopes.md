@@ -1,33 +1,146 @@
 # Scope
 
-A decalration introduce a name in a scope. The scope is the region of a program text in which the declaration of the name is valid.
-A scope has a life time. When the scope is ending of its life, all names introduced in the scope will go away and values associated
-with these name will also go away.
+A declaration introduces a [name](Names.md) in a scope. The scope is the region of a program text in which the declared name is valid. A scope has a lifetime. When the scope is ending its life, all names introduced in the scope will go away and values associated with these names will also go away.
 
-There are four kinds of scope: block, IO, object, and class.
+There are four kinds of scopes: object scope, class scope, input/output scope, and block scope.
 
-## Block Scope.
+The object scope or the class scope is an owner scope created for the lifetime of its associated object or class (owner). Names introduced in an owner scope are stored in a space allocated in the common value pool (or [heap memeory](https://www.geeksforgeeks.org/stack-vs-heap-memory-allocation/) for its associated owner. When the owner is created, the space required by the storage of the names within the scope are allocated in the pool. When the owner is deleted, the space allocated for the owner is released and all names introduced in the owner scope are gone.
+
+The input/output scope and block scope are local scopes, kind of temporary scopes created for a [routine call](Routine.md). Names introduced in a local scope are stored in a call [stack memeory](https://www.geeksforgeeks.org/stack-vs-heap-memory-allocation/). When the execution enters into a local scope, the space required by the storage of the names within the scope are pushed into the stack. When the execution exits from a local scope, the space pushed for the scope is popped out and all names introduced in the local scope are gone. The stack naturally maintains a nested structure so that local sopes can be nested inside one another.
+
+## Object Scope.
+
+A name (except for a meta name) declared in a class body is local to an instance of this class. A name declared in a [singleton body](Singleton.md) is local to this singleton. The class instance or the singleton is the owner object of the name. The name must be accessed through its owner object:
+```altscript
+class test
+{
+    object foo      // 'foo' is a singleton object
+    {
+        n : int;    // a name 'n' declared in the object scope
+    }
+    foo.n = 1;      // access name 'n' through its enclosing object 'foo'
+    class bar       // 'bar' is a class
+    {
+        m : int;    // a name 'm' declared in the object scope
+    }
+    bar.m = 2;      // This is an error. 'm' must be accessed through an instance of 'bar'
+    b:=bar();       // a name 'b' declared in the object scope of 'test', and initialized with
+                    // an instance of 'bar'
+    b.m = 2;        // access name 'm' through an instance of 'bar'
+}
+```
+If the expression of the name appears with the class body, the owner of the name is the [`self`](SelfAndOwner.md) object:
+```altscript
+class test
+{
+    class bar           // 'bar' is a member class
+    {
+        m: int;         // a name 'm' declared in the object scope
+        m = 1;          // access name 'm' through the 'self' object: self.m
+    }
+    class sub_bar: bar  // 'sub_bar' is a member class derived from 'bar'
+    {
+        m = 1;          // access name 'm' in the base class through the 'self' object: self.m
+    }
+}
+```
+If the expression of the name appears with a member class body, the owner of the name is the [`owner`](SelfAndOwner.md) object:
+```altscript
+class test
+{
+    n : int;            // a name 'n' declared in the object scope
+    class bar           // 'bar' is a member class
+    {
+        m: int;         // a name 'm' declared in the object scope
+        class bar       // 'bar' is a member class
+        {
+            k: int;     // a name 'm' declared in the object scope
+            k = 1;      // access name 'm' through the 'self' object: self.k
+            m = 1;      // access name 'm' through the 'owner' object: owner.m
+            n = 1;      // access name 'm' through the 'owner.owner' object: owner.owner.n
+        }
+    }
+}
+```
+
+## Class Scope
+
+Names declared as class parameters or meta members are local to this class. The name is accessed through the (enclosing) class:
+```altscript
+class test
+{
+    class bar       // 'bar' is a member class
+    {
+        meta n : int;    // a name 'n' declared in the object scope
+    }
+    bar.n = 2;      // 'n' is accessed through the class 'bar'
+    b:=bar();       // a name 'b' declared in the object scope of 'test', and initialized with
+                    // an instance of 'bar'
+    b.n = 2;        // Though 'n' is accessed through an instance of 'bar', the actual owner used
+                    // to access 'n' is the type of 'b'. Therefore, it is the same as 'bar.m'
+}
+```
+If the expression of the meta name appears with the class body, the owner of the name is the [`selfclass`](SelfAndOwner.md) type:
+```altscript
+class test
+{
+    class bar           // 'bar' is a member class
+    {
+        meta m: int;    // a name 'm' declared in the object scope
+        meta ctor()
+        {
+            m = 1;      // access name 'm' through 'selfclass': selfclass.m
+        }
+    }
+}
+```
+If the expression of the meta name appears with a member class body, the owner of the name is the [`ownerclass`](SelfAndOwner.md) type:
+```altscript
+class test
+{
+    meta n : int;            // a name 'n' declared in the object scope
+    class bar           // 'bar' is a member class
+    {
+        meta m: int;         // a name 'm' declared in the object scope
+        class bar       // 'bar' is a member class
+        {
+            meta k: int;     // a name 'm' declared in the object scope
+            meta ctor()
+            {
+                k = 1;      // access name 'm' through 'selfclass': selfclass.k
+                m = 1;      // access name 'm' through 'ownerclass': ownerclass.m
+                n = 1;      // access name 'm' through 'ownerclass.ownerclass' object: ownerclass.ownerclass.n
+            }
+        }
+    }
+}
+```
+
+## Block Scope
+
 A block is a compound statement, beginning at opening of the block by ‘{‘ and ending at the end of the block by ‘}’. A name declared
 in a block is local to that block and can be used only in this block or blocks enclosed (nested blocks). It can be used only after
-the point of the declaration.
+the point of the name declaration.
 
 The block scope starts when the program execution enters into the block, and will end of its life when the program execution exits
 from the block. For instance
 
 ```altscript
-{                              // a block scope starts
-    s1: string;                // a name 's1' is introduced in the block
-    s2: string;                // a name 's2' is introduced in the block
-    {                          // a nested block starts
-        t1:= "Hello, World!"   // a name 't1' is introduced in the inner block, and owns value "Hello, World!"
-        t2:= "Hello, World2!"  // a name 't2' is introduced in the inner block, and owns value "Hello, World2!"
-        s1 = t1;               // name 't1' transfers its value to 's1' declared in outer scope
-        s2 = t2.clone();       // name 's2' get a value copy from t2. This can be written as s2 = *t2;
-    }                          // the inner block ends, and t2 and its value dropped.
-                               // t1 is also dropped but it has no value because its value was transferred to s1          
-}                              // the outer scope exits, name s1 and s2 and their values are dropped.
+{                              // A block scope starts.
+    s1: string;                // A name 's1' is introduced in the block.
+    s2: string;                // A name 's2' is introduced in the bloc.k
+    {                          // A nested block starts
+        t1:= "Hello, World!"   // A name 't1' is introduced in the inner block, and owns value "Hello, World!"
+        t2:= "Hello, World2!"  // A name 't2' is introduced in the inner block, and owns value "Hello, World2!"
+        s1 = t1;               // The name 't1' transfers its value to 's1' declared in outer scope
+        s2 = t2.clone();       // The name 's2' get a value copy from t2. This can be written as s2 = *t2;
+    }                          // The inner block ends, and t2 and its value dropped.
+                               // The name t1 is also dropped but it does not own the value because its ownership was transferred to s1.       
+}                              // The outer scope exits, name s1 and s2 and their values are dropped.
 ```
-## IO Scope.
+
+## IO Scope
+
 The IO scope is an object instantiation input and output parameter scope. When we create an object or do a function call,
 we provide a number of input parmaters and expect an output. Names of input paramters in the IO block never owns the value
 unless the provided actual parameter is a literal value or it holds value of pass-by-value type (primitive values).
@@ -104,22 +217,6 @@ clone:
                                  // The output value is dropped if the valu is not transferred on exit
 
 ```
-
-## Object Scope.
-A name declared in a class body is local to an instance of this class. The name must be used with an instance (the enclosing object)
-of this class. It can be used (1) in classes enclosed by this class (nested classes); (2) in classes derived (subclasses) from this class;
-and (3) after the “.” operator applied to an instance of this class or of a derived class. When the name is used in cases of (1) and (2),
-the enclosing object is self.
-
-The value of the name in a object scope can never be transfered, i.e. the name in an object scope always owns its value. A name in a
-block scope can never grab the ownership of a name in a object scope. Names in object scope are reference counted and the object scope
-can only goes away when no other names referes to the value of any name in the object scope.
-
-## Class Scope.
-Names declared as class parameters or meta members are local to its class. The name must be used with the (enclosing) class.
-It can be used (1) in classes enclosed by this class (nested classes); (2) in classes derived (subclasses) from this class; and (3)
-after the “.” operator applied to an this class or a derived class. When the name is used in cases of (1) and (2), the enclosing class
-is selfclass.
 
 ## Scope Selector
 If a name decalred in an outer scope is obscured by the same name in an innder scope, it can be still used when it is qualified by the
