@@ -167,7 +167,7 @@ class test
 } 
 ```
 
-**Output Transfer Rule**: If the output is composite value, the output in an input/output scope will take the ownership from the name in the local scope and the ownship in the output is always taken by the name that takes the output.
+**Output Transfer Rule**: If the output is composite value, the output in an input/output scope will take the ownership from the name in the local scope and the ownership in the output is always taken by the name that takes the output.
 
 Consider:
 ```altscript
@@ -184,9 +184,9 @@ class test
 } 
 ```
 
-**Capture Transfer Rule**: If the output is a [free functor](FreeFunctor.md), all captured references in the local scope will take of ownership of their source.
+**Capture Transfer Rule**: If the output is a [free functor](FreeFunctor.md), all captured references in the local scope will take the ownership of their source.
 
-Consider:
+Consider an example:
 ```altscript
 func bar(): fn():(string; string)    // a function returns a free functor 'fn():(string; string)'
 {
@@ -200,6 +200,7 @@ s:=bar()();                          // 's', a name in object scope, takes the o
                                      // returned by calling 'bar', and 's' also takes the ownership of
                                      // ("Hello", "World") according to the 'Output Transfer Rule'
 ```
+where the the free functor returned by the function `bar` is `fn():(string; string) {local_s}` uses the captured reference of a local variable `local_s`. On return, the captured reference takes the ownership from local variable 'local_s'.
 
 ### Ownership Copy Rules
 
@@ -262,13 +263,11 @@ A command
 ```
 alt test
 ```
-will start an application to create a child object `test` in the application root. In the `test` object, a singleton object of the class ExternalClass is created as a child object of `test`. And the child object is referred to by the singleton name `n`. Note that the singleton child is created by using inheritance so that we can add more member stuff within the singleton. Again in the `test` object, another child object of `test` is created using the constructor of the class ExternalClass, and we use a variable name to refer to the child object.
+will start an application to create a child object `test` in the application root. In the `test` object, a singleton object of the class ExternalClass is created as a child object of `test`. And the child object is referred to by the singleton name `n`. Note that the singleton child is created by using inheritance so that we can add more member stuff within the singleton. Again in the `test` object, another child object is created in `test`, using the constructor of the class ExternalClass, and we use a variable name to refer to the child object.
 
-* Each object, except the root, has a parent object that owns the object.
+A name that refers to an object can either be a variable name or a singleton name. A singleton name is constantly bound to an object in its lifetime, and they live and die together. A singleton name can only be declared in an object scope or a class scope. A variable name, if it is not a const name, can refere to different objects at different time, and it can be declared in any scope, including an input/output scope or a block scope. However, the name does not own the referred object. The owner of an object is always its parent with the following object ownership rules:
+
+* Each object, except for the root, has a parent object that owns the object.
 * Each object can only have one parent object as its owner at a time.
 * When the parent object goes out of life, all child objects go out of life too.
 * The root object has no owner but it is created and destroyed automatically along with the application. The root object has the same life cycle of the application process.
-
-A name that refers to an object can either be a variable name or a singleton name.
-
-
