@@ -10,37 +10,38 @@ The input/output scope and block scope are local scopes, kind of temporary scope
 
 ## Object Scope.
 
-A name (except for a meta name) declared in a class body is local to an instance of this class. A name declared in a [singleton body](Singleton.md) is local to this singleton. The class instance or the singleton is the owner object of the name. The name must be accessed through its owner object:
+A name, except for a meta name, declared in a class body is local to an instance of this class. A name declared in a [singleton body](Singleton.md) is local to this singleton object. Since a singleton implicitly defines a class, meta names in a singleton object are the same as names that are not meta. The class instance or the singleton is the owner object of the name. The name must be accessed through its owner object:
 ```altscript
 class test
 {
-    object foo      // 'foo' is a singleton object
+    object foo      // 'foo' is a singleton object.
     {
-        n : int;    // a name 'n' declared in the object scope
+        n : int;    // The name 'n' is in the object scope.
+                    // 'n' also belongs to the class scope of the singleton class.
     }
-    foo.n = 1;      // access name 'n' through its enclosing object 'foo'
-    class bar       // 'bar' is a class
+    foo.n = 1;      // Access the name 'n' through its enclosing object 'foo'.
+    class bar       // 'bar' is a class.
     {
-        m : int;    // a name 'm' declared in the object scope
+        m : int;    // The name 'm' is in the object scope of 'bar'.
     }
-    bar.m = 2;      // This is an error. 'm' must be accessed through an instance of 'bar'
-    b:=bar();       // a name 'b' declared in the object scope of 'test', and initialized with
-                    // an instance of 'bar'
-    b.m = 2;        // access name 'm' through an instance of 'bar'
+    bar.m = 2;      // This is an error. 'm' must be accessed through an instance of 'bar'.
+    b:=bar();       // The name 'b' is in the object scope of 'test', and initialized with
+                    // an instance of 'bar'.
+    b.m = 2;        // Access the name 'm' through a 'bar' instance referred by 'b'.
 }
 ```
 If the expression of the name appears with the class body, the owner of the name is the [`self`](SelfAndOwner.md) object:
 ```altscript
 class test
 {
-    class bar           // 'bar' is a member class
+    class bar           // 'bar' is a member class of 'test'.
     {
-        m: int;         // a name 'm' declared in the object scope
-        m = 1;          // access name 'm' through the 'self' object: self.m
+        m: int;         // The name 'm' is in the object scope of 'bar'.
+        m = 1;          // Access the name 'm' through the 'self' object: self.m.
     }
-    class sub_bar: bar  // 'sub_bar' is a member class derived from 'bar'
+    class sub_bar: bar  // 'sub_bar' is a member class derived from 'bar'.
     {
-        m = 1;          // access name 'm' in the base class through the 'self' object: self.m
+        m = 1;          // Accessthe  name 'm' in the base through the 'self' object: self.m.
     }
 }
 ```
@@ -48,16 +49,16 @@ If the expression of the name appears with a member class body, the owner of the
 ```altscript
 class test
 {
-    n : int;            // a name 'n' declared in the object scope
-    class bar           // 'bar' is a member class
+    n : int;            // The name 'n' is in the object scope of 'test'.
+    class foo           // 'foo' is a member class.
     {
-        m: int;         // a name 'm' declared in the object scope
-        class bar       // 'bar' is a member class
+        m: int;         // The name 'm' is in the object scope of 'foo'.
+        class bar       // 'bar' is a member class of 'foo'.
         {
-            k: int;     // a name 'm' declared in the object scope
-            k = 1;      // access name 'm' through the 'self' object: self.k
-            m = 1;      // access name 'm' through the 'owner' object: owner.m
-            n = 1;      // access name 'm' through the 'owner.owner' object: owner.owner.n
+            k: int;     // The name 'k' is in the object scope of 'bar'.
+            k = 1;      // Access the name 'k' through the 'self' object: self.k.
+            m = 1;      // Access the name 'm' through the 'owner' object: owner.m.
+            n = 1;      // Access the name 'n' through the 'owner.owner' object: owner.owner.n.
         }
     }
 }
@@ -69,47 +70,88 @@ Names declared as class parameters or meta members are local to this class. The 
 ```altscript
 class test
 {
-    class bar       // 'bar' is a member class
+    class bar          // 'bar' is a member class of 'test'.
     {
-        meta n : int;    // a name 'n' declared in the object scope
+        meta n : int;  // The meta name 'n' is in the object scope of 'bar'.
     }
-    bar.n = 2;      // 'n' is accessed through the class 'bar'
-    b:=bar();       // a name 'b' declared in the object scope of 'test', and initialized with
-                    // an instance of 'bar'
-    b.n = 2;        // Though 'n' is accessed through an instance of 'bar', the actual owner used
-                    // to access 'n' is the type of 'b'. Therefore, it is the same as 'bar.m'
+    bar.n = 2;         // 'n' is accessed through the class 'bar'.
+    b:=bar();          // The name 'b' is in the object scope of 'test', and initialized with
+                       // an instance of 'bar'.
+    b.n = 2;           // Though 'n' is accessed through an instance of 'bar', the actual owner
+                       // used to access the meta name 'n' is the type of 'b'. Therefore,
+                       // The expression 'b.n' is equivalent to 'bar.n'.
 }
 ```
 If the expression of the meta name appears with the class body, the owner of the name is the [`selfclass`](SelfAndOwner.md) type:
 ```altscript
 class test
 {
-    class bar           // 'bar' is a member class
+    class bar           // 'bar' is a member class.
     {
-        meta m: int;    // a name 'm' declared in the object scope
+        meta m: int;    // The name 'm' is in the object scope of 'bar'.
         meta ctor()
         {
-            m = 1;      // access name 'm' through 'selfclass': selfclass.m
+            m = 1;      // Access the name 'm' through 'selfclass': selfclass.m.
         }
     }
 }
 ```
 If the expression of the meta name appears with a member class body, the owner of the name is the [`ownerclass`](SelfAndOwner.md) type:
 ```altscript
-class test
+object test
 {
-    meta n : int;            // a name 'n' declared in the object scope
-    class bar           // 'bar' is a member class
+    meta n : int;         // The meta name 'n' is in the class scope of the singleton class.
+                          // The name 'n' is also in the object scope of the singleton.
+    class foo             // 'foo' is a member class of 'test'.
     {
-        meta m: int;         // a name 'm' declared in the object scope
-        class bar       // 'bar' is a member class
+        meta m: int;      // The meta name 'm' is in the class scope of 'foo'.
+        class bar         // 'bar' is a member class of 'foo'.
         {
-            meta k: int;     // a name 'm' declared in the object scope
-            meta ctor()
+            meta k: int;  // The meta name 'm' is in the class scope of 'bar'.
+            meta ctor()   // The meta constructor for 'bar'.
             {
-                k = 1;      // access name 'm' through 'selfclass': selfclass.k
-                m = 1;      // access name 'm' through 'ownerclass': ownerclass.m
-                n = 1;      // access name 'm' through 'ownerclass.ownerclass' object: ownerclass.ownerclass.n
+                k = 1;    // access name 'k' through 'selfclass': selfclass.k.
+                m = 1;    // access name 'm' through 'ownerclass': ownerclass.m.
+                n = 1;    // access name 'n' through 'ownerclass.ownerclass', i.e.,
+                          // ownerclass.ownerclass.n
+            }
+        }
+    }
+}
+```
+Please note, a meta member class can only access meta members in its enclosing class. Consider:
+```altscript
+object test
+{
+    class foo              // 'foo' is a member class of 'test'.
+    {
+        meta m: int;       // The meta name 'm' is in the class scope of 'foo'.
+        n: int;            // The name 'n' in the object scope of 'foo'.
+        meta class bar     // 'bar' is a meta member class of 'foo'.
+        {
+            ctor()         // a constructor for 'bar' instance.
+            {
+                m = 10;    // Okay, 'm' is a meta member of the enclosing class 'foo'
+                n = 10;    // Error: Accessing name 'n' that is not in the class scope
+            }
+        }
+    }
+}
+```
+However, when a meta member class is enclosed in a singleton, then, accessing a meta name or a non-meta name will have no difference:
+```altscript
+object test
+{
+    object foo              // 'foo' is a singleton object in 'test'.
+    {
+        meta m: int;       // The meta name 'm' is in the class scope of 'foo'.
+        n: int;            // The name 'n' in the object scope of 'foo'.
+        meta class bar     // 'bar' is a meta member class of 'foo'.
+        {
+            ctor()
+            {
+                m = 10;    // Okay
+                n = 10;    // Alos okay 
             }
         }
     }
@@ -118,12 +160,9 @@ class test
 
 ## Block Scope
 
-A block is a compound statement, beginning at opening of the block by ‘{‘ and ending at the end of the block by ‘}’. A name declared
-in a block is local to that block and can be used only in this block or blocks enclosed (nested blocks). It can be used only after
-the point of the name declaration.
+A block is a compound statement, beginning at opening of the block by ‘{‘ and ending at the end of the block by ‘}’. A name declared in a block is local to that block and can be used only in this block or blocks enclosed (nested blocks). It can be used only after the point of the name declaration.
 
-The block scope starts when the program execution enters into the block, and will end of its life when the program execution exits
-from the block. For instance
+The block scope starts when the program execution enters into the block, and will end of its life when the program execution exits from the block. For instance,
 
 ```altscript
 {                              // A block scope starts.
@@ -133,21 +172,16 @@ from the block. For instance
         t1:= "Hello, World!"   // A name 't1' is introduced in the inner block, and owns value "Hello, World!"
         t2:= "Hello, World2!"  // A name 't2' is introduced in the inner block, and owns value "Hello, World2!"
         s1 = t1;               // The name 't1' transfers its value to 's1' declared in outer scope
-        s2 = t2.clone();       // The name 's2' get a value copy from t2. This can be written as s2 = *t2;
+        s2 = t2.substring(7);  // The name 's2' get a copy of substring from t2, "World2!"
     }                          // The inner block ends, and t2 and its value dropped.
                                // The name t1 is also dropped but it does not own the value because its ownership was transferred to s1.       
 }                              // The outer scope exits, name s1 and s2 and their values are dropped.
 ```
+For ownership transfer among names in different scopes, see [Ownership](Ownership.md).
 
-## IO Scope
+## Input/Output Scope
 
-The IO scope is an object instantiation input and output parameter scope. When we create an object or do a function call,
-we provide a number of input parmaters and expect an output. Names of input paramters in the IO block never owns the value
-unless the provided actual parameter is a literal value or it holds value of pass-by-value type (primitive values).
-The output paramter is a hidden name. It can either owns its own value or refer to a value passed from one of input paramters
-or a value owned by names in object or class scope. If the value is owned by the output and is not transfered on exit of the
-IO scope, the output value will be dropped. The output cannot refer to a value owned by any name introduced in the function
-body block scope.
+The input/output scope (abbreviation: IO scope) is an input and output parameter scope for [routine](Routine.md) instantiation. When we create an object through a [constructor call](Constructor.md) or do a [function call](Functor.md), we provide a number of input parmaters and expect an output. Names of input paramters in the IO block never owns the value unless the provided actual parameter is a literal value or it holds value of pass-by-value type (primitive values). The output paramter is a hidden name. It can either owns its own value or refer to a value passed from one of input paramters or a value owned by names in object or class scope. If the value is owned by the output and is not transfered on exit of the IO scope, the output value will be dropped. The output cannot refer to a value owned by any name introduced in the function body block scope.
 
 For instance
 
@@ -163,7 +197,7 @@ func clone (x: string) : string
 }
 ```
 
-When the function hello is called, say hello("World"), we get the fllowing block scope:
+When the function hello is called, say hello("World"), we get the following scopes:
 
 ```altscript
 // for hello("World");
@@ -177,7 +211,7 @@ hello:
         exit hello;              // exit to the outer IO scope
     }                            // the name str and its value is dropped here
 }                                // The name 'x' and its value dropped.
-                                 // The output value is dropped if the valu is not transferred on exit
+                                 // The output value is dropped if the value is not transferred on exit
                                  
 // for s:="World"; hello(s);
 hello:
