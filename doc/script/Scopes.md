@@ -172,7 +172,7 @@ The block scope starts when the program execution enters into the block, and wil
         t1:= "Hello, World!"   // A name 't1' is introduced in the inner block, and owns value "Hello, World!"
         t2:= "Hello, World2!"  // A name 't2' is introduced in the inner block, and owns value "Hello, World2!"
         s1 = t1;               // The name 't1' transfers its value to 's1' declared in outer scope
-        s2 = t2.substring(7);  // The name 's2' get a copy of substring from t2, "World2!"
+        s2 = t2.substring(7);  // The name 's2' gets a copy of substring from t2, "World2!"
     }                          // The inner block ends, and t2 and its value dropped.
                                // The name t1 is also dropped but it does not own the value because its ownership was transferred to s1.       
 }                              // The outer scope exits, name s1 and s2 and their values are dropped.
@@ -200,61 +200,23 @@ func clone (x: string) : string
 When the function hello is called, say hello("World"), we get the following scopes:
 
 ```altscript
-// for hello("World");
+// for s:= hello("World");       // Call 'hello' with a string literal
 hello:
-{                                // the IO scope of the function hello starts here
-    x:= "World";                 // x owns "World" because the actual paramter is a literal
-    output: string;              // the output is a hidden name
-    {                            // the body block scope of the function some_string_op starts here
-        str := "Hello ";
-        output = hello + x;      // output owns the result of hello + x, which is "Hello World"
-        exit hello;              // exit to the outer IO scope
-    }                            // the name str and its value is dropped here
-}                                // The name 'x' and its value dropped.
-                                 // The output value is dropped if the value is not transferred on exit
-                                 
-// for s:="World"; hello(s);
-hello:
-{                                // the IO scope of the function hello starts here
-    x:= s;                       // x refers to the value of s, but does not own it
-    output: string;              // the output is a hidden name
-    {                            // the body block scope of the function some_string_op starts here
-        str := "Hello ";
-        output = str + x;        // output owns the result of str + x, which is "Hello World"
-        exit hello;              // exit to the outer IO scope
-    }                            // the name hello and its value is dropped here
-}                                // The name 'x' is dropped, but not the value it refers to
-                                 // The output value is dropped if the valu is not transferred on exit
-                       
-// for s:="World";  clone(s);
-clone:
-{                                // the IO scope of the function clone starts here
-    x:= s;                       // x refers to the value of s, but does not own it
-    output: string;              // the output is a hidden name
-    {                            // the body block scope of the function some_string_op starts here
-        output = x;              // output copies the value for x because x does not owns the value
-        exit hello;              // exit to the outer IO scope
-    }                            // the name hello and its value is dropped here
-}                                // The name 'x' is dropped, but not the value it refers to
-                                 // The output value is dropped if the valu is not transferred on exit
-
-// clone("World");
-clone:
-{                                // the IO scope of the function clone starts here
-    x:= "World";                 // x owns "World" because the actual paramter is a literal
-    output: string;              // the output is a hidden name
-    {                            // the body block scope of the function some_string_op starts here
-        output = x;              // output owns the value of x, and x no longer has the value
-        exit hello;              // exit to the outer IO scope
-    }                            // the name hello and its value is dropped here
-}                                // The name 'x' is dropped, but not the value
-                                 // The output value is dropped if the valu is not transferred on exit
-
+{                                // The IO scope of the function 'hello' starts here
+    x:= "World";                 // x refers to the string literal "World"
+    output: string;              // The output is a hidden name
+    {                            // A nested block scope of the function 'hello' starts here
+        str := "Hello ";         // A name 'str' is introduced in the block scope and refers "Hello " 
+        output = hello + x;      // 'output' owns the result of hello + x and refers to "Hello World"
+    }                            // A nested block scope ends here and the name 'str' is no longer valid.
+    s := output;                 // The output value is transferred to to 's'.
+}                                // The IO scope ends here and the name 'x' is no longer valid.
+                                 // If the output value is not transferred to other name after the
+                                 // function call, the value referered by 'output' will be dropped
 ```
 
 ## Scope Selector
-If a name decalred in an outer scope is obscured by the same name in an innder scope, it can be still used when it is qualified by the
-name of its enclosing class with a scope select operator ::
+If a name decalred in an outer scope is obscured by the same name in an innder scope, it can be still used when it is qualified by the name of its enclosing class with a scope select operator ::
 
 ## self, owner, selfclass, ownerclass, and root
 When the self appears in the block scope of a class constructor (enter block), it refers to the instance of this class. When the owner appears
