@@ -56,7 +56,7 @@ object MainPage
     object MyDesignTag3: DesignTab { }
 }
 ```
-Note, the alias name given for an external class file must be consistent. You cannot given different alias names for the same class file:
+Note, the alias name given for an external class file must be consistent. You cannot give different alias names for the same class file:
 ```altscript
 object MainPage
 {
