@@ -38,7 +38,7 @@ object MainPage
     object MyDesignSettings: class at "%DesignTab/class/DesignSettings" { }
 }
 ```
-If we want to use an external classes multiple times, we can give an alias name in the external class expression the first time we use it, and afterwords, give the alias only:
+If we want to use an external class multiple times, we can give an alias name in the external class expression the first time we use it, and afterwords, we just give the alias:
 ```altscript
 object MainPage
 {
@@ -56,7 +56,7 @@ object MainPage
     object MyDesignTag3: DesignTab { }
 }
 ```
-Note, the alias name for an external class file must be consistent. You cannot given different alias names for the same class file:
+Note, the alias name given for an external class file must be consistent. You cannot given different alias names for the same class file:
 ```altscript
 object MainPage
 {
@@ -64,7 +64,7 @@ object MainPage
     object MyDesignTag2: MyDesignTab2 at "%DesignTab/DesignTab" { }  // Error: inconsistent alias
 }
 ```
-If you have to give different alias names for the same external class, you can use type definition:
+If you have to give different alias names for the same external class, use type definition instead:
 ```altscript
 object MainPage
 {
