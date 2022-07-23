@@ -74,13 +74,11 @@ Let’s explore these situations now.
 
 The ownership transfer rule governs how the ownership is transferred when we pass the reference to another name. Before discussing this, we need to cover the concept of [scope](Scopes.md) first. We have four kinds of scopes: object scope, class scope, input/output scope, and block scope.
 
-The ownership transfer rule governs how the ownership is transferred when we pass the reference to another name. Before discussing this, we need to cover the concept of [scope](Scopes.md) first. We have four kinds of scopes: object scope, class scope, input/output scope, and block scope.
-
 The input/output scope and block scope are local scopes, kind of temporary scopes created for a [routine](Routines.md) call. Names introduced in a local scope are stored in a [call stack](https://en.wikipedia.org/wiki/Call_stack). When the execution enters into a local scope, the space required by the storage of the names within the scope are pushed into the stack. When the execution exits from a local scope, the space pushed for the scope is popped out and all names introduced in the local scope are gone. The stack naturally maintains a nested structure so that local sopes can be nested inside one another.
 
 The object scope or the class scope is an owner scope created for the lifetime of its associated object or class (owner). Names introduced in a full scope are stored in a space allocated in the common value pool for its associated owner. When the owner is created, the space required by the storage of the names within the scope are allocated in the pool. When the owner is deleted, the space allocated for the owner is released and all names introduced in the owner scope are gone.
 
-We have following the ownership transfer rules:
+We have the following ownership transfer rules:
 
 **Local-to-Owner Transfer Rule**: The name in owner scope will take the ownership from the name in local scope.
 
