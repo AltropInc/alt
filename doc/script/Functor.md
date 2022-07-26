@@ -21,7 +21,7 @@ is a function call where `Σ()` is a constructor call to to generate an object o
 
 In some cases, a function call can use the class name directly.
 
-One case is when the enclosing class is an [immaterial class](ImmaterialClass.md). An immaterial class defines only functors and meta members. It has no data/value, class members, or constructors defined in object scope. Therefore  we do not need to create an object of the class to perform the function call. For instance:
+One case is when the enclosing class is a [stateless class](KindsOfClasses.md). A stateless class defines only functors and meta members. It has no members oror constructors defined in the object scope. Therefore  we do not need to create an object of the class to perform the function call. For instance:
 ```altscript
 class Σ implements functional   // Σ is a subclass that implements the functional interface
 {
@@ -29,7 +29,7 @@ class Σ implements functional   // Σ is a subclass that implements the functio
 }
 sum := Σ(1,2,3,4);  // the function call uses the class name Σ directly
 ```
-Here the class Σ is an immaterial class and it implements the interface [functional](Interfacefunctional.md). The expression of the function call `Σ(1,2,3,4)` uses the class name `Σ`, instead of `Σ()`.
+Here the class Σ is a stateless class and it implements the interface [functional](Interfacefunctional.md). The expression of the function call `Σ(1,2,3,4)` uses the class name `Σ`, instead of `Σ()`.
 
 Another case is when the provided input parameters do not match any constructor routine type but a matched function routine type is found. In this case, an object of the class is automatically created to perform the function call. In order to make this possible, the class must provide a [default constructor](DefaultConstructor.md). Example with an explicit default constructor:
 ```altscript
@@ -65,45 +65,10 @@ The expression of a function call Σq(1,2,3,4) can cause an ambiguity error beca
 ```altscript
 Σq ctor(1,2,3,4) fn(1,2,3,4)
 ```
-In this case, the keyword `fn` is not necessary, because `Σq ctor(1,2,3,4)` is an expression of an object and what follows is always a function call.
-
-## Function
-
-A `function class` is a class that defines only functors as shown in the following example:
+In this case, the keyword `fn` is not necessary, because `Σq ctor(1,2,3,4)` is an expression of an object and what follows is always a function call:
 ```altscript
-class Derived: SuperClassName
-{
-  fn(x: int) { }
-  fn(x, y: int) { }
-  fn(x, y, z: int) { }
-}
+Σq ctor(1,2,3,4)(1,2,3,4)
 ```
-The class `Derived` is a function class that has three functors (funcion routine types), and it can be written in a set of separated [simple class forms](class.md#Simple-Class-Form-and-Sealed-Class):
-```altscript
-SuperClassName Derived(x: int) { }
-SuperClassName Derived(x, y: int) { }
-SuperClassName Derived(x, y, z:: int) { }
-```
-Each simple class form of the function class is a `function`. The function class `Derived` has three functions. The benefit of using separated simple class forms for a function class is that we can introduce more functions (function overloading) for a function class later whenever as needed.
-
-The class [func](FunctionalClass.md) is a built-in functional class which uses an efficient and sequential procedure based on the call stack technique for a traditional function call protocol. Use the `func` class, we can defines functions as below:
-```altscript
-func sum(values: int...): int
-{
-  sum := 0;
-  foreach (v in values) sum += v;
-  sum
-}
-func sum(strs: string...): string
-{
-    merged: string;
-    foreach (s in strs) merged = merged + s;
-    merged
-}
-```
-Here `sum` is a function class. It is derived from the superclass `func`. The `sum` class has two functors, one takes an integer stream and generates output of the summary of the stream elements, the other takes a string stream and generates output of a merged string from the given string stream.
-
-Other [functional class](FunctionalClass.md) such as threads, reactors, remote functions can be derived in the same way.
 
 ## Free Functor
 
@@ -129,7 +94,7 @@ See [Free Functor](FreeFunctor.md) for more details.
 * **function routine**: a functor instance (object) created to perform the task specified by the functor.
 * **function call**: an action to use a functor to create a function routine.
 * **function class**: a [class](Class.md) that defines functors only.
-* **function**: a functor written in [simple class form](SimpleClassForm.md).
+* **function**: a separated form for a functor defined in a function class.
 * **function overloading**: multiple functions with different input interfaces for a function class.
 * **free functor**: a functor that does belong to a function class.
 * **abstract free functor**: a free functor with interface only and without a code block.
@@ -137,5 +102,4 @@ See [Free Functor](FreeFunctor.md) for more details.
 ## See also:
 * [Routine type](Routine.md)
 * [Free functor](FreeFunctor.md)
-* [Function class in simple class form](SimpleClassForm.md)
-* [Functional class](FunctionalClass.md)
+* [Function class and functions](FunctionClass.md)
