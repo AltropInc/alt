@@ -45,7 +45,7 @@ str_conjuction := sum("Hello","World");
 ```
 See [Function Call Using Class Name](Functor.md) for more information.
 
-The class `func` is also a [sealed](KindsOfClasses.md] class in which only [functors](Functor.md) can be defined. Therefore we can only write  `func` classes in function form. Writing a `func` classes in a regular class form is an error:
+The class `func` is also a [sealed](KindsOfClasses.md) class in which only [functors](Functor.md) can be defined. Therefore we can only write  `func` classes in function form. Writing a `func` classes in a regular class form is an error:
 ```altscript
 class sum : func   // Error: Sealed class cannot be inherited
 {
