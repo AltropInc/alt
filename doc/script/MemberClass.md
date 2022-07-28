@@ -123,8 +123,78 @@ If a member class is a [function class](FunctionClass.md), it can be written in 
 
 A member function can have an [override]([FunctionOverride](https://en.wikipedia.org/wiki/Method_overriding) (implementation replacement) in a derived subclass. A member function can also defer its implementation to derived classes (deferred member function).  See [Member Functions](MemberFunctions.md) for more description.
 
-## Access Outer Names
+## Access Names in Outer Classes
 
-A member class has direct access to names defined in its enclosing class. However, a meta member class can have access only to names defined in class scope (meta names). 
+A member class has direct access to names defined in its enclosing class. However, a meta member class can have access only to names defined in class scope (meta names).  Consider the following example:
+```altscript
+class foo
+{
+   meta m: int; 
+   n: int; 
+   class bar1
+   {
+      i := m;  // Okay
+      j := n;  // Okay
+   }
+   meta class bar2
+   {
+      i := m;  // Okay
+      j := n;  // Error: Access the name 'n' that is not in the class scope
+   }
+}
+```
+As long as the the name search path hit a meta class outwards, the name obtained must be meta too. Consider a little bit more complicated example:
+```altscript
+class foo
+{
+   n: int; 
+   class bar1
+   {
+      meta class bar2
+      {
+          m: int;
+          class bar3
+          {
+              j := n;  // Error, though bar3 is not meta but search path hit a meta class 'bar2'
+              k := m;  // Okay, bar3 is not meta, and the search path did not hit a meta class
+          }
+      }
+   }
+}
+```
+If a declaration of a name in an inner class has the same name as another declaration in the enclosing class, then the declaration **shadows** the declaration of the enclosing class. You cannot refer to a shadowed name directly because the name in the inner class will be hit first in the outward search path. To refer to a shadowed name in an outer class, use [scope selector](OperatorSelector.md) `::` with the outer class name. Consider the following example:
+```altscript
+ class foo
+ {
+     n: int = 3; 
+     class bar
+     {
+         n := n + 1;    // At this point, the name 'n' defined in 'foo' is not shadowed yet
+                        // becuase the declaration of 'n' in 'bar' is not completed yet.
+                        // 'n' gets value 4
+         m := n;        // The name 'n' now refers to the one defined in 'bar'.
+                        // 'm' gets value 4
+         p := foo::n;   // Use scope scope selector to access 'n' defined in 'foo'.
+                        // 'p' gets value 3
 
-Consider the following classes:
+     }
+ }
+```
+
+## Meta Members in Singleton
+
+A [singleton](Singleton.md) is an object, but also a class. You can view a singleton as a special class that has only one instance, but a singleton acts like an object. The class is defined together with the singleton object. The class scope and the object scope of a singleton are the same. The name defined in a singleton can be accessed in either meta way or non-meta way. Therefore, using 'meta', though not prohibited, is unnecessary in a singleton. Consider:
+
+```altscript
+object foo          // 'foo' is an singleton
+{
+    n: int; 
+    class bar1
+    {
+        meta class bar2
+        {
+           j := n;  // Okay: Access the name 'n' in a singleton
+        }
+    }
+}
+```
