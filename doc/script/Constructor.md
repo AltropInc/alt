@@ -4,8 +4,8 @@ A constructor (abbreviation: ctor) is a special [routine type](Routine.md) (cons
 ```altscript
 class Box
 {
-    top_left: (double; ouble);
-    bottom_right: (double; ouble);
+    top_left: (double; double);
+    bottom_right: (double; double);
     ctor (origin: (x:double; y:double); width, height: double)
     {
         top_left = origin;
@@ -15,12 +15,39 @@ class Box
 ```
 The constructor in the class `Box` is a routine type specified after the key word `ctor`. It takes the input of the box origin, and the width and height of the box, and uses the input parameters to initialize the box by setting the values for the top-left and bottom-right corners of the box.
 
+## Constructor Call
+
 To use the constructor of a class to create an object, we give the class name and provide a list of expressions for the inputs (if any), thus the expression `Box((0,0), 2, 4)` creates an object of `Box` from the origin (0,0) with width 2 and height 4. This process is referred as `contructor call`.
 
-The interface of a constructor does not specify output type, however, a constructor always returns an object of the enclosing class. Therefore, the constructor call `Box((0,0), 2, 4)` returns an object of `Box`:
+The interface of a constructor does not specify output type, however, a constructor always implicitly returns an object of the enclosing class. Therefore, the constructor call `Box((0,0), 2, 4)` returns an object of `Box`:
 ```altscript
 box := Box((0,0), 2, 4);
 ```
+If the class of the constructor is a [member class](MemberClass.md), the owner for the constructor call must be given, and the owner type must be enclosing class of the member class. For instance,
+```altscript
+object test
+{
+    class Box     // 'Box' is member class
+    {
+        top_left: (double; double);
+        bottom_right: (double; double);
+        ctor (origin: (x:double; y:double); width, height: double)
+        {
+            top_left = origin;
+            bottom_right = (origin.x + width, origin.y+ height);
+        }
+    }
+    object BoxFactory
+    {
+        box1 := Box((0,0), 2, 4);        // Error: Member class is used with an object not in the owner type
+        box2 := owner.Box((0,0), 2, 4);  // Okay
+    }
+    box3 := Box((0,0), 2, 4);            // Okay
+}
+```
+Here in creating `box1`, the owner is not given, and the default owner is the object in the current context (`self`), which is in the type of `BoxFactory`. This is an error. In creating `box2`, the owner is given to the parent object of the object in the current context (`owner`),  which is in the type of enclosing class of `Box`. In creating `box3`, the owner is not given, and the default owner is the object in the current context which is in the same type of the enclosing class of the `Box`.
+
+However, if the class of the constructor is a free class, the owner for the constructor call is always the object in the current context.
 
 ## Constructor Interface Overloading
 
@@ -124,7 +151,7 @@ class Box
     }
 }
 ```
-Only one default constructor is allowed in a class. If both the default constructor without any parameter and the default constructor with all the parameters having default values are provided, calling the default constructor without providing any input parameter will cause an error of ambiguity:
+Only one default constructor is allowed in a class. If both the default constructor without any parameter and the default constructor with all the parameters having default values are provided, it will cause an error of duplicated default constructor:
 ```altscript
 class Box
 {
@@ -135,13 +162,12 @@ class Box
         top_left = (0, 0);
         bottom_right = (0, 0);
     }
-    ctor(top, left, bottom, right: double = 0,0,0,0) // This is another default constructor
+    ctor(top, left, bottom, right: double = 0,0,0,0) //  Error: Default constructor is already defined
     {
         top_left = (top, left);
         bottom_right = (bottom, right);
     }
 }
-box := Box();  // Error: Call of overloaded routine is ambiguous: Box
 ```
 
 ## Constructor Chaining
@@ -150,8 +176,8 @@ Constructor chaining occurs through inheritance when subclass constructor calls 
 ```altscript
 class Box
 {
-    top_left: (double; ouble);
-    bottom_right: (double; ouble);
+    top_left: (double; double);
+    bottom_right: (double; double);
     ctor (origin: (x:double; y:double); width, height: double)
     {
         top_left = origin;
@@ -170,12 +196,12 @@ class ColoredBox: Box
 ```
 This ensures the initialization of the data members of the super class on the creation of a subclass object.
 
-If the super class explicitly defines a constructor that is not the default, the subclass must call the constructor in the super:
+If the superclass defines a constructor that is not default and the superclass does not explicitly define a default constructor, the subclass must call the constructor in the super:
 ```altscript
 class Box
 {
-    top_left: (double; ouble);
-    bottom_right: (double; ouble);
+    top_left: (double; double);
+    bottom_right: (double; double);
     ctor (origin: (x:double; y:double); width, height: double)
     {
         top_left = origin;
@@ -192,12 +218,12 @@ class ColoredBox: Box
     }
 }
 ```
-unless the super class provides a default constructor:
+But if the super class provides a default constructor:
 ```altscript
 class Box
 {
-    top_left: (double; ouble);
-    bottom_right: (double; ouble);
+    top_left: (double; double);
+    bottom_right: (double; double);
     ctor(top, left, bottom, right: double)
     {
         top_left = (top, left);
@@ -223,12 +249,12 @@ The subclass can also select one of the constructors in the super class as the d
 ```altscript
 class Box
 {
-    top_left: (double; ouble);
-    bottom_right: (double; ouble);
-    ctor (origin: (x:double; y:double); width, height: double)
+    top_left: (double; double);
+    bottom_right: (double; double);
+    ctor (top, left, width, height: double)
     {
-        top_left = origin;
-        bottom_right = (origin.x + width, origin.y+ height);
+        top_left = (top, left);
+        bottom_right = (top + width, left + height);
     }
     ctor (origin: (x:double; y:double); width, height: double)
     {
@@ -237,12 +263,71 @@ class Box
     }
 }
 class ColoredBox: Box(0,0,0,0)  // The constructor ctor(top, left, bottom, right: double) in super is selected as
-                                // the defulat constructor
+                                // the defulat constructor for ColoredBox
 {
     box_color: Color;
     ctor (color: Color) // Okay, Box(0,0,0,0) is automatically called as the default constructor in the super class
     {
         box_color = color;
+    }
+}
+```
+
+## Constructor Delegation
+
+A class have multiple constructors that do similar things. Sometimes it is useful to make a constructor to call another constructor of the same class, for the purpose of avoiding repetitive code. This feature is called **Constructor Delegation**.
+```altscript
+class Box
+{
+    top_left: (double; double);
+    bottom_right: (double; double);
+    ctor (top, left, width, height: double)
+    {
+        top_left = (top, left);
+        bottom_right = (top + width, left + height);
+    }
+    ctor () self(0,0,0,0) {}
+    ctor (origin: (x:double; y:double); width, height: double) self(origin.x, origin.y, width, height)
+    {
+    }
+}
+```altscript
+The delegated constructor call starts with the keywoad`self` for the constructor in the same class. It is simular to constructor chaining where the keyword `super` is used for the constructor in the base class.
+
+It is very important to note that constructor delegation is different from calling a constructor from inside the body of another constructor, which is not recommended because doing so creates another object and initializes it, without doing anything to the object created by the constructor that called it. Consider:
+```altscript
+object test
+{
+    class Box
+    {
+        top_left: (double; double);
+        bottom_right: (double; double);
+        ctor (top, left, width, height: double)
+        {
+            top_left = (top, left);
+            bottom_right = (top + width, left + height);
+        }
+        ctor ()
+        {
+            owner.Box(0,0,0,0);  // a new Box instance is created in the enclosing object
+        }
+    }
+}
+```
+Also, recursive constructor calls is considered an error:
+```altscript
+class foo 
+{
+    ctor(x: int);
+    ctor() self(0)
+    {
+    }
+    ctor(x, y: int);
+    ctor(x: int) self (0,0)
+    {
+    }
+    ctor(x, y: int) self()  // Error:  recursive constructor invocation is not allowed:
+    {
     }
 }
 ```
@@ -270,9 +355,15 @@ A meta constructor is a `class construction routine type` used to initialize met
 ```
 Meta members belong to the class scope. A meta constructor cannot have any input parameters in the interface, and it cannot be explicitly called.  One class can have only one meta constructor.
 
+## Free Constructor
+
+A [free constructor](FreeConstructor.md) is a [construction routine type](Routine.md) that does not belong to any class. Because a constructor is used to create instances from its enclosing class and a free constructor has no associated enclosing class, a free constructor is always abstract. It can only be used as a declared type for an argument, and the argument of a free constructor can be used only if it is bound to a concrete constructor that belongs to an enclosing class.
+
+A typical reason for using a free constructor is to declared a polymorphic constructor argument, just like a polymorphic function argument where a [FreeFunctor.md](FreeFunctor.) is used, so the actual class used for creating an object through the argument will be determined at run time. See [Free Constructor](FreeConstructor.md) for more information.
+
 ## See also:
 * [Routine type](Routine.md)
-* [Abstract constructor](AbstractRoutineType.md)
+* [Free constructor](FreeConstructor.md)
 * [Class](Class.md)
 * [Inheritance](Inheritance.md)
 * [Member class](MemberClass.md)
