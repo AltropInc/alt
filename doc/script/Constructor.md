@@ -47,7 +47,14 @@ object test
 ```
 Here in creating `box1`, the owner is not given, and the default owner is the object in the current context (`self`), which is in the type of `BoxFactory`. This is an error. In creating `box2`, the owner is given to the parent object of the object in the current context (`owner`),  which is in the type of enclosing class of `Box`. In creating `box3`, the owner is not given, and the default owner is the object in the current context which is in the same type of the enclosing class of the `Box`.
 
-However, if the class of the constructor is a free class, the owner for the constructor call is always the object in the current context.
+However, if the class of the constructor is a free class, the owner for the constructor call is always the object in the current context. Let's say the class `Box` is placed in a separate  file and is loaded as an external free class, the code:
+```altscript
+object test
+{
+    box := Box at "%/class"((0,0), 2, 4);
+}
+```
+will create an object of the class `Box` imported from the file at "%/class/Box.alt" where "%" indicates the path to the starting file. The `Box` object is created as a child of the `test` singleton object.
 
 ## Constructor Interface Overloading
 
