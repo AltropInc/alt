@@ -298,7 +298,7 @@ class Box
     {
     }
 }
-```altscript
+```
 The delegated constructor call starts with the keywoad`self` for the constructor in the same class. It is simular to constructor chaining where the keyword `super` is used for the constructor in the base class.
 
 It is very important to note that constructor delegation is different from calling a constructor from inside the body of another constructor, which is not recommended because doing so creates another object and initializes it, without doing anything to the object created by the constructor that called it. Consider:
