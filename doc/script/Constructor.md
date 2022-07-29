@@ -47,7 +47,7 @@ object test
 ```
 Here in creating `box1`, the owner is not given, and the default owner is the object in the current context (`self`), which is in the type of `BoxFactory`. This is an error. In creating `box2`, the owner is given to the parent object of the object in the current context (`owner`),  which is in the type of enclosing class of `Box`. In creating `box3`, the owner is not given, and the default owner is the object in the current context which is in the same type of the enclosing class of the `Box`.
 
-However, if the class of the constructor is a free class, the owner for the constructor call is always the object in the current context. Let's say the class `Box` is placed in a separate  file and is loaded as an external free class, the code:
+However, if the class of the constructor is a free class (top-level class), the instance of the class can be created within any object. The owner for a constructor call is always implicitly referred to the object in the current context. Let's say the class `Box` is placed in a separate file and is loaded as an external free class, the code:
 ```altscript
 object test
 {
@@ -321,7 +321,7 @@ object test
     }
 }
 ```
-Also, recursive constructor calls is considered an error:
+Recursive constructor calls are not allowed:
 ```altscript
 class foo 
 {
@@ -333,8 +333,11 @@ class foo
     ctor(x: int) self (0,0)
     {
     }
-    ctor(x, y: int) self()  // Error:  recursive constructor invocation is not allowed:
+    ctor(x, y: int) self()  // Error:  recursive constructor invocation is not allowed
     {
+        owner.foo();        // Error:  recursive constructor invocation is not allowed
+        owner.foo(x);       // Error:  recursive constructor invocation is not allowed
+        owner.foo(x,y);     // Error:  recursive constructor invocation is not allowed
     }
 }
 ```
@@ -343,30 +346,30 @@ class foo
 
 A meta constructor is a `class construction routine type` used to initialize meta members of its enclosing class:
 ```altscript
-  class Box
-  {
-      meta box_count : int;
-      top_left: (double; double);
-      bottom_right: (double; double);
-      meta ctor()
-      {
-          box_count = 0;
-      }
-      ctor (origin: (x:double; y:double); width, height: double)
-      {
-          ++box_count;
-          top_left = origin;
-          bottom_right = (origin.x + width, origin.y+ height);
-      }
-  }
+class Box
+{
+    meta box_count : int;
+    top_left: (double; double);
+    bottom_right: (double; double);
+    meta ctor()
+    {
+        box_count = 0;
+    }
+    ctor (origin: (x:double; y:double); width, height: double)
+    {
+        ++box_count;
+        top_left = origin;
+        bottom_right = (origin.x + width, origin.y+ height);
+    }
+}
 ```
-Meta members belong to the class scope. A meta constructor cannot have any input parameters in the interface, and it cannot be explicitly called.  One class can have only one meta constructor.
+A meta constructor can only access meta members that belong to the class scope. A meta constructor cannot have any input parameters in the interface, and it cannot be explicitly called.  One class can have only one meta constructor.
 
 ## Free Constructor
 
 A [free constructor](FreeConstructor.md) is a [construction routine type](Routine.md) that does not belong to any class. Because a constructor is used to create instances from its enclosing class and a free constructor has no associated enclosing class, a free constructor is always abstract. It can only be used as a declared type for an argument, and the argument of a free constructor can be used only if it is bound to a concrete constructor that belongs to an enclosing class.
 
-A typical reason for using a free constructor is to declared a polymorphic constructor argument, just like a polymorphic function argument where a [FreeFunctor.md](FreeFunctor.) is used, so the actual class used for creating an object through the argument will be determined at run time. See [Free Constructor](FreeConstructor.md) for more information.
+A typical reason for using a free constructor is to declared a polymorphic constructor argument, just like a polymorphic function argument where a [free functor](FreeFunctor.md) is used, so the actual class used for creating an object through the argument will be determined at run time. See [Free Constructor](FreeConstructor.md) for more information.
 
 ## See also:
 * [Routine type](Routine.md)
