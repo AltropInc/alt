@@ -198,3 +198,24 @@ object foo          // 'foo' is an singleton
     }
 }
 ```
+
+## Terminology Summary and Comparison
+
+A **member class** belongs to the [object scope](Scopes.md) of the enclosing class, and a **meta member class** belongs to the [class scope](Scopes.md) of the enclosing class, or in other words, an instance of a member class is created as a member of the instance of the enclosing class, and an instance of a meta member class is created as a meta member of the enclosing class. Therefore, to create an instance of a member class, an instance of the enclosing class is given as the owner, and to create an instance of a meta member class, the enclosing class is given as the owner. In comparison, the instance of a **top-level class** can be created as a member of any object of a non-sealed class, and you do not give the owner explicitly when you create instances of a top-level class.
+
+The member class concept is different from the concept of nested class in C++, where a nested class does not belong to any scope of the enclosing class. A C++ nested class acts behaviorally like a top-level class and you do not need to give the owner when creating a instance of a nested class. Because there is no direct relationship between the nested class and its enclosing class, a nested class cannot access to the members of the enclosing class directly without explicitly give the instance of the enclosing class. However, the member class concept is similar to the concept of member function in C++ because a member function in C++ belongs to the object scope of the enclosing class - you have to give an instance of the enclosing class as the owner to call a member function and a member function have the direct access to members of its enclosing class. However, C++ member function is not a member class. They are different concepts in C++.
+
+The member class concept is similar to the concept of nested (or inner) class in Java and Python,  where a nested class belong to the object scope of the enclosing class, i.e. an instance of a nested class must be created through an instance of the enclosing class.
+
+The meta member class concept is different from the concept of static nested class in Java, where a static nested class does not conceptually belong to the class scope of the enclosing class because an instance of a static nested class can be created like a top-level class instantiation without a given owner, i.e. the enclosing class. See [Inner Class and Nested Static Class Example](https://docs.oracle.com/javase/tutorial/java/javaOO/nested.html#inner-class-and-nested-static-class-example) in Java for more information.
+
+## See also:
+* [Class](Class.md)
+* [Class Members](ClassMember.md)
+* [Scope](Scopes.md)
+* [Ownership](Ownership.md)
+* [Singleton](Singleton.md)
+* [Constructor](Constructor.md)
+* [Functor](Functor.md)
+* [Function Class](FunctionClass.md)
+
