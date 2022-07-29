@@ -1,6 +1,6 @@
 # Function Class and Functions
 
-A **function class** is a class that defines only [functors (funcion routine types](Functor.md) in its class body. For instance:
+A **function class** is a class that defines only [functors (funcion routine types)](Functor.md) in its class body. For instance:
 ```altscript
 class AFuncClass: SuperClassName
 {
