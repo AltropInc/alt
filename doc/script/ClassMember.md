@@ -2,9 +2,9 @@
 
 Class members are the members declared in an enclosing class that represent the data and behavior of instances created from the enclosing class or the enclosing class itself.
 
-Those representing the data and behavior of instances of the enclosing class are **members of object** (abbreviation: **members**), which belongs to the [object scope](Scopes.md) and they are accessed through an instance of the enclosing class. The instance of the enclosing class is the **owner** of a member.
+Those representing the data and behavior of instances of the enclosing class are **members of object** (abbreviation: **members**), which belong to the [object scope](Scopes.md) and they are accessed through an instance of the enclosing class. The instance of the enclosing class is the **owner** of these members.
 
-Those representing the data and behavior of the enclosing class itself are **members of class** (abbreviation: **meta members**), which belongs to the [class scope](Scopes.md) and they are accessed through the enclosing class. The enclosing class is the **owner** of a meta member.
+Those representing the data and behavior of the enclosing class itself are **members of class** (abbreviation: **meta members**), which belong to the [class scope](Scopes.md) and they are accessed through the enclosing class. The enclosing class is the **owner** of these meta members.
 
 Members of object (members) class can be one of the following kinds:
 * [**Member classes**](MemberClass.md): an inner class in the enclosing class to define how member instances are structured and created within the instance of the enclosing class. A member class can be a [functional class(member function)](FunctionClass.md) that provides functors for member activities that represent the behavior of the class instances.
@@ -12,7 +12,7 @@ Members of object (members) class can be one of the following kinds:
 *  [**Member Singletons**](Singleton.md): a singleton class defined in the enclosing class and its singleton object will be created as an member object in the instance of the class.
 
 Members of class (meta members) can be one of the following kinds:
-* Class parameters
+* [**Class parameters**](ParametricClass.md): a parameter in a parametric class to introduce a family of classes by substitution of the parameter with different types or values.
 * [**Meta member classes**](MemberClass.md): an inner class in the enclosing class to define how meta member instances are structured and created within the enclosing class. A meta member class can be a [meta functional class(member function)](FunctionClass.md) that provides functors for member activities that represent the behavior of the enclosing class.
 * [**Meta member Singletons**](Singleton.md): a singleton object defined in the enclosing class
 * [**Meta member name declarations**](NameDeclaration.md): a name declared in an enclosing class to hold a value or a reference to a composite value or object. The value and reference held by the member name is owned by the enclosing class. But the value or object referred by the reference held by a member name can be owned by another object or class.
@@ -45,21 +45,21 @@ class EC #(type T: any)  // A class parameter 'T' in the class 'EC' header
     { }
     meta func MMF(x:T)   // A function of the meta member class named MMF
     { }
-    x: int;              // A memeber name 'x' that holds an integer
-    const c:=1;          // A const memeber name 'c' that holds an integer value 1
-    s: string="abc";     // A memeber name 's' that holds a reference to a string value
-    meta mx: int;        // A meta memeber name 'mx' that holds an integer
-    meta ms :="abc";     // A meta memeber name 's' that holds a reference to a string value
+    x: int;              // A member  name 'x' that holds an integer
+    const c:=1;          // A const member  name 'c' that holds an integer value 1
+    s: string="abc";     // A member  name 's' that holds a reference to a string value
+    meta mx: int;        // A meta member  name 'mx' that holds an integer
+    meta ms :="abc";     // A meta member  name 's' that holds a reference to a string value
     ctor()               // A constructor of 'EC'. This is not a member.
     { }
-    ctor(x: int)         // Another constructor with different input interface.
+    ctor(x: int)         // Another constructor with a different input interface.
     { }
     meta ctor()          // The meta constructor of 'EC'. This is not a member.
     { }
     fn ()                // A functor of 'EC'. This is not a member.
     { }
-    fn (x: int)          // Another functor with different input interface
-    { }
+    fn (x: int)          // Another functor with a different input interface
+    { } 
 }                        // The 'EC' class body ends here
 ```
 
@@ -77,7 +77,7 @@ EC().x    // access the variable name 'x' using an instance of the class 'EC'
 EC.mx     // access the meta variable name 'mx' using the class 'EC'
 ```
 
-In calling a constructor of a member class, we need to provide the input values required by the constructor of the member class. A member class may have multiple constructors with diferent interfaces. The one with matched interface will be selected for this constructor call. Example:
+In calling a constructor of a member class, we need to provide the input values required by the constructor of the member class. A member class may have multiple constructors with different interfaces. The one with a matched interface will be selected for this constructor call. Example:
 ```altro
 class EC
 {
@@ -94,11 +94,11 @@ class EC
 }
 ec  := EC();           // create an instance of EC and referred by 'ec'
 mc1 := ec.MC(3);       // created an instance of MC in the instance referred by 'ec'
-mc2 := ec.MC("xyz");   // created another instance of MC using a differnt constructor
+mc2 := ec.MC("xyz");   // created another instance of MC using a different constructor
 mmc1 := EC.MMC(3);     // created an instance of MMC in the class 'EC'
-mmc2 := EC.MMC("xyz"); // created another instance of MMC using a differnt constructor
+mmc2 := EC.MMC("xyz"); // created another instance of MMC using a different constructor
 ```
-Becuase a member class may have multiple functions with diferent interfaces, for the same reason, in calling a function of a member class, we need to provide the input values required by the function of the member class.  The one with matched interface will be selected for this function call. Example:
+Because a member class may have multiple functions with different interfaces, for the same reason, in calling a function of a member class, we need to provide the input values required by the function of the member class.  The one with a matched interface will be selected for this function call. Example:
 ```altro
 class EC
 {
@@ -112,17 +112,17 @@ class EC
 ec := EC();           // create an instance of EC and referred by 'ec'
 i1 := ec.MF(3);       // Call MF's function through the instance of 'EC' just created
 i2 := ec.MF(2,3);     // Call MF's another function with an input of two integers
-mi := EC.MMF(3);      // Call MMF's function through the the class 'EC'.
+mi := EC.MMF(3);      // Call MMF's function through the class 'EC'.
                       // This is a call to a function of the meat member class 'MMF'
 ```
 
-Functors, constructors and destructor are not members. Constructors and meta functors are call by using the enclosing class name directly. See [Constructor](Constructor.md) for more description about constructor call. Functors are called either by the instance of its enclosing class or by the enclosing class directly if the enclosing class is a stateless class. See [Functor](Functor.md) for more description about functor call. [Destructor](Destructor.md) are not called explicitly.
+Functors, constructors and destructors are not members. Constructors and meta functors are called by using the enclosing class name directly. See [Constructor](Constructor.md) for more description about constructor calls. Functors are called either by the instance of its enclosing class or by the enclosing class directly if the enclosing class is a stateless class. See [Functor](Functor.md) for more description about functor calls. [Destructor](Destructor.md) are not called explicitly.
 
 Because a [type definition](TypeDefinition.md) defined within a class is not a member, we cannot use the member selector `.` to access the inner type definition. Instead, we use the scope selector `::`
 ```altro
 class EC
 {
-    type NC = int[4];    // define a alias type name for int[4]
+    type NC = int[4];    // define an alias type name for int[4]
 }
 nc : EC::NC = (1,2,3,4);
 ```
