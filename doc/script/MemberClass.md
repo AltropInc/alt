@@ -117,6 +117,81 @@ Here an instance of `Nested` is used to create an instance of `MetaMember`, but 
 
 Note that this meta member class concept is different to [Java's static nested class](https://docs.oracle.com/javase/tutorial/java/javaOO/nested.html#inner-class-and-nested-static-class-example), where a static nested class is behaviorally a top-level class that has been nested in another top-level class for packaging convenience. Here, a meta member class is not behaviorally a top-level class. Because the object [ownership rule](Ownership.md) requires that each object, except for the root, must have a parent object that owns the object, instances of a meta member class has an owner and the owner is the enclosing class.
 
+## Inheritance of Member Classes
+
+A member class `A` can be inherited only by another member class `B` only if the enclosing class of `B' is the same as or is a subclass of the enclosing class of `A`. Here is the example of the same enclosing class:
+```altscript
+class OuterClass
+{
+    class A
+    {
+    }
+ 
+    class B is A  // The same enclosing class of 'A' and 'B' 
+    {
+    }
+}
+```
+Here is the example of the different enclosing classes in subclass relationship:
+```altscript
+class OuterClass
+{
+    class InnerClassBase
+    {
+       class A
+       {
+       }
+    }
+    
+    class InnerClass is InnerClassBase
+    {
+       class B is A
+       {
+       }
+    }
+}
+```
+This is an example of an inccorect member class inheritance:
+```altscript
+class OuterClass
+{
+    class A
+    {
+    }
+    
+    class InnerClass
+    {
+       class B is A   // Error: the base must be the member of a base of the enclosing class
+       {
+       }
+    }
+}
+```
+The inheritance in the above example is not allowed.  The reason for this rule can be illustrated by the following example:
+```altscript
+class OuterClass
+{
+    i := 3;
+    class A
+    {
+        k: int;
+        ctor() { k = owner.i }
+    }
+    
+    class InnerClass
+    {
+       class B is A  // Error: the base must be the member of a base of the enclosing class
+       {
+       }
+    }
+    
+    ic := InnerClass();  // create an instance of 'InnerClass' in the instance of 'OuterClass'
+    b := ic.B();         // create an instance of 'B' in the object referred by 'ic'
+}
+```
+In this example, the instance of 'B' is created within the object of 'InnerClass', that is, the object of 'InnerClass' is the owner of the instance of 'B'. When the constructor of 'A' is called to initialize the instance of 'B', the owner type becomes `OuterClass`, which is inconsistent with the actual owner of the he instance of 'B', and the expression `owner.i` in the constructor of `A` is invalid.
+
+
 ##  Member Functions
 
 If a member class is a [function class](FunctionClass.md), it can be written in a set of separated [functions](FunctionClass.md). These functions are member functions. Like a member class, a member function is called through an instance of its enclosing class and a meta member function is called through its enclosing class.
