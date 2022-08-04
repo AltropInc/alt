@@ -119,7 +119,7 @@ Note that this meta member class concept is different to [Java's static nested c
 
 ## Inheritance of Member Classes
 
-A member class `A` can be inherited only by another member class `B` only if the enclosing class of `B` is the same as or is a subclass of the enclosing class of `A`. However, top-level class or a meta class does not have this restriction.
+A member class `A` can be inherited only by another member class `B` only if the enclosing class of `B` is the same as or is a subclass of the enclosing class of `A`. However,a  top-level class or a meta class does not have this restriction.
 
 Here is the example of the same enclosing class:
 ```altscript
@@ -147,7 +147,7 @@ class OuterClass
     
     class InnerClass is InnerClassBase
     {
-       class B is A
+       class B is A   // The enclosing class of 'B' is a subclass of the enclosing class of 'A'
        {
        }
     }
@@ -191,7 +191,7 @@ class OuterClass
     b := ic.B();         // create an instance of 'B' in the object referred by 'ic'
 }
 ```
-In this example, the instance of 'B' is created within the object of 'InnerClass', that is, the object of 'InnerClass' is the owner of the instance of 'B'. When the constructor of 'A' is called to initialize the instance of 'B', the owner type becomes `OuterClass`, which is inconsistent with the actual owner of the he instance of 'B', and the expression `owner.i` in the constructor of `A` is invalid.
+In this example, the instance of `B` is created within the object of `InnerClass`, that is, the object of `InnerClass` is the owner of the instance of `B`. When the constructor of `A` is called to initialize the instance of `B`, the owner type becomes `OuterClass`, which is inconsistent with the actual owner of the instance of `B`. Therefore, the expression `owner.i` in the constructor of `A` is invalid when it is used for initializing the instance of `B`.
 
 
 ##  Member Functions
