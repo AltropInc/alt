@@ -119,7 +119,9 @@ Note that this meta member class concept is different to [Java's static nested c
 
 ## Inheritance of Member Classes
 
-A member class `A` can be inherited only by another member class `B` only if the enclosing class of `B' is the same as or is a subclass of the enclosing class of `A`. Here is the example of the same enclosing class:
+A member class `A` can be inherited only by another member class `B` only if the enclosing class of `B' is the same as or is a subclass of the enclosing class of `A`. A top-level class or a meta class does not have this restriction.
+
+Here is the example of the same enclosing class:
 ```altscript
 class OuterClass
 {
