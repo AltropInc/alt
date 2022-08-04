@@ -1,109 +1,115 @@
 # Class
 
-A class describes a set of objects that have a common structure and a common set of behaviours. The object belonging to the class is called an instance of the class. In ALT, a class is also referred to as a type. They are the same concept.
-
-The object structure tells how the structural representation of the object is composed in terms of a set of member object/value declarations. While this definition is recursive, there are a set of primitive classes whose structural representations are built-in values without member object/value declarations. Examples are classes for integers, floating-point numbers, enumeration values, and characters. Take the example of a `ParticleSystem`, it contains a set of particles as its member objects. while each particle is composed of primitive values to represents its size, color, and other attributes:
-
-```altscript
-class Partcle
-{
-  size: int;
-  color: Color;
-  position: (float, float, float);
-  life: duration;
-}
-class ParticleSystem
-{
-  particles: Particle...;
-  emit_position: (float, float, float);
-  emit_direction: (float, float, float);
-}
-```
-
-The object behaviour tells how the object can act in response to a set of inputs in terms of a set of member classes. A member class is an inner class nested in its enclosing class. The class `ParticleSystem`, for example, has a member class of `MyParticle` to describe the composition of its own specialized version of particle, and a functional member class `emit` (member function) to tell how a set of particles can be generated:
-
-```altscript
-class ParticleSystem
-{
-  particles: MyParticle...;
-  emit_position: (float, float, float);
-  emit_direction: (float, float, float);
-  
-  class MyParticle is Partcle
-  {
-    enter (minmum_to_life_span, maximum_to_life_span: int)
-    {
-      // construct MyParticle
-    }
-  }
-  func emit(minmum_to_generate, maxmum_to_generate: int)
-  {
-    // generate partciles
-    particles.append(MyParticle(10, 60));
-    particles.append(MyParticle(15, 45));
-  }
-}
-```
-
-Note: the functional member class `emit` is written in a simple class form where `emit` is the member class name and `func` is its base class. It is conceptually equivalent to the following pseudo code:
-
-```altscript
-class emit is func
-{
-  enter (minmum_to_generate, maxmum_to_generate: int)
-  {
-    // generate partciles
-  }
-}
-```
-
-The above pseudo code is used to illustrate the concept of functional class `emit` and is actually not a valid code because `func` is a sealed class. We will explain this later.
-
-Objects that are instances of an member class exist within an instance of the enclosing class class. A member class has access to other members of its enclosing class. Therefore, An instance of `MyParticle` or `emit` can exist only within an instance of `ParticleSystem` and has direct access to members defined in the enclosing instance of `ParticleSystem`:
-
-```altscript
-func emit(minmum_to_generate, maxmum_to_generate: int)
-{
-   // generate partciles
-   particles.append(MyParticle(10, 60));
-   particles.append(MyParticle(15, 45));
-}
-```
-
-## Defining a Class
-
-A class always starts with the keyword `class` followed by the name of the class:
-
+A **class** describes a set of objects that have a common structure and a common set of behaviours. The object belonging to the class is called an **instance** of the class. A class in Altro is also referred to as a type. They are the same concept. A class always starts with the keyword `class` followed by the name of the class:
 ```altscript
 class ClassName
 {
 }
 ```
+The object structure tells how the structural representation of the object is composed in terms of a set of member object/value declarations. While this definition is recursive, there are a set of primitive classes whose structural representations are built-in values without member object/value declarations. Examples are classes for integers, floating-point numbers, enumeration values, and characters. Take the example of a `ParticleSystem`, it contains a set of particles and each particle is composed of primitive values to represents its size, color, and other attributes:
 
-A class can be created or derived from an existing class. The existing class from which the derived class is created through the process of inheritance is known as a base class or superclass. A derived class is also known as subclass. The relationship between a derived class and a base class is an “is a” relationship. A subclass is a subtype of its base, i.e. any instance of a subclass is also an instance of its base. By using inheritance to derive a new class from its base, all of the members in the base can be reused to make the new class and the only thing needed to consider is the extension part of the new class and the existing part needs to be changed in the base. For example, consider a base class, Vertebrate , which is used to create two derived classes, Reptile and Mammal. Reptile is a Animal and Mammal is a Mammal. Both have few common features:  they have a backbone and are air-breathing.  But each type can have features that are unique to its specialization and are different from the features of the base class: mammals have hairs and are warm-blooded while reptiles have scales and are cold-blooded:
+```altscript
+class ParticleSystem
+{
+    particles: (size: float; color: Color; position: (x,y,z:float);  life: float)...;
+    emit_position: (x,y,z:float);
+    emit_direction: (x,y,z:float);
+}
+```
+The object behaviour tells how the object can act in response to a set of inputs in terms of a set of member funcions. A member funcions is a function class nested in its enclosing class. The class `ParticleSystem`, for example, has a function class `emit` (member function) to tell how a set of particles can be generated:
+```altscript
+class ParticleSystem
+{
+    particles: (size: float; color: Color; position: (x,y,z:float);  life: float)...;
+    emit_position: (x,y,z:float);
+    emit_direction: (x,y,z:float);
+  
+    func emit(minmum_to_generate, maxmum_to_generate: int) : int
+    {
+       // generate some partciles and putthem in 'particles' 
+       // returns number of particles generated
+    }
+}
+```
+Using the class, we can create objects of the class:
+```altscript
+ps := ParticleSystem();  // A ParticleSystem object is created and referred by the name 'ps'
+```
+Then, we can call member funcions of the object to activate some behavior within the object:
+```altscript
+generated := ps.emit(1,10);  // Let the ParticleSystem object generate 1 to 10 particles
+```
 
+##  Inheritance and Subclasses
+
+Every time we introduce a new class of objects, we do not want to describe all the structure and behaviours of each object from scratch. We would like to have a mechanism to build a new class on a existing class so that te new class contains all the features of the existing class in addition to its own. This mechanism is called **inheritance**. The class which is newly created is known as the **subclass** or **derived class** of the existing class on which the new class is based. and the existing class is the **superclass** or **base class** of the newly created class. The relationship between a derived class and a base class is an [**is-a** relationship](https://en.wikipedia.org/wiki/Is-a). A subclass is a **subtype** of its base, i.e. any instance of a subclass is also an instance of its base. The following code establishes an explicit inheritance relationship between classes B and A:
+```altscript
+class A { }
+class B is A { }   // or class A: B { }
+```
+By using inheritance to derive a new class from its base, all of the members in the base can be reused to make the new class and the only thing needed to consider is the extension part of the new class and the existing part needs to be changed (overridden) in the base. Consider the following pseudo code, a base class, Vertebrate, used as a base class to create two derived classes, Reptile and Mammal. Reptiles and mammals have few common features as vertebrates:  they have a backbones and are air-breathing.  But each type can have features that are unique to its specialization and are different from the features of the base class: mammals have hairs and are warm-blooded while reptiles have scales and are cold-blooded:
 ```altscript
 class Vertebrate
 {
-  object Backbone: SpinalColumn {}
-  func breathe (media: Air)
-  {
-    // move air into lungs to take in oxygen and give out carbon dioxide
-  }
+    backbones: SpinalColumns;
+    func breathe (media: Air)
+    {
+       // move air into lungs to take in oxygen and give out carbon dioxide
+    }
 }
-class Mammal: Vertebrate
+class Mammal is Vertebrate
 {
-  object Hairs: ThreadLikeBodyCovering {}
-  func thermoRegulate(environment_temperature: float)
-  {
-    // adjust metabolism to maintain body temperature in a given range
-  }
+    hairs: ThreadLikeBodyCoverings;
+    func thermoRegulate(environment_temperature: float)
+    {
+        // adjust metabolism to maintain body temperature in a given range
+    }
 }
-class Reptile: Vertebrate
+class Reptile is Vertebrate
 {
-  object Scales: FlattenedRigidBodyCovering {}
+    scales: FlattenedRigidBodyCoverings;
 }
 ```
+See [**Class Inheritance**](Inheritance.md) for more description, including multiple inheritance and member class inheritance.
+
+##  Member Classes
+
+A class defined within a class or a singleton is called a [**member class**](MemberClass.md). While subclasses via inheritance establish an **is-a** relationship, member classes via composition defines a [**has-a** relation](https://en.wikipedia.org/wiki/Has-a) in which instances of the member class "belongs to" (is part or member of) an instance of its enclosing class. The member class is known as **child class** of its enclosing class and the enclosing class is the **owner class** or **parent class** of the member class.  The instance of a member class is known as **child object** of the instance of its enclosing class and the instance of the enclosing class is its **owner** or **parent**.
+
+Let us revist the `ParticleSystem` example, particles contained in a particle system can be decribed by a memmber class `Particle`:
+```altscript
+class ParticleSystem
+{
+    class Particle
+    {
+        size: float;
+        color: Color;
+        position: (x,y,z:float);
+        life_span: float;
+        age: float;
+    }
+}
+```
+When we create a particle via the member class `Particle`, we need to provide the owner of the particle, and in this case, the owner must be an instance of the `ParticleSystem`:
+```altscript
+ps := ParticleSystem();  // A ParticleSystem object is created and referred by the name 'ps'
+p := ps.Particle();      // Create a particle inside the ParticleSystem object referred by the name 'ps'
+```
+Particles are created as child objects inside an instance of `ParticleSystem`.
+
+It is quite often the case that we need to mix inheritance and composition. Here is an example:
+class SplitParticleSystem is ParticleSystem
+{
+    class SplittableParticle is Particle
+    {
+        split_age: float;
+    }
+}
+```
+
+See [**Member Class**](MemberClass.md) for more description.
+
+## Singleton
 
 If a class can have only one instance, the class is a singleton class, and the unique instance is called singleton. The instance is defined together with its class. A singleton starts with the keyword `object` followed by the name of the singleton, as shown in the above example. `Backbone`, `Hairs`, and `Scales` are singletons. The definition of a singleton body is the same as the definition of a class body except for a few limitations, for example, the constructor of a singleton should have no input because the singleton is created in-place and its constructor cannot be called from the outside.
 
