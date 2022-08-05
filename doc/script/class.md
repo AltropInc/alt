@@ -1,6 +1,6 @@
 # Class
 
-A **class** describes a set of objects that have a common structure and a common set of behaviours. The object belonging to the class is called an **instance** of the class. A class in Altro is also referred to as a type. They are the same concept. A class always starts with the keyword `class` followed by the name of the class:
+A **class** describes a set of objects that have a common structure and a common set of behaviors. The object belonging to the class is called an **instance** of the class. A class in Altro is also referred to as a type. They are the same concept. A class always starts with the keyword `class` followed by the name of the class:
 ```altscript
 class ClassName
 {
@@ -16,7 +16,7 @@ class ParticleSystem
     emit_direction: (x,y,z:float);
 }
 ```
-The object behaviour tells how the object can act in response to a set of inputs in terms of a set of member funcions. A member funcions is a function class nested in its enclosing class. The class `ParticleSystem`, for example, has a function class `emit` (member function) to tell how a set of particles can be generated:
+The object behavior tells how the object can act in response to a set of inputs in terms of a set of member functions. A member functions is a function class nested in its enclosing class. The class `ParticleSystem`, for example, has a function class `emit` (member function) to tell how a set of particles can be generated:
 ```altscript
 class ParticleSystem
 {
@@ -26,7 +26,7 @@ class ParticleSystem
   
     func emit(minmum_to_generate, maxmum_to_generate: int) : int
     {
-       // generate some partciles and putthem in 'particles' 
+       // generate some particles and put them in 'particles' 
        // returns number of particles generated
     }
 }
@@ -35,19 +35,19 @@ Using the class, we can create objects of the class:
 ```altscript
 ps := ParticleSystem();  // A ParticleSystem object is created and referred by the name 'ps'
 ```
-Then, we can call member funcions of the object to activate some behavior within the object:
+Then, we can call member functions of the object to activate some behavior within the object:
 ```altscript
 generated := ps.emit(1,10);  // Let the ParticleSystem object generate 1 to 10 particles
 ```
 
 ##  Inheritance and Subclasses
 
-Every time we introduce a new class of objects, we do not want to describe all the structure and behaviours of each object from scratch. We would like to have a mechanism to build a new class on a existing class so that te new class contains all the features of the existing class in addition to its own. This mechanism is called **inheritance**. The class which is newly created is known as the **subclass** or **derived class** of the existing class on which the new class is based. and the existing class is the **superclass** or **base class** of the newly created class. The relationship between a derived class and a base class is an [**is-a** relationship](https://en.wikipedia.org/wiki/Is-a). A subclass is a **subtype** of its base, i.e. any instance of a subclass is also an instance of its base. The following code establishes an explicit inheritance relationship between classes B and A:
+Every time we introduce a new class of objects, we do not want to describe all the structure and behaviors of each object from scratch. We would like to have a mechanism to build a new class on an existing class so that the new class contains all the features of the existing class in addition to its own. This mechanism is called **inheritance**. The class which is newly created is known as the **subclass** or **derived class** of the existing class on which the new class is based. and the existing class is the **superclass** or **base class** of the newly created class. The relationship between a derived class and a base class is an [**is-a** relationship](https://en.wikipedia.org/wiki/Is-a). A subclass is a **subtype** of its base, i.e. any instance of a subclass is also an instance of its base. The following code establishes an explicit inheritance relationship between classes B and A:
 ```altscript
 class A { }
 class B is A { }   // or class A: B { }
 ```
-By using inheritance to derive a new class from its base, all of the members in the base can be reused to make the new class and the only thing needed to consider is the extension part of the new class and the existing part needs to be changed (overridden) in the base. Consider the following pseudo code, a base class, Vertebrate, used as a base class to create two derived classes, Reptile and Mammal. Reptiles and mammals have few common features as vertebrates:  they have a backbones and are air-breathing.  But each type can have features that are unique to its specialization and are different from the features of the base class: mammals have hairs and are warm-blooded while reptiles have scales and are cold-blooded:
+By using inheritance to derive a new class from its base, all of the members in the base can be reused to make the new class and the only thing needed to consider is the extension part of the new class and the existing part needs to be changed (overridden) in the base. Consider the following pseudo code, a base class, Vertebrate, used as a base class to create two derived classes, Reptile and Mammal. Reptiles and mammals have few common features as vertebrates:  they have backbones and are air-breathing.  But each type can have features that are unique to its specialization and are different from the features of the base class: mammals have hairs and are warm-blooded while reptiles have scales and are cold-blooded:
 ```altscript
 class Vertebrate
 {
@@ -76,7 +76,7 @@ See [**Class Inheritance**](Inheritance.md) for more description, including mult
 
 A class defined within a class or a singleton is called a [**member class**](MemberClass.md). While subclasses via inheritance establish an **is-a** relationship, member classes via composition defines a [**has-a** relation](https://en.wikipedia.org/wiki/Has-a) in which instances of the member class "belongs to" (is part or member of) an instance of its enclosing class. The member class is known as **child class** of its enclosing class and the enclosing class is the **owner class** or **parent class** of the member class.  The instance of a member class is known as **child object** of the instance of its enclosing class and the instance of the enclosing class is its **owner** or **parent**.
 
-Let us revist the `ParticleSystem` example, particles contained in a particle system can be decribed by a memmber class `Particle`:
+Let us revisit the `ParticleSystem` example, particles contained in a particle system can be described by a member class `Particle`:
 ```altscript
 class ParticleSystem
 {
@@ -98,185 +98,68 @@ p := ps.Particle();      // Create a particle inside the ParticleSystem object r
 Particles are created as child objects inside an instance of `ParticleSystem`.
 
 It is quite often the case that we need to mix inheritance and composition. Here is an example:
+```altscript
 class SplitParticleSystem is ParticleSystem
 {
     class SplittableParticle is Particle
     {
         split_age: float;
+        max_split_number, min_split_number: int;
     }
 }
 ```
 
 See [**Member Class**](MemberClass.md) for more description.
 
-## Singleton
-
-If a class can have only one instance, the class is a singleton class, and the unique instance is called singleton. The instance is defined together with its class. A singleton starts with the keyword `object` followed by the name of the singleton, as shown in the above example. `Backbone`, `Hairs`, and `Scales` are singletons. The definition of a singleton body is the same as the definition of a class body except for a few limitations, for example, the constructor of a singleton should have no input because the singleton is created in-place and its constructor cannot be called from the outside.
 
 ## Constructor and Destructor
 
-Constructors defined in a class are used in the process of creating instances of the class. A class can specify a set of constructor interfaces (interface overloading) with different inputs to create the instance of the class. A constructor is introduced by the keyword `enter`:
+Constructors defined in a class are used in the process of creating instances of the class. A class can specify a set of constructor interfaces (interface overloading) with different inputs to create the instance of the class. A constructor is introduced by the keyword `ctor`:
 
 ```altscript
 type position = (x, y: float);
 type area_size = (width, height: float);
 class Rectangle
 {
-  enter(origin: position; size: area_size) { }
-  enter(top_left, bottom_right: position) { }
-  enter(x, y, width, height: float) { }
+    ctor(origin: position; size: area_size) { }
+    ctor(top_left, bottom_right: position) { }
+    ctor(x, y, width, height: float) { }
 }
 ```
 
-A default constructor is the constructor which doesn't take any input. If you define any constructor explicitly in a class, then you will have to call one of the constructors with matched inputs to initialize the instance of the class, including a constructor in all of its base classes. For example:
+For a complete description of the constructor, see [Constructor](Constructor.md).
 
-```altscript
-class Base
-{
-  enter(x: int) { }
-}
-class Derived: Base
-{
-  enter(x, y: int) { }  // <- Error: No default constructor in base class. Explicit base constructor call is required
-}
-```
-
-Because the `Base` class explicitly defines a constructor that takes an integer value as input, the `Derived` must call the constructor in the base unless the `Base' provides a default constructor. Either,
-
-```altscript
-class Base
-{
-  enter(x: int) { }
-  enter() { }
-}
-class Derived: Base
-{
-  enter(x, y: int) { }  // <- okay, the default constructor in the base is called automatically
-}
-```
-
-or
-
-```altscript
-class Base
-{
-  enter(x: int) { }
-}
-class Derived: Base
-{
-  enter(x, y: int) super(x) { }  // <- okay, the constructor that takes an integer value in the base is called explicitly
-}
-```
-
-The base class can also select one of the constructors in base as the default constructor:
-
-```altscript
-class Base
-{
-  enter(x: int) { }
-}
-class Derived: Base(0)        // <- the constructor that takes an integer value 0 in the base is used as the default constructor
-{
-  enter(x: int) super(x) { }  // <- okay, the constructor in the base is called explicitly and takes the input value given by x
-  enter(x, y: int) { }        // <- okay, the selected default constructor in the base is called automatically and takes the input value 0
-}
-```
-
-The destructor, on the other hand, is used to destroy the class instance. A destructor is introduced by the keyword `exit`:
+The destructor, on the other hand, is used to destroy the class instance. A destructor is introduced by the keyword `dtor`:
 
 ```altscript
 class ClassName
 {
-  exit() {}
+   dtor() { /* code for exit */ }
 }
 ```
 
-The destructor should not have any input, and is automatically invoked, including all destructors in bases classes, when the instance of the class is in destroy. The destructor in the derived class is invoked first, then, the one defined in the base.
+The destructor should not have any input, and is automatically invoked, including all destructors in base classes, when the instance of the class is destroyed. The destructor in the derived class is invoked first, then, the one defined in the base.
 
-<h3 id="Simple-Class-Form-and-Sealed-Class">Simple Class Form and Sealed Class</h3>
+For a complete description of the destructor, see [Destructor](Destructor.md).
 
-If a derived class does not have any member extension or modification and only provides constructors to create instances of the class, the class definition can use a simple form for each constructor interface. For instance:
+## Declaring Classes
 
+A class declaration consists of a [class header](ClassHeader.md) and a [class body](ClassBody.md) class body. The class header may contain the class modifiers , the class name, the class parameters, the base class, the default constructor in the base to call, and a list of interfaces to be implemented. Here is a sample of class declaration:
 ```altscript
-class Base
+sealed class MyClass#(type ClassParameter1: any; ClassParameter2: int) is MyBaseClass(x, y) implements MyInterface1, MyInterface2
 {
-}
-class Derived: Base
-{
-  enter(x: int) { }
-  enter(x, y: int) { }
-  enter(x, y, z: int) { }
+    // class members, constructors, functors and destructor declared in class body
 }
 ```
+In the class header,  `sealed` is a [class modifier](ClassModifier.md); `MyClass` is the class name; `ClassParameter1` is a type [class parameter](ParametricClass.md); `ClassParameter2` is a constant value [class parameter](ParametricClass.md); `MyBaseClass` is the [superclass](Inheritance.md) from which this class is derived; `(x, y)` are two parameters used to call one of the constructors in `MyBaseClass`([Selected default constructor](Constructor.md)); `MyInterface1` and `MyInterface2` are two [interface classes]InterfaceClass.md) that this class implements - so you can see that the class header, which is the opening line of the class declaration, can become quite complicated. For the moment, we'll not worry about these extra complications.
 
-Only constructors are provided in the `Derived` class. Therefore, we can use set of a simple form for the `Derived` class:
+The class body is the area between a pair of curly brackets in which a list of [class members](ClassMember.md), [constructors](Constrcutors.md), [functors](Functor.md)  and a [destructor](Destructor.md). For a complete description of a class body, see [Class Body](ClassBody.md).
 
-```altscript
-class Base
-{
-}
-Base Derived(x: int) { }
-Base Derived(x, y: int) { }
-Base Derived(x, y, z:: int) { }
-```
 
-In particular, a sealed class is a class that cannot be extended with new members in derived classes. However, new constructors with different interfaces can be added to a sealed class. Therefore, we cannot use a sealed class as a base class in class inheritance, but we can use simple class form to generate derived class from a sealed base class with a set of different constructors:
+## Singleton
+If a class can have only one instance, the class is a singleton class, and the unique instance is called singleton. The instance is defined together with its class. A singleton starts with the keyword `object` followed by the name of the singleton, as shown in the above example. `Backbone`, `Hairs`, and `Scales` are singletons. The definition of a singleton body is the same as the definition of a class body except for a few limitations, for example, the constructor of a singleton should have no input because the singleton is created in-place and its constructor cannot be called from the outside.
 
-```altscript
-sealed class SealedBase
-{
-    y: int;
-    z: int;
-}
-class Derived: SealedBase           // Error: Sealed class cannot be inherited
-{
-    enter(a: int) { y=a; z=a; }
-    enter(a, b: int) { y=a; z=b; }
-}
-SealedBase Derived (a: int) { y=a; z=a; }      // okay
-SealedBase Derived (a, b: int) { y=a; z=b; }   // okay
-```
 
-## Functional Class
-
-A functional class is used to create callable objects that perform some functionality described by its constructor body. When a callable object finishes its performance, its duties are done and it is deleted. Examples of such instantiations are a procedure to open a file, a process to display an image, a thread to deal with an event, a scientific calculation, and an activity to generate a signal. The interface of the constructor of a functional class can have both inputs and output. If the interface has output, an output object or value is generated. Consider:
-
-```altscript
-class sum: func
-{
-  enter (values: int...): int
-  {
-    sum := 0;
-    foreach (v in values) sum += v;
-    return sum;
-  }
-  enter (strs: string...): string
-  {
-    sum: string;
-    foreach (str in strs) sum.append(str);
-    return sum;
-  }
-}
-```
-
-The above code cannot be compiled because the base class `func` is sealed class. We can only use simple class form to define function classes:
-
-```altscript
-func sum(values: int...): int
-{
-  sum := 0;
-  foreach (v in values) sum += v;
-  return sum;
-}
-func sum(strs: string...): string
-{
-  sum: string;
-  foreach (str in strs) sum.append(str);
-  return sum;
-}
-```
-
-The class `func` a built-in functional class that supports traditional function call protocol, which is an efficient and sequential procedure using the same stack frame technique.
 
 ## Member Interface Overriding, Deferred Member Interface, and Abstract Class
 
