@@ -44,12 +44,80 @@ object JohnSmith is Student
 }
 ```
 
-## Multiple Inheritance
+## Shadowing
 
-## Inheritance in Parametric Class
+Though names declared in the base class is accessible in derived class, the derived class can intruduce a new member with a name that is alread used in the base class, then the  new member shadows the one with the same name in the base class. For example:
+```Altro
+class Person
+{
+    func occupation(): string { "Occupation: " }
+}
+class Student is Person
+{
+    func occupation(): string { "Student" }
+}
+```
+If we use a student reference to call `occupation`, the returned value will be "Student":
+```Altro
+s := Student();
+s_occupation := s.occupation();    // s_occupation gets "Student"
+```
+This is because the function `occupation` defined in `Student` **shadows** the function `occupation` defined in `Person`. If we need to call `occupation` defined in `Person` by using a student reference, we need to use the scope selector to explicitly refers the function defined in `Person`:
+```Altro
+s := Student();
+s_occupation := s.Person::occupation() + s.occupation(); // s_occupation gets "Occupation: Student"
+```
+For the same reason, we need to use the scope selector within the body of the derived class to access any shadowed name declared in the base class:
+```Altro
+class Person
+{
+    func occupation(): string { "Occupation: " }
+}
+class Student is Person
+{
+    func occupation(): string { Person::occupation() + "Student" }
+}
+```
 
+## Overriding
 
-## Member Interface Overriding, Deferred Member Interface, and Abstract Class
+Back to the Person-Student example:
+```Altro
+class Person
+{
+    func occupation(): string { "unset" }
+}
+class Student is Person
+{
+    func occupation(): string { "Student" }
+}
+```
+When we use a name reference of `Person` to call `occupation`, the function `occupation` defined in `Person` will be called even if the name reference refers to a student:
+```Altro
+p: Person = Student();
+p_occupation := p.occupation();    // p_occupation gets "unset"
+```
+This is because the funtion `occupation` defined in `Person` and the one defined in `Student` belong to two distinct funtion classes. When we use a name reference of `Person` to call `occupation`, we explicitly calls the one defined in `Person`.
+
+What if we want to call the function defined in a derived class through a base reference? This is the mechanism of **overriding**. When the function of the same name defined in a derived class, it overrides the implementation of the same function defined in the base class. To make this happen, we just need to define the function in the base virtual, meaning, overridable:
+```Altro
+class Person
+{
+    virtual func occupation(): string { "unset" }
+}
+class Student is Person
+{
+    override func occupation(): string { "Student" }
+}
+```
+Then,
+```Altro
+p: Person = Student();
+p_occupation := p.occupation();
+```
+`p_occupation` will get the value of "Student".
+
+The derived class override the value or a [member function](FunctionClass.md) defined in the base class.
 
 A member class can have a virtual constructor interface defined in the base class that can be overridden in a derived class. When you refer to a derived class object using a variable declared in the base class, you can use the virtual constructor interface for that object and execute the overridden version of the constructor in derived class to create a member object.
 
@@ -117,9 +185,14 @@ enter ()
 }
 ```
 
-## Interface Class and Its Implementation
+## Multiple Inheritance with Interface Classes
 
-A class can be declared as an interface class using the keyword `interface`. In addition, an interface class cannot have any member object/value declaration. It cannot have any constructor or destructor either. An interface class can only have member classes with deferred virtual constructor interfaces, although the keyword `deferred` is not required: 
+In Multiple Inheritance, one child or subclass class can have more than one base class or superclass and inherit features from every parent class which it inherits. Altro achieves multiple inheritances only with the help of **interface classes**.
+
+A class can be declared as an interface class using the keyword `interface`. An interface class can only have member classes with deferred [functor](Functor.md) interfaces, although the keyword `deferred` is not required in an interface class.
+
+
+cannot have any member object/value declaration. It cannot have any constructor or destructor either. An interface class can only have member classes with deferred virtual constructor interfaces, although the keyword `deferred` is not required: 
 
 ```altscript
 interface class ButtonInterface
@@ -191,6 +264,12 @@ enter ()
     x2.member2(4);
 }
 ```
+
+
+
+## Inheritance in Parametric Class
+
+
 
 
 ## self, selfclass, owner, ownerclass
