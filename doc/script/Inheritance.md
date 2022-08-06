@@ -115,9 +115,28 @@ Then,
 p: Person = Student();
 p_occupation := p.occupation();
 ```
-`p_occupation` will get the value of "Student".
+`p_occupation` will get the value of "Student". This overriding mechanism allows [subtype polymorphism or inclusion polymorphism](https://en.wikipedia.org/wiki/Subtyping) in which a name of a superclass can denote instances possibly in many different subclasses and can be used to access members actually defined in the subclass that is the type of the current instance denoted by the name.
 
-The derived class override the value or a [member function](FunctionClass.md) defined in the base class.
+## Finalizing
+
+In the overriding example, the keyword `override` ensures that the function `occupation` is virtual in the superclass `Person`. The program is ill-formed if this is not true from the superclass class and a compile-time error is generated. However, the keyword `override` is optional, the function `occupation` will always override the virtual one in the superclass if they have the matched interfaces:
+```Altro
+class Person
+{
+    virtual func occupation(): string { "unset" }
+}
+class Student is Person
+{
+    func occupation(): string { "Student" }  // still overrides without presenting 'override'
+}
+```
+So then we come to the question of how to stop overriding of a virtual function in a subclass. This can be achieved by subg the keyword `final`. 
+
+
+Please note the difference between shadowing and overriding. In shadowing, the members with the same name in subclass and superclass are different entities so the subclass can use the name freely for any other purpose. But in overriding, the members with the same name in subclass and superclass are the same entity so the subclass must use the name following certain rules in order to achieve overriding.
+
+Please also note the difference between overloading and overriding. Overloading is a kind of [ad hoc polymorphism](https://en.wikipedia.org/wiki/Ad_hoc_polymorphism) in which a [function class](FunctionClass) can have multiple interfaces (functions), and which interface to use in a function call is determined by the actual parameters provided in the function call. This ad hoc polymorphism is resolved statically during compile time. Overriding is a kind of [subtype polymorphism](https://en.wikipedia.org/wiki/Subtyping) in which one interface of a [function class](FunctionClass) can have multiple implementations in different subclasses, and which implementation to use in a function call is determined by the actual type of the object that owns the function call. This subtype polymorphism is resolved dynamically at run time.
+
 
 A member class can have a virtual constructor interface defined in the base class that can be overridden in a derived class. When you refer to a derived class object using a variable declared in the base class, you can use the virtual constructor interface for that object and execute the overridden version of the constructor in derived class to create a member object.
 
