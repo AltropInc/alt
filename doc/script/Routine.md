@@ -13,7 +13,7 @@ also referred as [functor](Functor.md), tells what function that the object of t
 
 A routine type can also be free, which is not a member of any class. A free routine type can be passed as a first-class object that can be dynamically created, destroyed, passed to a function, returned as a value, and have all the rights as other variables have. See [Free Constructor](FreeConstructor.md] and [Free Functor](FreeFunctor.md] for details.
 
-## Construction Routine Type (Constructor) and Construction Call
+## Construction Routine Type (Constructor) and Constructor Call
 
 A construction routine type, also referered as [constructor](Constructor.md), is a routine type prefixed with the keyword `ctor`. For example, a constructor in a `Point` class can be
 ```altscript
@@ -22,7 +22,7 @@ class Point
     ctor (x, y: double) { /* initialize x and y coordinates of the point using the input x and y */ }
 }
 ```
-The constructor in the class `Point` defines a callable unit that takes the input of x  and y coordinates to initialize the Point object. To create a construction  routine from the constructor to perform the initialization specified by the constructor, we provide the enclosing class and an expression for the input values. This instantiation process is referred to as `construction call`:
+The constructor in the class `Point` defines a callable unit that takes the input of x  and y coordinates to initialize the Point object. To create a construction  routine from the constructor to perform the initialization specified by the constructor, we provide the enclosing class and an expression for the input values. This instantiation process is referred to as [constructor call](Constructor.md):
 ```altscript
 Point(0,0)
 ```
@@ -64,3 +64,5 @@ In some cases, a function call can use the class name directly, i.e. we can use 
 * [Functor](Functor.md)
 * [Free functor](FreeFunctor.md)
 * [Free constructor](FreeConstructor.md)
+* [Member Class](MemberClass.md)
+
