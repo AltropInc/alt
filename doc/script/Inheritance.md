@@ -136,13 +136,11 @@ class Base
 {
     virtual func foo() {}
     func bar() {}
-    func baz() {}
 }
 class Derived is Base
 {
     func foo() {}           // override the one in 'Base'
-    final func bar() {}     // Error: 'final' can only be used for virtual defined in the base
-    override func baz() {}  // Error: 'override' can only be used for virtual defined in the base
+    override func bar() {}  // Error: 'override' can only be used for virtual defined in the base
 }
 class Derived2 is Derived
 {
@@ -151,6 +149,17 @@ class Derived2 is Derived
 class Derived3 is Derived2
 {
     func foo() {}          // Error: Override final member function is not allowed
+}
+```
+Like the specifier `override`, the pecifier `final` also ensures that the function  is virtual in the superclass:
+```Altro
+class Base
+{
+    func foo() {}
+}
+class Derived is Base
+{
+    final foo bar() {}     // Error: 'final' can only be used for virtual defined in the base
 }
 ```
 
@@ -174,7 +183,29 @@ A class that contains deferred member functions is an [abstract class](AbstractC
 ```Altro
 p := Person();   // Error: Abstract class is not instantiable
 ```
-A class that contains only deferred member functions is an [interface class](InterfaceClass.md).
+A class that contains only deferred member functions is an [interface class](InterfaceClass.md). And in an interface class, all functions declared are deferred functions even without using the `deferred` specifier:
+```Altro
+interface class Person
+{
+    func occupation(): string;  // 'occupation' is deferred ensures that the function  is virtual in the superclass:
+}
+```
+Please note the difference between a deferred function and a function in [forward declaration](ForwardDeclaration.md). A forward declared function is also a function can be declared without having it followed by its implementation, but its implementation cannot be deferred to derived classes. Its implementation must be provided in the same class with a full declaration:
+```Altro
+class Person
+{
+    func occupation(): string;  // 'occupation' is forward declared
+    // more members here declarations
+    func occupation(): string {"unset"}  // 'occupation' is fully declared
+}
+```
+The program is ill-formed if the full declaration is not provided for a forward declared function:
+```Altro
+class Person
+{
+    func occupation(): string;  // 'occupation' is forward declared
+}  // Error: The class interface is not implemented: occupation
+```
 
 ## Multiple Inheritance
 
