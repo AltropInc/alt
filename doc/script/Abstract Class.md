@@ -4,7 +4,7 @@ An abstract class is a class that cannot be instantiated, but they can be subcla
 
 * contains deferred member functions or inherits such function that is not overridden with an implementation,
 * is declared abstract using the specifier `abstract`, or
-* is a parametric class (see [Parametric Class](Parametric Class.md)) (with type parameters unbound).
+* is a [parametric class](Parametric Class.md) with type parameters unbound.
 
 If a class contains a member function with any deferred interface, this class must be declared as an abstract or interface class:
 ```Altro
