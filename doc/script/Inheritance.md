@@ -219,16 +219,10 @@ A derived class can inherit only one base class that is not an interface class. 
 
 
 
-Altro achieves multiple inheritances only with the help of **interface classes**.
-The interface of member class (function) `onButtonClick` is deferred and does not have implementation. An interface class is an abstract class because all member class constructor interfaces are deferred.
 
 
 
-An abstract class is a class that cannot be instantiated, but they can be subclassed. If a class contains a member class with any deferred constructor interface, this class is an abstract class. If its derived class does not override this deferred constructor interface with an implementation block, the derived class is an abstract  class too. In the above example, the class `abstract_base` and `abstract_derived` are abstract classes, and only the class `derived` can be used to instantiate objects. A class can also be declared abstract using the keyword `abstract` even though it does not have any member classes with deferred constructor interfaces. In addition, a parametric class (see [Parametric Class](@ref man-parametric-classes)) is also an abstract class. In summary, a class is abstract if
 
- * It contains a member class with any deferred constructor interface or inherits such interface that is not overriden
- * It is declared abstract using the keyword `abstract`.
- * It is a parametric class (see [Parametric Class](@ref man-parametric-classes))
 
 The ALT virtual constructor interface is more general than the concept of virtual functions in other traditional programming languages, because the overriding mechanism is not just limited to functions:
 
