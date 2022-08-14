@@ -105,13 +105,11 @@ class OuterClass
                                       ^ ------------- Error: Name undefined
 }
 ```
-The superclass of the meber function `<` is `func`, which is a [stateless class](StatelessClass.md] that has no members in its object scope. Accessing the name `a` by using `self` is to find the name `a` in the instance of a stateless class and is an error.
-
-There a major distinction in accessing enclosing names within a member function between altro and other programming lauguages such as Java and C++. The distinction is caused by the concept of a member function that is not considered a member class in other programming lauguages. In altro, `self` appearing in a member function refers to the instance of the function class itsef, not the instance of the class that encloses the member function. To access the instance of the class that encloses the function within the function body, `owner` has to be used.
+The superclass of the meber function `<` is `func`, which is a [stateless class](StatelessClass.md] that has no members in its object scope. Accessing the name `a` by using `self` is to find the name `a` in the instance of a stateless class and is an error. This is the major distinction in accessing enclosing names within a member function between altro and other programming lauguages such as Java and C++. The distinction is caused by the concept of a member function that is not considered a member class in other programming lauguages. In altro, `self` appearing in a member function refers to the instance of the function class itsef, not the instance of the class that encloses the member function. To access the instance of the class that encloses the function within the function body, `owner` has to be used.
 
 ## selfclass
 
-The keyword `selfclass` represents the actual type of the instance represented by `self`. Therefore, `selfclass` appearing in a class body may refer to the type of this class or a subclass of this class. Example:
+The keyword **selfclass** represents the actual type of the instance represented by `self`. Therefore, `selfclass` appearing in a class body may refer to the type of this class or a subclass of this class. Example:
 ```altro
 class PointAtLeast2D
 {
@@ -136,7 +134,7 @@ class Point2D
     }
 }
 ```
-While the constructor `ctor(other: Point2D)` can accept an instance of any subclass of `Point2D`, the constructor `ctor(other: selfclass)` in the class `PointAtLeast2D` can accept an instance of the same type to the type of `self`. Consider:
+While the constructor `ctor(other: Point2D)` can accept an instance of any subclass of `Point2D`, the constructor `ctor(other: selfclass)` in the class `PointAtLeast2D` can accept an instance in exactly the same type of the `self`. Consider:
 ```altro
 sealed class Point2D is PointAtLeast2D
 {
@@ -166,4 +164,74 @@ p_copy3 := Point3D(p3);           // Okay because Point3D is sealed, the type of
 
 ## ownerclass
 
-The keyword `ownerclas`s represents the actual type of the instance represented by `owner`.
+The keyword **ownerclas** represents the actual type of the instance represented by `owner`. Therefore, `ownerclass` appearing in a member class body may refer to the type of the enclosing class of this class, or of a subclass of this class. Let's take a look at the built-in interface class `comparable`:
+```altro
+interface class comparable
+{
+    func <=> (other: ownerclass): int;
+}
+```
+The member class `<=>` ([three-way comparison](https://en.wikipedia.org/wiki/Three-way_comparison)) takes the `other1 argument to determine whether owner < other, owner = other, or owner > other in a single operation and returns the values −1, 0, or 1 respectively. Here `ownerclass` represents the type of a subclass derived from `comparable`, which is the exact type of the owner used to call the member class `<=>`. In a concreate derived class from `comparable`, the function class `<=>` with the interface `(ownerclass):int` must be overridden to provide the implementation  of a three-way comparison. For example:
+```altro
+class MyComparable : comparable
+{
+    i : int;
+    final func <=> (other: ownerclass): int { i <=> other.i }
+    ctor(x:int) { i = x }
+}
+n1:=MyComparable(3);
+n2:=MyComparable(2);
+compare_ordering := n1<=>n2;  // compare_ordering gets value 1
+```
+If the overriden function is final, or the derived class itself is sealed, the `ownerclass` in the function `<=>` of the derived class is fixed exactly to the derived class and it cannot be any class further derived. Therefore, in the expression `n1<=>n2`, `n2` guarantees to be the exact type expected by the owner referred to by `n1`. In fact, we can replace `ownerclass` with the derived class name:
+```altro
+class MyComparable : comparable
+{
+    i : int;
+    final func <=> (other: MyComparable): int { i <=> other.i }
+    ctor(x:int) { i = x }
+}
+```
+However, if the class `MyComparable` is not sealed or the overridden function `<=>` is not final, the function interface `(MyComparable):int` will be a different interface from `(ownerclass):int`:
+```altro
+class MyComparable : comparable
+{
+    i : int;
+    func <=> (other: MyComparable): int { i <=> other.i }
+         // This does not override the deferred function '<=>(ownerclass):int' defined in comparable,
+         // and therefore, 'MyComparable' is an abstract class
+    ctor(x:int) { i = x }
+}
+n1:=MyComparable(3);   // Error: Cannot instantiate abstract: the deferred interface '<=>' is not implemented
+```
+What if we override the function '<=>(ownerclass):int' defined in comparable in a non-sealed derived class and allow the function to be overridden further without using the specifier `final`? Consider:
+```altro
+class MyComparable : comparable
+{
+    i : int;
+    func <=> (other: ownerclass): int { i <=> other.i }
+         // This overrides the deferred function '<=>(ownerclass):int' defined in comparable,
+         // but can be further overridden in a derived class from 'MyComparable'
+    ctor(x:int) { i = x }
+}
+n1:=MyComparable(3);
+n1:=MyComparable(2);
+compare_ordering := n1<=>n2;  // Error: No matched IO interface is found to call <=>
+```
+You may wonder why there is an error here? The reason is that variable names `n1` and `n2`, though they all initialized to refer to an instance of `MyComparable`, can refer to instances of different derived classes in which the function `<=>` is overridden with different implementations, and this can cause `n1<=>n2` ill-formed:
+```altro
+class MyComparable2 : MyComparable
+{
+    j : int;
+    func <=> (other: ownerclass): int
+    { 
+        if (i==other.i) return j<=>other.j;
+        return i<=>other.i;
+    }
+    ctor(x, y:int) super(x) { j = y }
+}
+n1: MyComparable = MyComparable2(3,2);
+n2: MyComparable = MyComparable(2);
+compare_ordering := n1<=>n2;  // Error: No matched IO interface is found to call <=>
+```
+If we allowed `n1<=>n2` here, the overridden function in the instance referred by `n1` would expect the input referred by `n2` has the declared name `j`, but unfortunately, `n2` refers to an instance of `MyComparable` that has no declared name `j`.
