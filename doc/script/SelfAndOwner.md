@@ -171,7 +171,7 @@ interface class comparable
     func <=> (other: ownerclass): int;
 }
 ```
-The member class `<=>` ([three-way comparison](https://en.wikipedia.org/wiki/Three-way_comparison)) takes the `other1 argument to determine whether owner < other, owner = other, or owner > other in a single operation and returns the values −1, 0, or 1 respectively. Here `ownerclass` represents the type of a subclass derived from `comparable`, which is the exact type of the owner used to call the member class `<=>`. In a concreate derived class from `comparable`, the function class `<=>` with the interface `(ownerclass):int` must be overridden to provide the implementation  of a three-way comparison. For example:
+The member class `<=>` ([three-way comparison](https://en.wikipedia.org/wiki/Three-way_comparison)) takes the `other` argument to determine whether owner < other, owner = other, or owner > other in a single operation and returns the values −1, 0, or 1 respectively. Here `ownerclass` represents the type of a subclass derived from `comparable`, which is the exact type of the owner used to call the member class `<=>`. In a concreate derived class from `comparable`, the function class `<=>` with the interface `(ownerclass):int` must be overridden to provide the implementation  of a three-way comparison. For example:
 ```altro
 class MyComparable : comparable
 {
