@@ -93,31 +93,19 @@ b := s1 > s2;      // this uses the two-way operator '>' directly
 
 ## Built-in Comparables
 
-Built-in types such as [integers and floating-point numbers](TypeNumeric.md) are comparable types. They are classes derived (indirectly) from the interface `comparable`. However, the implementation of the required member function `<=>` is not explicitly written in these built-in classes. These built-in classes also interprets two-way comparisons directly without a need to translate them into a three-way comparison. Therefore, the expression
+Built-in types such as [integers and floating-point numbers](TypeNumeric.md) are comparable types. They are classes derived (indirectly) from the interface `comparable`. However, the implementation of the required member function `<=>` is not explicitly written in these built-in classes. These built-in classes also interpret two-way comparisons directly without a need to translate them into a three-way comparison. Therefore, the expression
 ```altro
 4 > 3
 ```
 is executed directly without calling any member function in the `int` class.
 
-Note that member functions used for comparisons using `ownerclass` for the type of instance or value to be compared with. This requires that the one to be compared with must be in the same type of the owner who performs the comparison. If they are in different types, one of them must be converted to the type of the other. Using comparison operatorss on built-in types honors the [type promotion rule](TypePromotion), a rule of using widening conversions to prevent the loss of information about the magnitude of a value. For instance, in the expression
+Note that member functions used for comparisons using `ownerclass` for the type of instance or value to be compared with. This requires that the one to be compared with must be in the same type as the owner who performs the comparison. If they are in different types, one of them must be converted to the type of the other. Using comparison operators on built-in types honors the [type promotion rule](TypePromotion.md), a rule of using widening conversions to prevent the loss of information about the magnitude of a value. For instance, in the expressionn
 ```altro
 4 > 4.2
 ```
-The owner (integer 4) will be promoeted to `double` before the expression is executed. And the result of the execution is `false`.
+The owner (integer 4) will be promoted to `double` before the expression is executed. And the result of the execution is `false`.
 
-In a polymorphic case where the types of arguments are unknown, performing a comparison on these arguments is ill-formed:
-```altro
-c : comparable;
-c_is_greater := c > 4.0; // Error: Types not comparable: comparable, int
-```
-Type check is required to compare polymorphic arguments:
-```altro
-c : comparable;
-c_is_greater: bool;
-if (c->d is double) { c_is_greater = d > 4.0; }
-```
-
-In a parametric case, only type conversion is used and type promotion is not honored. For example:
+However, in a parametric polymorphism case, only type conversion is used and type promotion is not honored. For example:
 ```altro
 meta func compare#(sealed type T: comparable)(x,y: T): int
 {
@@ -125,5 +113,18 @@ meta func compare#(sealed type T: comparable)(x,y: T): int
 }
 order := compare(5, 5.1);   // order gets value 0. 5 is not promoted to 5.0
 ```
-In calling the `compare` function with a parametric interface, the type paramter `T` is bound to `int`, and the second input parameter '5.1' is converted to an integer '5'.
+In calling the `compare` function with a parametric interface, the type parameter `T` is bound to `int`, and the second input parameter '5.1' is converted to an integer '5'. And in this case, the actual parameter for 'x' will not be promoted to double.
+
+In other polymorphism case where the types of arguments cannot be determined to be the same, performing a comparison on these arguments is ill-formed because `ownerclass` requires that only values of the same type can be compared.
+```altro
+c : comparable;
+c_is_greater := c > 4.0; // Error: Types not comparable: comparable, int
+```
+Type check is required to compare a polymorphic argument when its type cannot be determined to be the same as the one to be compared with:
+```altro
+c : comparable;
+c_is_greater: bool;
+if (c->d is double) { c_is_greater = d > 4.0; }
+```
+
 
