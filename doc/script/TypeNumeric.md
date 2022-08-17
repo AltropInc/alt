@@ -40,6 +40,6 @@ interface class integral is numeric
 | func   | Alias    | Common Name      | Example   |   Description                             |
 |:------ |:-------- |:---------------- |:--------- |:----------------------------------------- |
 | \      | ⊻        | Bit Exclusive Or | x \ y     | Returns bitwise-exclusive-or of x and y   |
-| \|     | ∪        | Bit Or           | x | y     | Returns bitwise-or of x and y             |
+| \|     | ∪        | Bit Or           | x \| y    | Returns bitwise-or of x and y             |
 | &      | ∩        | Bit And          | x & y     | Returns bitwise-and of x and y            |
 | ~      |          | Bit Complement   | x & y     | Returns Bitwise complement of x           |
