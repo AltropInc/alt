@@ -1,6 +1,6 @@
 # Numeric
 
-Numeric classes representing numeric values that have the property of arithmetic calculation such as addition, subtraction, multiplication, and division. Numeric interfaces can be further divided into four categories: integral, real, rational, and complex. The integral class specifies [whole numbers](https://en.wikipedia.org/wiki/Integer) that can be represented without a fractional component. The real class represents [real number](https://en.wikipedia.org/wiki/Real_number) values that have a continuous quantity, but their bit-representation in platform is approximate due to the limited number of bytes used to store their values. The `rational` class represents fractional numbers by exact ratios of two integers. Complex numbers have a real and imaginary part, which are each a real number.
+Numeric classes representing numeric values that have the property of arithmetic calculation such as addition, subtraction, multiplication, and division. Numeric interfaces can be further divided into four categories: integral, real, rational, and complex. The integral class specifies [whole numbers](https://en.wikipedia.org/wiki/Integer) that can be represented without a fractional component. The real class represents [real number](https://en.wikipedia.org/wiki/Real_number) values that have a continuous quantity, but their bit-representation in platform is approximate due to the limited number of bytes used to store their values, and they are often referred as [floating point numbers](https://en.wikipedia.org/wiki/Floating-point_arithmetic). The `rational` class represents fractional numbers by exact ratios of two integers. Complex numbers have a real and imaginary part, which are each a real number.
 
 ## Numeric Interfaces
 
@@ -46,7 +46,7 @@ A class derived form the `numeric` interface must implement the deferred member 
 | *      |          | Multiplication   | x * y     | Returns the multiplies of x by the factor y         |
 | /      |          | Division         | x / y     | Returns the quotient of dividing x by the divisor y |
 | ÷      | /#       | Integer Division | x ÷ y     | Returns the integral part of the quotient from x/y  |
-| %      |          | Modulus          | x % y     | Returns the division remainder                      |
+| %      |          | Modulus          | x % y     | Returns the integral division remainder             |
 | ^      |          | Power            | x ^ y     | Returns the value of x raised to the power of y     |
 | +=     |          | Add Assign       | x += y    | Adds y to x and x gets the sum                      |
 | -=     |          | Sub Assignn      | x -= y    | Substrcts y from x and x gets the difference        |
@@ -113,7 +113,7 @@ interface class signed is integral
 |:----------- |:------- |:---------------- |:--------- |:------------------------------------------------- |
 | +           |         | Positive sign    | +x       | Returns positive (unchanged) value of x            |
 | -           |         | Negative sign    | -x       | Returns the negating value of x                    |
-| \|()\|      |         | Negative sign    | \|x\|    | Returns the absolute value of x                    |
+| \|()\|      |         | Absolue value    | \|x\|    | Returns the absolute value of x                    |
 
 ### real
 The class **real** is an interface class derived from `numeric` with the following additional deferred member functions for negatable values:(https://en.wikipedia.org/wiki/Bitwise_operation):
@@ -129,12 +129,63 @@ interface class real is numeric
 |:----------- |:------- |:---------------- |:--------- |:------------------------------------------------- |
 | +           |         | Positive sign    | +x       | Returns positive (unchanged) value of x            |
 | -           |         | Negative sign    | -x       | Returns the negating value of x                    |
-| \|()\|      |         | Negative sign    | \|x\|    | Returns the absolute value of x                    |
+| \|()\|      |         | Absolue value    | \|x\|    | Returns the absolute value of x                    |
 
-## Built-in Integer Types
 
-All built-in integer types are derived from the `integral` interface. They are [value types](ValueType.md) and their instances are [passed by value](ArgumentPassing.md). They are also simple types so you can use literals to represent an instance of the type. 
+## Built-in Number Types
 
+All concrete built-in number types are derived from the `numeric` interface. They are [value types](ValueType.md) and their instances are [passed by value](ArgumentPassing.md). They are also simple types so you can use literals to represent instances of the type. 
+
+### Built-in Integer Types
+
+All built-in integer types are derived from the `integral` interface. Altro supports the following built-in integral types:
+
+| class name  | derived from | size      | Literal Example   |   Description                 |
+|:----------- |:------------ |:--------- |:----------------- |:----------------------------- |
+| tiny        | signed       | 1 byte    | 43t               | Signed 8-bit integer          |
+| short       | signed       | 2 bytes   | 43s               | Signed 16-bit integer         |
+| int         | signed       | 4 bytes   | 43                | Signed 32-bit integer         |
+| long        | signed       | 8 bytes   | 43l               | Signed 62-bit integer         |
+| llong       | signed       | 16 bytes  | 43L               | Signed 128-bit integer        |
+| utiny       | unsigned     | 1 byte    | 43ut              | Unsigned 8-bit integer        |
+| ushort      | unsigned     | 2 bytes   | 43us              | Unsigned 16-bit integer       |
+| uint        | unsigned     | 4 bytes   | 43u               | Unsigned 32-bit integer       |
+| ulong       | unsigned     | 8 bytes   | 43ul              | Unsigned 62-bit integer       |
+| ullong      | unsigned     | 16 bytes  | 43uL              | Unsigned 128-bit integer      |
+
+Each of the integral types has constant meta names `min` and `max` that provide the minimum and maximum value of that type. 
+
+| class name  |min                          | max                             |
+|:----------- |:--------------------------- |:------------------------------- |
+| tiny        | -128                        | 127                             |
+| short       | 32,768                      | 32,767                          |
+| int         | -2,147,483,648              | 2,147,483,647                   |
+| long        | -9,223,372,036,854,775,808  | 9,223,372,036,854,775,807       |
+| llong       | -(2^127) ≅ -(1.7 x 10^38)   | 2^127 - 1 ≅ 1.7 x 10^38         |
+| utiny       | 0                           | 255                             |
+| ushort      | 0                           | 65,535                          |
+| uint        | 0                           | 4,294,967,295                   |
+| ulong       | 0                           | 18,446,744,073,709,551,615      |
+| ullong      | 0                           |  2^128 - 1 ≅ 3.4 x 10^38        |
+
+For instance, the expression `int.min` represents the minimum value of integers in the `int` type, which is `-2147483648`.
+
+### Built-in real Types
+
+All built-in real number types are derived from the `real` interface.  Altro supports the following built-in real number types:
+
+| class name  | derived from | size      | Literal Example   |   Description                 |
+|:----------- |:------------ |:--------- |:----------------- |:----------------------------- |
+| float       | real         | 4 byte    | 43.23f            | 4-byte floating-point number  |
+| double      | real         | 8 bytes   | 43.23             | 8-byte floating-point number  |
+| ldouble     | real         | 16 bytes  | 43.23l            | 16-byte floating-point number |
+
+A real number literal can also be represented as a mantissa with an exponent. For example:
+```altro
+       mantissa   exponent
+         ┌──┴──┐  ┌┴┐
+         1.23456e-67
+```
 
 
 ## Compound Assignments
