@@ -1,14 +1,14 @@
 # Numeric
 
-Numeric classes representing numeric values that have the property of arithmetic calculation such as addition, subtraction, multiplication, and division. Numeric interfaces can be further divided into four categories: integral, real, rational, and complex. The integral class specifies [whole numbers](https://en.wikipedia.org/wiki/Integer) that can be represented without a fractional component. The real class represents [real number](https://en.wikipedia.org/wiki/Real_number) values that have a continuous quantity, but their bit-representation in platform is approximate due to the limited number of bytes used to store their values, and they are often referred as [floating point numbers](https://en.wikipedia.org/wiki/Floating-point_arithmetic). The `rational` class represents fractional numbers by exact ratios of two integers. Complex numbers have a real and imaginary part, which are each a real number.
+Numeric classes representing numeric values that have the property of arithmetic calculation such as addition, subtraction, multiplication, and division. Built-in numeric interfaces can be further divided into two categories: integral and real. The integral class specifies [whole numbers](https://en.wikipedia.org/wiki/Integer) that can be represented without a fractional component. The real class represents [real number](https://en.wikipedia.org/wiki/Real_number) values that have a continuous quantity, but their bit-representation in platform is approximate due to the limited number of bytes used to store their values, and they are often referred as [floating point numbers](https://en.wikipedia.org/wiki/Floating-point_arithmetic).
 
 ## Numeric Interfaces
 
 All concrete numeric classes such as int, short, long, double, float, etc. re derived from the interface class **numeric**.
 ```
                                                   nemric
-                              ┌─────────────────────┴────────────┬─────────────────┬───────────────┐
-                          integral                              real           rational        complex
+                              ┌─────────────────────┴────────────┬──────── ─ ─ ─ ─ ┬ ─ ─ ─ ─ ─ ─ ┐
+                          integral                              real           rational       complex
               ┌───────────────┴─────────────┐            ┌───────┼───────┐
           unsigned                        signed      float   double  ldouble 
   ┌─────┬─────┼─────┬─────┐      ┌─────┬────┼────┬────┐
@@ -187,24 +187,39 @@ A real number literal can also be represented as a mantissa with an exponent. Fo
          1.23456e-67
 ```
 
+## Other Numeric Classes
 
-## Compound Assignments
+Other derived concrete numeric classes are not the built-in ones in the altro core. They are provided in libraries as user defined types, such as `rational` that represents fractional numbers by exact ratios of two integers, `complex` numbers that have a real and imaginary part in a real number, `decimal` data type defined by its precision (total number of digits) and scale (number of digits to the right of the decimal point), and etc. To retain the property of arithmetic calculation, they must impement all deferred member functions listed in the `numeric` interface class.
 
-A compound assignment in the form `x op= y` is equivalent to x = x op y, except that x is evaluated only once. For exampe, the following code
+## Numeric Type Promotion for Addable and Scalable Operation
+
+When we use an [add or scale operation](operators.md) (binary +, -, \*, / etc.) that have another input as the second operand required to be the ownerclass for the same type of the owner (the first operand), say
 ```altro
-x: int = 4;
-x += 5.2;
+x op y
 ```
-is equivalent to
+where `x` is the owner value (the first operand), `op` is the operation and `y` is the input (the second operand). A type promotion rule is used to determine whether `x` or `y` need to be convered using widening conversions to prevent the loss of information about the magnitude of the result value. For instance, in the expressionn
 ```altro
-x: int = 4;
-x = x + 5.2;
+4 + 4.2
 ```
-The result of `x + 5.2` is 9.2 which is converted to the type of `x` in assigment. Therefore, `x` gets the value 9.
+The owner (integer 4) will be promoted to double before the expression is executed. And the result of the execution will be in the type of double. On the otherhabd,
+```altro
+4.2 + 4
+```
+The input (integer 4) will be promoted to double before the expression is executed. And the result of the execution will be in the type of double. Here is another eample:
+```altro
+x: tiny = 150;
+y: tiny = 150;
+z := x+y;
+```
+Here in the expression `x+y`, both `x` and `y` are promoted to int, and the result will be 300 in the type of `int`.
 
-If you want to define your own numeric class derived from any numeric interface classes, you are not required to provide member functions for compound assignments. They will be automatically translated into the form `x = x op y`. However，the translation may not be eqivalent if there is a side effect in evaluating `x`. To prevent this from happening, you can provide member functions for compound assignments in your numeric class. 
+Here are the numeric type promotion rules for addable and scalable Operation:
 
-For built-in types, compound assignments are interpreted directly without the translation.
-
-
+* if one value is a ldouble, both are promoted to ldouble, otherwise
+* if one value is a double, both are promoted to double, otherwise
+* if one value is a float, both are promoted to float, otherwise
+* if one value is a llong, both are promoted to llong, otherwise
+* if one value is a long, both are promoted to llong, otherwise
+* if one value is an int, both are promoted to long, otherwise
+* both tiny or short values are promoted to int.
 
