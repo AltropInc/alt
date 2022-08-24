@@ -197,7 +197,7 @@ When we use an [add or scale operation](operators.md) (binary +, -, \*, / etc.) 
 ```altro
 x op y
 ```
-where `x` is the owner value (the first operand), `op` is the operation and `y` is the input (the second operand). A type promotion rule is used to determine whether `x` or `y` need to be convered using widening conversions to prevent the loss of information about the magnitude of the result value. For instance, in the expressionn
+where `x` is the owner value (the first operand), `op` is the operation and `y` is the input (the second operand). A type promotion rule is used to determine whether `x` or `y` need to be converted using widening conversions to prevent the loss of information about the magnitude of the result value. For instance, in the expression
 ```altro
 4 + 4.2
 ```
@@ -213,7 +213,7 @@ z := x+y;
 ```
 Here in the expression `x+y`, both `x` and `y` are promoted to int, and the result will be 300 in the type of `int`.
 
-Here are the numeric type promotion rules for addable and scalable Operation:
+Here are the numeric type promotion rules for addable and scalable opration:
 
 * if one value is a ldouble, both are promoted to ldouble, otherwise
 * if one value is a double, both are promoted to double, otherwise
@@ -222,4 +222,6 @@ Here are the numeric type promotion rules for addable and scalable Operation:
 * if one value is a long, both are promoted to llong, otherwise
 * if one value is an int, both are promoted to long, otherwise
 * both tiny or short values are promoted to int.
+
+For more information about this topic, see [Type Promotion](TypePromotion.md).
 
