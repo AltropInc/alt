@@ -99,32 +99,33 @@ Built-in types such as [integers and floating-point numbers](TypeNumeric.md) are
 ```
 is executed directly without calling any member function in the `int` class.
 
-Note that member functions used for comparisons using `ownerclass` for the type of instance or value to be compared with. This requires that the one to be compared with must be in the same type as the owner who performs the comparison. If they are in different types, one of them must be converted to the type of the other. Using comparison operators on built-in types honors the [type promotion rule](TypePromotion.md), a rule of using widening conversions to prevent the loss of information about the magnitude of a value. For instance, in the expressionn
+## Numeric Type Promotion for Comparison Operation
+
+Note that member functions used for comparisons using `ownerclass` for the type of instance or value to be compared with. This requires that the one to be compared with must be in the same type as the owner who performs the comparison. If they are in different types, one of them must be converted to the type of the other. In case of comparing numbers, a type promotion rule is used to determine what widening conversions are used to prevent the loss of information about the magnitude. For instance, in the expression
 ```altro
 4 > 4.2
 ```
-The owner (integer 4) will be promoted to `double` before the expression is executed. And the result of the execution is `false`.
+The owner (integer 4) will be promoted to `double` before the expression is executed. And the result of the execution is `false`. Consider another eample:
+```altro
+x: int = -4;
+y: uint = 150;
+y_is_greater_than_y := y > x;
+```
+Here in the expression `x+y`, both `x` and `y` are promoted to int, and the result will be true. If we do not do the type promotion and compare the value bits of y and x directly, the result would be false.
 
-However, in a parametric polymorphism case, only type conversion is used and type promotion is not honored. For example:
-```altro
-meta func compare#(sealed type T: comparable)(x,y: T): int
-{
-    return x<=>y;
-}
-order := compare(5, 5.1);   // order gets value 0. 5 is not promoted to 5.0
-```
-In calling the `compare` function with a parametric interface, the type parameter `T` is bound to `int`, and the second input parameter '5.1' is converted to an integer '5'. And in this case, the actual parameter for 'x' will not be promoted to double.
+Here are the numeric type promotion rules for comparison operation:
 
-In other polymorphism case where the types of arguments cannot be determined to be the same, performing a comparison on these arguments is ill-formed because `ownerclass` requires that only values of the same type can be compared.
-```altro
-c : comparable;
-c_is_greater := c > 4.0; // Error: Types not comparable: comparable, int
-```
-Type check is required to compare a polymorphic argument when its type cannot be determined to be the same as the one to be compared with:
-```altro
-c : comparable;
-c_is_greater: bool;
-if (c->d is double) { c_is_greater = d > 4.0; }
-```
+* if both operands are in the same type, no conversion is needed, otherwise
+* if both are unsigned or both are signed, the integer in smaller magnitude is promoted to the integer of the same magnitude of the other, otherwise
+* if one value is a ldouble, both are promoted to ldouble, otherwise
+* if one value is a double, both are promoted to double, otherwise
+* if one value is a float, both are promoted to float, otherwise
+* if one value is a llong, both are promoted to llong, otherwise
+* if one value is a long, both are promoted to llong, otherwise
+* if one value is an int, both are promoted to long, otherwise
+* both tiny or short values are promoted to int.
+
+For more information about this topic, see [Type Promotion](TypePromotion.md).
+
 
 
