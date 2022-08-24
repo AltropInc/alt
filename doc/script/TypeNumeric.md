@@ -189,11 +189,11 @@ A real number literal can also be represented as a mantissa with an exponent. Fo
 
 ## Other Numeric Classes
 
-Other derived concrete numeric classes are not the built-in ones in the altro core. They are provided in libraries as user defined types, such as `rational` that represents fractional numbers by exact ratios of two integers, `complex` numbers that have a real and imaginary part in a real number, `decimal` data type defined by its precision (total number of digits) and scale (number of digits to the right of the decimal point), and etc. To retain the property of arithmetic calculation, they must impement all deferred member functions listed in the `numeric` interface class.
+Other derived concrete numeric classes are not the built-in ones in the altro core. They are provided in libraries as user defined types, such as `rational` that represents fractional numbers by exact ratios of two integers, `complex` numbers that have a real and imaginary part in a real number, `decimal` data type defined by its precision (total number of digits) and scale (number of digits to the right of the decimal point), and etc. To retain the property of arithmetic calculation, they must implement all deferred member functions listed in the `numeric` interface class.
 
-## Numeric Type Promotion for Addable and Scalable Operation
+## Numeric Type Promotion for Adding and Scaling Operation
 
-When we use an [add or scale operation](operators.md) (binary +, -, \*, / etc.) that have another input as the second operand required to be the ownerclass for the same type of the owner (the first operand), say
+When we use binary [adding or scaling operators](operators.md) (+, -, \*, /, etc.) that have another input as the second operand required to be the ownerclass for the same type of the owner (the first operand), say
 ```altro
 x op y
 ```
@@ -201,11 +201,11 @@ where `x` is the owner value (the first operand), `op` is the operation and `y` 
 ```altro
 4 + 4.2
 ```
-The owner (integer 4) will be promoted to double before the expression is executed. And the result of the execution will be in the type of double. On the otherhabd,
+The owner (integer 4) will be promoted to double before the expression is executed. And the result of the execution will be in the type of double. On the other hand,
 ```altro
 4.2 + 4
 ```
-The input (integer 4) will be promoted to double before the expression is executed. And the result of the execution will be in the type of double. Here is another eample:
+The input (integer 4) will be promoted to double before the expression is executed. And the result of the execution will be in the type of double. Here is another example:
 ```altro
 x: tiny = 150;
 y: tiny = 150;
