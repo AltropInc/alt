@@ -136,7 +136,7 @@ s.at(1);                    // returns 2
 s.at(1) = 6                 // sets element at 1 to 6
 ```
 * `func value_at (index: int): element_type` --
-    returns the element reference at the specified position given by the index. If the index is not within the range of the container,
+    returns the element vallue at the specified position given by the index. If the index is not within the range of the container,
     an exception is raised with an error of "Index out of boundary".
 ```altscript
 int...(1,2,3,4).value_at(1);             // returns 2
