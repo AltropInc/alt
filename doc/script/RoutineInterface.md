@@ -180,7 +180,6 @@ class IntStream
         for (i:=start; i<end; ++i) sum += agg_func(i_stream[i]);
         sum
     }
-    func [ (ix: int) ]: int { i_stream[ix] }
 }
 ns := IntStream(1,2,3,4);
 aggregate_power_2 := ns aggregate from 1 to 3 with {x²};
