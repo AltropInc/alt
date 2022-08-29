@@ -200,7 +200,7 @@ e := i_stream[3];
 ```
 Here is another example using prefix interface:
 ```altro
-class double: real
+sealed class double: real
 {
     prefix func |()|: double;
 }
