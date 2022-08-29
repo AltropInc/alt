@@ -156,12 +156,61 @@ member_function owner
 ```
 A prefix interface with a member function starts with the keyword `prefix`:
 ```altro
-value class IntPair
+class IntPair
 {
     i,j := 0, 0;
-    prefix func ++ (): IntPair { ++i; ++j; self }
+    prefix func ++ (): IntPair { ++i; ++j; owner }  // increases owner's i and j, returns the owner
 }
 n1 := IntPair();
-n2 := ++n1;
+n2 := ++n1;   // call prefix function '++'
 ```
+While we call a non-prefix memmber function, we give the owner first, and then the memmber function name. In calling a prefix function, we put the owner after the memmber function name, as shown in the expression `++n1`, where `++` is the member function name and `n1` is the expression of the owner.
+
+## Multi-Section Member Function Interface
+
+A member function interface can consist of multiple sections separated by suffix names. For instance,
+```altro
+class IntStream
+{
+    i_stream: int...
+    ctor(istr: int...) { i_stream = istr }
+    func aggregate () from (start:int) to (end:int) with (agg_func: fn(x:int):int) :int
+    {
+        sum:=0;
+        for (i:=start; i<end; ++i) sum += agg_func(i_stream[i]);
+        sum
+    }
+    func [ (ix: int) ]: int { i_stream[ix] }
+}
+ns := IntStream(1,2,3,4);
+aggregate_power_2 := ns aggregate from 1 to 3 with {x²};
+```
+Here the member function has an input interface `(start:int; end:int; agg_func: fn(x:int):int)` that is separated into 4 sections where the first section is empty. A suffix name is used to separate between sections. When calling the member function, the actual parameters must be grouped into specified sections and separated by suffix names in the same way that specifies the input interface.
+
+A suffix name can be appended at the end of the input interface. For instance, the built-in class `stream` defines the indexing member function like this:
+```altro
+class stream #(type element_type: any): iterable #(element_type)
+{
+    func [(index: int)]: ref#(element_type);
+}
+```
+Here the member function `[` has one section but a suffix `]` is appended at the end of the input interface. When call this member function, the suffix must be provided after the actual parameter for the index:
+```altro
+i_stream = (1,2,3,4);
+e := i_stream[3];
+```
+Here is another example using prefix interface:
+```altro
+class double: real
+{
+    prefix func |()|: double;
+}
+```
+Here the prefix member function `|` has one empty section with a suffix `|` is appended at the end of the input interface. When call this prefix member function, the owner value appears after the function name, and the suffix `|` must be attached after the owner value:
+```altro
+p := -3.14;
+abs_p := |p|;
+```
+Because the input interface is empty and the member function is a prefix function, you do not need to provide in parentheses with empty actual parameters.
+
 
