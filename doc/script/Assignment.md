@@ -62,13 +62,41 @@ For more information about the ownership, see [Ownership](Ownership.md).
 
 ## Copy Assignment `a @= expr`
 
-A copy assignment uses copy by value only, as a result, the destination gets a distinct shallow copy of the original value. A shallow copy is a copy of a value, where a new value is created and it has the same copy of the values in the original value. If any of the value is composite and conatins references to refer to the other values then in such cases only the reference is copied. For instance,  let `b` a reference to value ("abc", "xyz", "123), and `a` a null reference to a tripple of strings:
+A copy assignment uses copy by value only, as a result, the destination gets a distinct shallow copy of the original value. A shallow copy is a copy of a value in which references to element values, if any, are not copied, that is, if the value is composite and contains references to refer to another value then in such cases only the reference is copied and the copied reference does not own the value. Let `b` a reference to a tuple value ("abc", "xyz", "123), and `a` a null reference to a tuple of strings:
 ```altro
 Before the assignment:
 a : (string; string; string);
 b := ("abc", "xyz", "123);
 ```
-Before the assignment `a = b`, we have:
+After the assignment `a @= b`, we have:
+```altro
+a ───🡪 null
+b ───🡪 ( ◯     ◯      ◯ )  ⭠ a tuple value that contains three references
+          🡫     🡫      🡫     ⭠ each reference owns the value that they are referring
+        "abc"   "xyz"  "123"
+```
+After the assignment `a @= b`, we get:
+```altro
+b ───🡪 ( ◯     ◯      ◯ )
+          🡫     🡫      🡫     ⭠ references that owns what they are referring
+        "abc"   "xyz"  "123"
+          🡩     🡩      🡩     ⭠ references that does not own what they are referring
+a ───🡪 ( ◯     ◯      ◯ )
+```
+Here `a` has a reference to a triple string references that points to the same string values pointed by references referred by `b`. Note that `a` owns the tuple value that contains three references, whereas the references contained in the tuple referred by `a` does not own the string value. If we have `b` set to null, all strings owned by references contained in the tuple value referred by `b` are gone, and `a` still owns the tuple value  but all three references contained in the tuple becomes null:
+```altro
+b ───🡪 null 
+a ───🡪 ( ◯     ◯      ◯ )
+```
+
+## Deep Copy Assignment `a @@= expr`
+
+A deep copy assignment also uses copy by value only, as a result, the destination gets a distinct deep copy of the original value. Deep copy is a process in which the copying process occurs recursively, that is, If the value contains a reference to a value and the reference owns the value, a deep copy of the value is created within its conataining value. How ever, if the contained reference does not own the value, the reference itsef is copied and the copied reference does not own the value either. Let `b` a reference to a tuple value ("abc", "xyz", "123), and `a` a null reference to a tuple of strings:
+```altro
+a : (string; string; string);
+b := ("abc", "xyz", "123);
+```
+Before the assignment `a @@= b`, we have:
 ```altro
 a ───🡪 null
 b ───🡪 ( ◯     ◯      ◯ )  ⭠ a tuple value that contains three references
@@ -80,14 +108,14 @@ After the assignment `a = b`, we get:
 b ───🡪 ( ◯     ◯      ◯ )
           🡫     🡫      🡫     ⭠ references that owns what they are referring
         "abc"   "xyz"  "123"
-          🡩     🡩      🡩     ⭠ references that does not own what they are referring
+        
 a ───🡪 ( ◯     ◯      ◯ )
-```
-Here `a` has a reference to a tripple string references that points to the same string values pointed by references referred by `b`. Note that `a` owns the tuple value that contains three references, by the references contained in the tuple referred by `a` does not own the string value. If we have `b` set to null, all strings owned by references contained in the tuple value referred by `b` are gone, and `a` still owns the tuple value  but all three references constained in the tuple becomes null:
-b ───🡪 null 
-a ───🡪 ( ◯     ◯      ◯ )
+          🡫     🡫      🡫     ⭠ references that owns what they are referring
+        "abc"   "xyz"  "123"
+
 ```
 
-## Deep Copy Assignment `a @@= expr`
+## Reference Assignment `a <- expr`
 
-A deep copy assignment also uses copy by value only, as a result, the destination gets a distinct deep copy of the original value. A shallow copy is a bitwise copy of a value, where a new value is created and it has the same copy of the values in the original value. If any of the value is composite and conatins references to refer to the other values then in such cases only the reference is copied. For instance,  let `b` a reference to value ("abc", "xyz", "123), and `a` a null reference to a tripple of strings:
+## Declaration Assignment `a := expr`
+
