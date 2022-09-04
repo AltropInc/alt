@@ -1,18 +1,21 @@
 # Assignment
 
-An assignment sets or resets the value stored or referred in the storage location denoted by a variable name, or in other words, it copies a value or reference into the storage location of the variable.
+An assignment sets or resets the value stored or referred in the storage location denoted by a variable name, or in other words, it copies a value or reference into the storage location of the variable. An assignment consists of a left part and a right part separated by an assignment operator. The right part is an expression evaluated to a value in the current state of the program, and the left part is a name expression evaluated to a value storage location, often denoted by a variable name. The assignment operator determines how the value evaluated from the right part is copied into the location evaluated from the left part.
 
-There are five kinds assignments:
+This topic will cover the following:
 
-|                        | notation    | Description                                                                        |
-|:---------------------- |:----------- |:---------------------------------------------------------------------------------- |
-| assignment             | a = expr    | default assignment using copy by value for value classes or by reference otherwise |
-| copy assignment        | a @= expr   | copy assignment using copy by value only and the copy is a shallow copy            |
-| deep copy assignment   | a @@= expr  | copy assignment using copy by value only and the copy is a deep copy               |
-| declaration assignment | a := expr   | a new name declaration being assigned with an initial value or reference           |
-| reference assignment   | a <- expr   | a new reference declaration being assigned with an initial reference to a value    |
+| Terminology            | Notation      | Description                                                                        |
+|:---------------------- |:------------- |:---------------------------------------------------------------------------------- |
+| assignment             | a = expr      | default assignment using copy by value for value classes or by reference otherwise |
+| copy assignment        | a @= expr     | copy assignment using copy by value only and the copy is a shallow copy            |
+| deep copy assignment   | a @@= expr    | copy assignment using copy by value only and the copy is a deep copy               |
+| declaration assignment | a := expr     | a new name declaration being assigned with an initial value or reference           |
+| parallel assignment    | (a, b) = expr | an assignment in which several variables to be assigned in parallel                |
+| parallel declaration   | a, b := expr  | a set of new name declaredn and assigned with an initial composite value           |
+| chained assignment     | a = b = expr  | the value of expr is assigned to multiple variables a, b, etc.                     |
+| augmented assignment   | a += expr     | an assignment with additional operator to alter the value stored in a variable     |
 
-## Assignment `a = expr` (Default assignment)
+## Assignment `a = expr` (Default Assignment)
 
 When you assign a variable, if it is the value copied into the variable, this behavior is called **copy by value**. If the value is an instance of a [value class](ValueClass.md) (examples are integers, characters, and enumeration values), the default assignment behavior is copy by value. For example, let `a` and `b` be two variables to store integer values and each has an initial value, 1 and 2 respectively:
 ```altro
@@ -137,14 +140,59 @@ Here `s` is declared as an integer stream, and the tuple value (1,2,3,4) is then
 ```altro
 s := int...(1,2,3,4);
 ```
-## Reference Assignment `a <- expr`
 
-A reference assignment `a <- expr` is to copy the reference of a value evaluated by `expr` to a reference variable `a`. The expression `expr` must be a name expression (also called as [l-value expression](https://en.wikipedia.org/wiki/Value_(computer_science)#lrvalue) in some other programing languages) which evaluates to a value stored in a location that persists beyond this expression. The location of the value is copied as a reference to the reference variable. Example:
+## Parallel Assignment `(a, b) = expr`
+
+A parallel assignment allows several variables to be assigned in parallel with a tuple value. For example:
 ```altro
-s : int... = (1,2,3,4);      // 's' refers to a integer stream (1,2,3,4)
-r <- s[1];                   // 'r' refers to the second element value in 's'
-r = 10;                      // copy assign the value 10 into the location referred by 'r'
-i := s[1];                   // 'i' get the value of the second element in 's', which is changed to 10
+func foo(): (int; string) { (0, "hello") }
+a : int;
+b : string;
+(a, b) = foo();
 ```
-Note that a reference assignment is a special declaration assignment which introduce a new reference variable name.
+Here the function `foo` return a tuple value in the type of `(int; string)`, and the assignment simultaneously assigns the first element of the tuple value to `a` and the second element of the tuple value to `b`. This feature acts like [unpacking](https://www.w3schools.com/PYTHON/python_tuples_unpack.asp) in some of the other programming languages.
+
+## Parallel Declaration Assignment `a, b := expr`
+
+A parallel declaration assignment allows several new variable names to be declared in parallel with a tuple value. For example:
+```altro
+func foo(): (int; string) { (0, "hello") }
+a, b := foo();
+```
+Here the function `foo` returns a tuple value in the type of `(int; string)`, and the declaration assignment simultaneously declares two names `a` and `b` being initialized with the first and the second element of the tuple value respectively.
+
+Note that the tuple value is unpacked only when the right side of the parallel declaration assignment contains one expression in a tuple value. If the right side contains a list of expression, the tuple value will not be unpacked, and the names declared at the left side will be initialized respectively with the expression in the expression list:
+```altro
+func foo(): (int; string) { (0, "hello") }
+a, b := foo(), 3;
+```
+This is equivalent to:
+```altro
+func foo(): (int; string) { (0, "hello") }
+a := foo();
+b := 3;
+```
+And the following is ill-formed:
+```altro
+func foo(): (int; string) { (0, "hello") }
+a, b, c := foo(), 3;  // Error: Type cannot be inferred for the name: c
+```
+
+## Augmented Assignment `a += expr`
+
+Augmented assignment is generally used to replace a member function call that applies an input value to its owner's value and then assigned back to the owner. For instance:
+```altro
+a := 0;
+a = a + 3;
+```
+Here `+ is a member function of `int`. The member function call `a + 3` adds the input `3` to the owner contained in `a` and the assignment `a = a + 3` assigns the modified value back to `a`. The augmented assignment combines the two steps together:
+```altro
+a := 0;
+a += 3;
+```
+The difference is that the owner expression `a` will only eavaluated once. If the owner expression has a side effect that may be evaluated to a different value the seocnd time, then, `owner_expr = owner_expr + input_expr` may have a different result than `owner_expr += owner_expr op input_expr`.
+
+
+
+
 
