@@ -180,17 +180,49 @@ a, b, c := foo(), 3;  // Error: Type cannot be inferred for the name: c
 
 ## Augmented Assignment `a += expr`
 
-Augmented assignment is generally used to replace a member function call that applies an input value to its owner's value and then assigned back to the owner. For instance:
+Augmented assignment combines assignment with an operator name used as a member function. It is generally used to replace a member function call that applies an input value to its owner's value and then assigned the modified value back to the owner. For instance:
 ```altro
 a := 0;
 a = a + 3;
 ```
-Here `+ is a member function of `int`. The member function call `a + 3` adds the input `3` to the owner contained in `a` and the assignment `a = a + 3` assigns the modified value back to `a`. The augmented assignment combines the two steps together:
+Here `+` is a member function of `int`. The member function call `a + 3` adds the input `3` to the owner contained in `a` and the assignment `a = a + 3` assigns the modified value back to `a`. The augmented assignment combines the two steps together:
 ```altro
 a := 0;
 a += 3;
 ```
-The difference is that the owner expression `a` will only eavaluated once. If the owner expression has a side effect that may be evaluated to a different value the seocnd time, then, `owner_expr = owner_expr + input_expr` may have a different result than `owner_expr += owner_expr op input_expr`.
+The difference is that the owner expression `a` will only be evaluated once. If the owner expression has a side effect that may be evaluated to a different value the second time, then, `owner_expr = owner_expr + input_expr` may have a different result than `owner_expr += owner_expr op input_expr`.
+
+In general, a member function with an operator name that takes one input value and returns the same type value of the owner can have a corresponding augmented assignment defined. Arithmetic operators, bitshift operators, and bitwise operators are examples:
+
+| Operator    | Description                 | Example   |
+|:------------|:--------------------------- |:--------- |
+| +=          | Add Assign                  | x += y    |
+| -=          | Subtacrt Assignn            | x -= y    |
+| \*=         | Multiply Assign             | x \*= y   |
+| /=          | Divide Assign               | x /= y    |
+| ÷=, or /#=  | Integer Divide Assignn      | x ÷= y    |
+| %=          | Modulus Assign              | x %= y    |
+| ^=          | Power Assign                | x ^= y    |
+| \=  or ⊻=   | Bitwise Exclusive Or Assign | x \= y    |
+| \|= or ∪=   | Bitwise Inclusive Or Assign | x \|= y   |
+| &= or ∩=    | Bitwise And Assig           | x &= y    |
+| >>=         | Left Bit Shift Assign       | x >>= n   |
+| <<=         | Right Bit Shift Assign      | x <<= n   |
+
+Like an assignment, the owner expression at the left side of an augmented assignment operator must be a non-constant name expression. Unlike an assignment, an augmented assignment cannot be used in the class body for initialization. It can only be used in a code block.
+```altro
+class test
+{
+    const a:= 4;
+    b:= 4;
+    b += 5;      // Error: Name initialization or declartion expected in class body
+    ctor()
+    {
+        a += 4;  // Error: Cannot alter the value of a constant name
+        b + 5;   // okay
+    }
+}
+```
 
 
 
