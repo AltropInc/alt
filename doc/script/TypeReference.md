@@ -15,13 +15,13 @@ Therefore, in most cases, reference types are not explicitly used. In fact, a re
 x := 3;
 y : ref#(int) = x;  // Error: reference type cannot be explicitly used in name declaration
 ```
-Here `y` provides independent storage to hold the storage location of `x`. If `y` outlives `x`, the reference held by `y` becomes [dangling reference](https://en.wikipedia.org/wiki/Dangling_pointer). Consider the following
+Here `y` provides independent storage to hold the storage location of `x`. If this is allowed, the reference held by `y` might become a [dangling reference](https://en.wikipedia.org/wiki/Dangling_pointer) when `y` outlives `x`. Consider the following
 ```altro
 x := (1,2,3,4);
 y : ref#(int) = x[3];  // Error: reference type cannot be explicitly used in name declaration
 x = (5,6);  // the value (1,2,3,4) is destroyed before 'x' takes the new value (5,6).
 ```
-If we allow `y` to take the reference to the third element of `x`, `y` will become a dangling reference after `x` takes a new value.
+If we allowed `y` to take the reference to the third element of `x`, `y` would have became a dangling reference after `x` takes a new value.
 
 A reference type can only be used for the output type in a function interface. When a function returns a reference, it returns an implicit reference in its return value. This way, a function can be used on the left side of an assignment or wherever an L-value or name expression is required. For instance:
 ```altro
@@ -37,5 +37,5 @@ The function `[]` returns a reference type and then can be used at the left side
 sl := SizeList(1,2,3,4,5);
 s1[2] = s[3];   // assign the value stored in sl[3] to the location indicated by sl[2]
 ```
-Note that a function can only return a reference in object/class scope. Returning a reference in block to I/O scope is considered an error.
+Note that a function can only return a reference in object/class scope. Returning a reference in block or I/O scope is considered an error.
 
