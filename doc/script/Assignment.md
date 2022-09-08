@@ -4,18 +4,18 @@ An assignment sets or resets the value stored or referred in the storage locatio
 
 This topic will cover the following:
 
-| Terminology            | Notation       | Description                                                                        |
-|:---------------------- |:-------------- |:---------------------------------------------------------------------------------- |
-| assignment             | a = expr       | default assignment using copy by value for value classes or by reference otherwise |
-| copy assignment        | a @= expr      | copy assignment using copy by value only and the copy is a shallow copy            |
-| deep copy assignment   | a @@= expr     | copy assignment using copy by value only and the copy is a deep copy               |
-| declaration assignment | a := expr      | a new name declaration being assigned with an initial value or reference           |
-| tag assignment         | expr -> a      | a declaration of tag name used as an alias for an expression                       |
-| type case assignment   | a <- type:expr | assigns the value of expr to a only if a is in the specified type                  |
-| parallel assignment    | (a, b) = expr  | an assignment in which several variables to be assigned in parallel                |
-| parallel declaration   | a, b := expr   | a set of new name declaredn and assigned with an initial composite value           |
-| chained assignment     | a = b = expr   | the value of expr is assigned to multiple variables a, b, etc.                     |
-| augmented assignment   | a += expr      | an assignment with additional operator to alter the value stored in a variable     |
+| Terminology            | Notation         | Description                                                                        |
+|:---------------------- |:---------------- |:---------------------------------------------------------------------------------- |
+| assignment             | a = expr         | default assignment using copy by value for value classes or by reference otherwise |
+| copy assignment        | a @= expr        | copy assignment using copy by value only and the copy is a shallow copy            |
+| deep copy assignment   | a @@= expr       | copy assignment using copy by value only and the copy is a deep copy               |
+| declaration assignment | a := expr        | a new name declaration being assigned with an initial value or reference           |
+| tag assignment         | expr -> a        | a declaration of tag name used as an alias for an expression                       |
+| selective assignment   | a <- expr1,expr2 | assigns the value of 'expr' to 'a' only if 'a' is in the specified type            |
+| parallel assignment    | (a, b) = expr    | an assignment in which several variables to be assigned in parallel                |
+| parallel declaration   | a, b := expr     | a set of new name declaredn and assigned with an initial composite value           |
+| chained assignment     | a = b = expr     | the value of expr is assigned to multiple variables a, b, etc.                     |
+| augmented assignment   | a += expr        | an assignment with additional operator to alter the value stored in a variable     |
 
 ## Assignment `a = expr` (Default Assignment)
 
@@ -187,10 +187,50 @@ if (s[1] -> t is int)
     t = 1;
 }
 ```
-Here if we change the value of `t` to 1, the original `s[1]` still hold an integer value 2 in its storage.
+Here if we change the value of `t` to 1, the original `s[1]` still hold an integer value 2 in its storage. However, if we pass a reference for instances of a non-value class:
+```Altro
+s : array#(type element_type: numeric) = (2,2); 
+if (s -> t is int[])  // pass reference to 't' if 's' currently refers to an integer array
+{
+    t[0] = 1;
+}
+```
+assign `t[0]` a new value will actually change the value stored in `s[0]`.
 
-## Type Case Assignment  `a <- type1: expr1, type2: expr2`
+## Selective Assignment  `a <- expr1, expr2`
 
+A polymorphic variable can be declared by a type (especially an abstract type) so it can refer to a value in different subtype. For instance, the polymophic variable `y` cab be used to refer to values of any stream types:
+```Altro
+y : stream;
+if (some_condition)
+    y = ("abc", "1234", "uvwxyz");  // y referes to a string stream
+else
+    y = (1,2,3,4);                 // y referes to an integer stream
+```
+Becuase `y` is polymorphic, the expression of `y[0]` to get the element is also polymorphic. However, you cannot freely assign any type of values to `y[0]` because its type is dependent on th etype of the value that `y` currently holds. You can use tag assignment to check the current type of `y[0]` and then assign the value in the correct type to `y[0]`:
+```Altro
+if (y -> t is string...)  // pass reference to 't' if 's' currently refers to an integer array
+{
+    t[0] = "abcd";
+}
+```
+A selective assignment is another way to do this kind of type check and assignment in one step. It assigns the value to a polymorphic dependent argument by selecting a value from a list of expressions that has the suitable type. The value of the first expression is selected when its type is convertible to the type of the value  currently held by the polymorphic argument. Unlike other assignments, a type-case assignment returns a boolean value. It returns true when the polymorphic argument gets assigned. It returns false if none of the expressions matches the type of the  polymorphic argument.
+```Altro
+s[0] <- "abcd", 10;
+```
+If `s` currently refers to a string stream, `s[0]` will take the value "abcd", if `s` currently refers to an integer stream, `s[0]` will take the value 10.
+
+A selective assignment can used for a conditional expression because it returns a boolean value:
+```Altro
+if (s[0] <- "abcd", 10)
+{
+    // s[0] gets a new value
+}
+else
+{
+    // s[0] is unchanged
+}
+```
 
 ## Parallel Assignment `(a, b) = expr`
 
