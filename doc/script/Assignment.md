@@ -4,16 +4,18 @@ An assignment sets or resets the value stored or referred in the storage locatio
 
 This topic will cover the following:
 
-| Terminology            | Notation      | Description                                                                        |
-|:---------------------- |:------------- |:---------------------------------------------------------------------------------- |
-| assignment             | a = expr      | default assignment using copy by value for value classes or by reference otherwise |
-| copy assignment        | a @= expr     | copy assignment using copy by value only and the copy is a shallow copy            |
-| deep copy assignment   | a @@= expr    | copy assignment using copy by value only and the copy is a deep copy               |
-| declaration assignment | a := expr     | a new name declaration being assigned with an initial value or reference           |
-| parallel assignment    | (a, b) = expr | an assignment in which several variables to be assigned in parallel                |
-| parallel declaration   | a, b := expr  | a set of new name declaredn and assigned with an initial composite value           |
-| chained assignment     | a = b = expr  | the value of expr is assigned to multiple variables a, b, etc.                     |
-| augmented assignment   | a += expr     | an assignment with additional operator to alter the value stored in a variable     |
+| Terminology            | Notation       | Description                                                                        |
+|:---------------------- |:-------------- |:---------------------------------------------------------------------------------- |
+| assignment             | a = expr       | default assignment using copy by value for value classes or by reference otherwise |
+| copy assignment        | a @= expr      | copy assignment using copy by value only and the copy is a shallow copy            |
+| deep copy assignment   | a @@= expr     | copy assignment using copy by value only and the copy is a deep copy               |
+| declaration assignment | a := expr      | a new name declaration being assigned with an initial value or reference           |
+| tag assignment         | expr -> a      | a declaration of tag name used as an alias for an expression                       |
+| type case assignment   | a <- type:expr | assigns the value of expr to a only if a is in the specified type                  |
+| parallel assignment    | (a, b) = expr  | an assignment in which several variables to be assigned in parallel                |
+| parallel declaration   | a, b := expr   | a set of new name declaredn and assigned with an initial composite value           |
+| chained assignment     | a = b = expr   | the value of expr is assigned to multiple variables a, b, etc.                     |
+| augmented assignment   | a += expr      | an assignment with additional operator to alter the value stored in a variable     |
 
 ## Assignment `a = expr` (Default Assignment)
 
@@ -140,6 +142,55 @@ Here `s` is declared as an integer stream, and the tuple value (1,2,3,4) is then
 ```altro
 s := int...(1,2,3,4);
 ```
+
+## Tag Assignment `expr -> a`
+
+A tag assignment `expr -> a` is a default assignment of an expression value to a tag name introduced in a branched or conditional statement, and the tag name can be used as an alias for the expression value in the block associated with the condition. Let's say a function `foo` that returns an integer value when it is called, and in the branch control expression of the following switch statement:
+```
+switch (foo()->a)
+{
+    case 1: /* do something for the value 1 */;
+    case 2: /* do something for the value 2 */;
+    default: /* do something for the value assigned to the tag a */
+}
+```
+The value from the function call `foo()` is assigned to a tag `a`, and then the tag `a` can be used in the switch statement to represent the value returned by the function call.
+
+The type of the tag name is automatically inferred. Consider the following match statement:
+```
+s : int... = (1, 2, 3, 4, 5, 4, 5, 5, 6, 7);
+match (s)
+{
+    on {.:2 -> first, ... -> second, *(4,5):2 -> third, ... -> fourth} -> results:
+    {
+        /* do something for the tuple value assigned to the tag results */
+    }
+};
+```
+where the result of the match pattern expression `{.:2 -> first, ... -> second, *(4,5):2 -> third, ... -> rest}` is assigned to a tag named `results`. In the match pattern, the result of each subpattern is also assigned to a tag. These subpattern tags become the fields of the tuple value of the tag for the enclosing pattern. The type of `results` is then inferred as `tuple (first: (int;int); second: int...; third:(int;int;int;int); rest: int...)`, and for this match, the value is `((1,2),(3),(4,5,4,5), (5,6,7)`.
+
+Tag assignment can also be used in conditional statement for type check. For instance, in the following `if` statement:
+```Altro
+s : array#(type element_type: numeric) = (2,2); 
+if (s[1] -> t is int)
+{
+    /* do something for the integer value assigned to the tag t */
+}
+```
+the tag assignment is attached with an is-expression to check whether the value of the expression is in the subtype of the given type.
+
+Note that tag assignment follows the [argument passing rule](ArgumentPassing.md). If the instance belongs to a value class, changing the value of the tag will not affect the value of the original source. For instance:
+```Altro
+s : array#(type element_type: numeric) = (2,2); 
+if (s[1] -> t is int)
+{
+    t = 1;
+}
+```
+Here if we change the value of `t` to 1, the original `s[1]` still hold an integer value 2 in its storage.
+
+## Type Case Assignment  `a <- type1: expr1, type2: expr2`
+
 
 ## Parallel Assignment `(a, b) = expr`
 
