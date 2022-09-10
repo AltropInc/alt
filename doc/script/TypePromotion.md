@@ -61,7 +61,7 @@ x: int = -4;
 y: uint = 150;
 y_is_greater_than_y := y > x;
 ```
-Here in the expression `x > y`, both `x` and `y` are promoted to int, and the result will be true. If we do not do the type promotion and compare the value bits of y and x directly, the result would be false.
+Here in the expression `x > y`, both `x` and `y` are promoted to long, and the result will be true. If we do not do the type promotion and compare the value bits of y and x directly, the result would be false.
 
 ## Type Promotion and Polymorphism Case
 
@@ -86,4 +86,4 @@ c : comparable;
 c_is_greater: bool;
 if (c->d is double) { c_is_greater = d > 4.0; }
 ```
-
+For notation of type checking using tag assignment (c->d), see [Assignment](Assignment.md).
