@@ -4,18 +4,18 @@ An assignment sets or resets the value stored or referred in the storage locatio
 
 This topic will cover the following:
 
-| Terminology            | Notation         | Description                                                                        |
-|:---------------------- |:---------------- |:---------------------------------------------------------------------------------- |
-| assignment             | a = expr         | default assignment using copy by value for value classes or by reference otherwise |
-| copy assignment        | a @= expr        | copy assignment using copy by value only and the copy is a shallow copy            |
-| deep copy assignment   | a @@= expr       | copy assignment using copy by value only and the copy is a deep copy               |
-| declaration assignment | a := expr        | a new name declaration being assigned with an initial value or reference           |
-| tag assignment         | expr -> a        | a declaration of tag name used as an alias for an expression                       |
-| selective assignment   | a <- expr1,expr2 | assigns the value of 'expr' to 'a' only if 'a' is in the specified type            |
-| parallel assignment    | (a, b) = expr    | an assignment in which several variables to be assigned in parallel                |
-| parallel declaration   | a, b := expr     | a set of new name declaredn and assigned with an initial composite value           |
-| chained assignment     | a = b = expr     | the value of expr is assigned to multiple variables a, b, etc.                     |
-| augmented assignment   | a += expr        | an assignment with additional operator to alter the value stored in a variable     |
+| Terminology            | Notation           | Description                                                                        |
+|:---------------------- |:------------------ |:---------------------------------------------------------------------------------- |
+| assignment             | a = expr           | default assignment using copy by value for value classes or by reference otherwise |
+| copy assignment        | a @= expr          | copy assignment using copy by value only and the copy is a shallow copy            |
+| deep copy assignment   | a @@= expr         | copy assignment using copy by value only and the copy is a deep copy               |
+| declaration assignment | a := expr          | a new name declaration being assigned with an initial value or reference           |
+| tag assignment         | expr -> a          | a declaration of tag name used as an alias for an expression                       |
+| selective assignment   | a <- (expr1,expr2) | assigns the value of 'expr' to 'a' only if 'a' is in the specified type            |
+| parallel assignment    | (a, b) = expr      | an assignment in which several variables to be assigned in parallel                |
+| parallel declaration   | a, b := expr       | a set of new name declaredn and assigned with an initial composite value           |
+| chained assignment     | a = b = expr       | the value of expr is assigned to multiple variables a, b, etc.                     |
+| augmented assignment   | a += expr          | an assignment with additional operator to alter the value stored in a variable     |
 
 ## Assignment `a = expr` (Default Assignment)
 
@@ -197,7 +197,7 @@ if (s -> t is int[])  // pass reference to 't' if 's' currently refers to an int
 ```
 assign `t[0]` a new value will actually change the value stored in `s[0]`.
 
-## Selective Assignment  `a <- expr1, expr2`
+## Selective Assignment  `a <- (expr1, expr2)`
 
 A polymorphic variable can be declared by a type (especially an abstract type) so it can refer to a value in different subtype. For instance, the polymophic variable `y` cab be used to refer to values of any stream types:
 ```Altro
@@ -216,13 +216,13 @@ if (y -> t is string...)  // pass reference to 't' if 's' currently refers to an
 ```
 A selective assignment is another way to do this kind of type check and assignment in one step. It assigns the value to a polymorphic dependent argument by selecting a value from a list of expressions that has the suitable type. The value of the first expression is selected when its type is convertible to the type of the value  currently held by the polymorphic argument. Unlike other assignments, a type-case assignment returns a boolean value. It returns true when the polymorphic argument gets assigned. It returns false if none of the expressions matches the type of the  polymorphic argument.
 ```Altro
-s[0] <- "abcd", 10;
+s[0] <- ("abcd", 10);
 ```
 If `s` currently refers to a string stream, `s[0]` will take the value "abcd", if `s` currently refers to an integer stream, `s[0]` will take the value 10.
 
 A selective assignment can used for a conditional expression because it returns a boolean value:
 ```Altro
-if (s[0] <- "abcd", 10)
+if (s[0] <- ("abcd", 10))
 {
     // s[0] gets a new value
 }
@@ -252,7 +252,7 @@ a, b := foo();
 ```
 Here the function `foo` returns a tuple value in the type of `(int; string)`, and the declaration assignment simultaneously declares two names `a` and `b` being initialized with the first and the second element of the tuple value respectively.
 
-Note that the tuple value is unpacked only when the right side of the parallel declaration assignment contains one expression in a tuple value. If the right side contains a list of expression, the tuple value will not be unpacked, and the names declared at the left side will be initialized respectively with the expression in the expression list:
+Note that the tuple value is unpacked only when the right side of the parallel declaration assignment contains one expression in a tuple value. If the right side contains a list of expressions, the tuple value will not be unpacked, and the names declared at the left side will be initialized respectively with the expression in the expression list:
 ```altro
 func foo(): (int; string) { (0, "hello") }
 a, b := foo(), 3;
@@ -276,14 +276,14 @@ Augmented assignment combines assignment with an operator name used as a member 
 a := 0;
 a = a + 3;
 ```
-Here `+` is a member function of `int`. The member function call `a + 3` adds the input `3` to the owner contained in `a` and the assignment `a = a + 3` assigns the modified value back to `a`. The augmented assignment combines the two steps together:
+Here `+` is a member function of `int`. The member function call `a + 3` adds the input `3` to the owner value contained in `a` and the assignment `a = a + 3` assigns the modified value back to `a`. The augmented assignment combines the two steps together:
 ```altro
 a := 0;
 a += 3;
 ```
-The difference is that the owner expression `a` will only be evaluated once. If the owner expression has a side effect that may be evaluated to a different value the second time, then, `owner_expr = owner_expr + input_expr` may have a different result than `owner_expr += owner_expr op input_expr`.
+The difference is that the owner expression `a` will only be evaluated once. If the owner expression has a side effect that may be evaluated to a different value the second time, then, `owner_expr = owner_expr + input_expr` may have a different result than `owner_expr += input_expr`.
 
-In general, a member function with an operator name that takes one input value and returns the same type value of the owner can have a corresponding augmented assignment defined. Arithmetic operators, bitshift operators, and bitwise operators are examples:
+In general, a member function with an operator name that takes one input value and returns the same type value of the owner can have a corresponding augmented assignment defined. Examples are arithmetic operators, bitshift operators, and bitwise operators:
 
 | Operator    | Description                 | Example   |
 |:------------|:--------------------------- |:--------- |
@@ -310,7 +310,7 @@ class test
     ctor()
     {
         a += 4;  // Error: Cannot alter the value of a constant name
-        b + 5;   // okay
+        b += 5;  // okay
     }
 }
 ```
