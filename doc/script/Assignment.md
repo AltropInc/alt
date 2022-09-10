@@ -315,7 +315,30 @@ class test
 }
 ```
 
+## Chained Assignment `a = b = expr`
 
+Chained assignments are used as a shortcut when you want to bind several variables to the same value.
+```altro
+a = b = expr;
+```
+which is the same as this:
+```altro
+b = expr;
+a = b;
+```
+Note that the preceding statements may not be equivalent to:
+```altro
+b = expr;
+a = expr;
+```
+if `expr` is a function call that may return a different result each time it is invoked.
 
+Chained assignments are supported because assignments are expressions, and have values. In this case chain assignment can have a right-associative assignment, and assignments happen right-to-left. For example, `b = expr` is an expression that returns a value of the type of `b`; and `a = b = expr` is equivalent to `a` = value returned from the expression `b = expr`.
+
+However, a selective assignment  `a <- (expr1, expr2)` returns a boolean value, a chained assignment with selective assignment will have a different meaning:
+```altro
+a := b <- (expr1, expr2);
+```
+Here `a` is a bllean value which is a different value than the value held by `b`.
 
 
