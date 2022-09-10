@@ -2,7 +2,7 @@
 
 A **reference** in a reference type refers to an object or value in some memory space. The reference type is a built-in class defined as following:
 ```altro
-class ref#(type referred_type: any);
+value class ref#(type referred_type: any);
 ```
 In a name declaration,
 ```altro
@@ -38,4 +38,6 @@ sl := SizeList(1,2,3,4,5);
 s1[2] = s[3];   // assign the value stored in sl[3] to the location indicated by sl[2]
 ```
 Note that a function can only return a reference in object/class scope. Returning a reference in block or I/O scope is considered an error.
+
+Since the reference type is a [value class](ValueClass.md), the instance of the reference is a value object so that the reference itself is not allocated in heap. Therefore, the reference value returned by calling the function `[]` is temparorily put in stack.
 
