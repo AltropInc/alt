@@ -14,8 +14,8 @@ This topic will cover the following:
 | selective assignment   | a <- (expr1,expr2) | assigns the value of 'expr' to 'a' only if 'a' is in the specified type            |
 | parallel assignment    | (a, b) = expr      | an assignment in which several variables to be assigned in parallel                |
 | parallel declaration   | a, b := expr       | a set of new name declaredn and assigned with an initial composite value           |
-| chained assignment     | a = b = expr       | the value of expr is assigned to multiple variables a, b, etc.                     |
 | augmented assignment   | a += expr          | an assignment with additional operator to alter the value stored in a variable     |
+| chained assignment     | a = b = expr       | the value of expr is assigned to multiple variables a, b, etc.                     |
 
 ## Assignment `a = expr` (Default Assignment)
 
@@ -317,7 +317,7 @@ class test
 
 ## Chained Assignment `a = b = expr`
 
-Chained assignments are used as a shortcut when you want to bind several variables to the same value.
+Chained assignments are used as a shortcut when you want to bind several variables to get a value together.
 ```altro
 a = b = expr;
 ```
@@ -331,14 +331,23 @@ Note that the preceding statements may not be equivalent to:
 b = expr;
 a = expr;
 ```
-if `expr` is a function call that may return a different result each time it is invoked.
+if `expr` is a function call that may return a different result each time it is invoked, or the assignment `b assignment_operator expr` returns a different value as in a selective assignment `b <- a` which returns a boolean value.
 
-Chained assignments are supported because assignments are expressions, and have values. In this case chain assignment can have a right-associative assignment, and assignments happen right-to-left. For example, `b = expr` is an expression that returns a value of the type of `b`; and `a = b = expr` is equivalent to `a` = value returned from the expression `b = expr`.
+Chained assignments are supported only when assignments are expressions, and have values. In this case chain assignment can have a right-associative assignment, and assignments happen right-to-left. For example, `b = expr` is an expression that returns a value of the type of `b`; and `a = b = expr` is equivalent to `a` = value returned from the expression `b = expr`.
 
-However, a selective assignment  `a <- (expr1, expr2)` returns a boolean value, a chained assignment with selective assignment will have a different meaning:
+A selective assignment  `a <- (expr1, expr2)` returns a boolean value, a chained assignment with a selective assignment will have a different result shown as following:
 ```altro
 a := b <- (expr1, expr2);
 ```
-Here `a` is a bllean value which is a different value than the value held by `b`.
+Here `a` is a boolean value which is a different value than the value held by `b`.
 
+A declaratiopn assignment is not an expression and it does not have a return value. Therefore, you cannot chain a declaration assignment:
+```altro
+a := b:= 4;  // Error:  Name undefined: a -- Invalid declaration in class/object body
+```
 
+## See also:
+* [Argument Passing](ArgumentPassing.md)
+* [Value Class](ValueClass.md)
+* [Ownership](Ownership.md)
+* [Name Declaration](NameDeclaration.md)
