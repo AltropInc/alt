@@ -1,20 +1,18 @@
 # Argument Passing
 
-Passing arguments into an input interface during a [function or constructor call](Routines.md) can either be "pass-by-value" or "pass-by-reference".
+Passing instances among arguments can either be **pass-by-value** or **pass-by-reference**. 
 
-All instances of [value classes](KindsOfClasses.md) such as int, char, enum etc are passed by value. That is,
-a copy (or converted copy) of the instance (the value) is passed into the function and hence
-the change of the value is not reflected outside from the caller. "pass-by-value" accept values
-of [subtypes](Subtypes.md] and [convertable types](ConvertableTypes.md]. For instacne, you can pass an integer value to a double
-precision parameter because an interger value can be converted to double precision. You can also
-pass an integer to a parameter in declared type `Numeric`, because integer is a subtype of
-`Numeric`.
+All instances of [value types](ValueClass.md) such as int, char, enum etc are passed by value. That is, a copy (or converted copy) of the instance (the value) is passed from one argument to another. As result, the two arguments hold distinct copies of the value. Changing value through one argument will not affect the value held by the other argument. Therefore, when a caller pass a value instance into an input interface during a function or constructor call, the change made within the call will not be reflected outside from the caller.
 
-For all instances of non-value classes, the former paramter is specified to be passed
-by reference, which means that values are not copied when they are passed into the interface. Modifications
-to mutable paramters (such as arrays and tuple) made within a [routine call](Routine.md) will be visible to the caller.
-"pass-by-refenrece" accepts references of [subtypes](Subtypes.md] only. [Convertable types](ConvertableTypes.md] are not accepted. Consider:
+All instances of non-value classes are passed by reference, which means that values are not copied when they are passed from one argument to another. A modification
+to an instance of a non-value class through one argument will be sensed by all other arguments that have the same reference. Therefore, when a caller pass a non-value instance into an input interface during a function or constructor call, the change made within the call will be visible to the caller.
 
+Pass-by-value accepts values of [subtypes](Subtypes.md] and [convertible types](ConvertableTypes.md]. For instance, you can pass an integer value to a double
+precision parameter because an integer value can be converted to double precision. You can also pass an integer to a parameter in declared type `numeric`, because integer is a subtype of `numeric`.
+
+Pass-by-reference accepts references of [subtypes](Subtypes.md] only. [Convertible types](ConvertableTypes.md] are not accepted.
+
+Consider:
 ```altscript
 // this accepts all values convertable to tuple(int, int, int)
 func f1(x : tuple(char, char, char)) { system.in.read(x); }
