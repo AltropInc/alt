@@ -14,15 +14,24 @@ value point (x, y: double);
 ```
 And here is an example of parametric value class:
 ```altro
-value class Complex #(type T: real) : numeric
+value class complex #(type T: real) : numeric
 {
     a, b: T;
     ctor (a_, b_: T) { a=a_; b=b_ }
     final func <=> (other: ownerclass): int { a<=>other.a }
-    final func + (other: ownerclass): ownerclass { Complex(a+other.a, b+other.b) }
-    final func - (other: ownerclass): ownerclass { Complex(a-other.a, b-other.b) }
-    final func * (other: ownerclass): ownerclass { Complex(a*other.a-b*other.b, a*other.a+b*other.b) }
-    final func / (other: ownerclass): ownerclass { c:=other.a*other.a+other.b*other.b; Complex((a*other.a+b*other.b)/c, (b*other.a-a*other.b)/c) }
+    final func + (other: ownerclass): ownerclass { complex(a+other.a, b+other.b) }
+    final func - (other: ownerclass): ownerclass { complex(a-other.a, b-other.b) }
+    final func * (other: ownerclass): ownerclass { complex(a*other.a-b*other.b, a*other.a+b*other.b) }
+    final func / (other: ownerclass): ownerclass { c:=other.a*other.a+other.b*other.b; complex((a*other.a+b*other.b)/c, (b*other.a-a*other.b)/c) }
 }
 ```
-A value class is a sealed class and cannot be used to derive subclasses with more [member name declaration](NameDeclaration.md).
+A value clas can only be derived from an [interface class](InterfaceClass.md) or a [stateless class](StatelessClass.md).
+
+A value class is a [sealed class](SealedClass.md) and can only be used to derive subclasses with certain restrictions:
+
+* All member functions in a value class are final, that is, a derived class cannot override any member function defined in its base.
+* A derived class from a value class cannot have its own constructors. it uses the constructors defined in its base.
+* A derived class from a value class cannot have its own destructor.
+* A derived class from a value class cannot have more data members.
+
+
