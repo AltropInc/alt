@@ -17,6 +17,9 @@ If a function class is a [member class](MemberClass.md):
 ```altscript
 class C
 {
+    // Note: this code is actually ill-formed because 'func' is a sealed class that cannot be used
+    // in inheritance. We write it here only for conceptual purpose. The correct way to use sealed
+    // class to derive subclasses is to use separated forms as explained later.
     class MemberFunc: func   // here 'func' is the superclass of 'MemberFunc'
     {
         fn(x: int) { }
