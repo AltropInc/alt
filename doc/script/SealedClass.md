@@ -2,7 +2,7 @@
 
 A sealed class is a class that can not be inherited, but sealed classes are not necessarily [leaf classes](https://en.wikipedia.org/wiki/Leaf_class_(computer_programming)). They still can be used to derive subclasses by
 
-* adding more [functors](Functor.md) using separated class forms, or
+* adding more [functors](Functor.md) using [functions](FunctionClass.md), or
 * parametric substitution
 
 Because a sealed class can not be inherited, it has the following restrictions:
@@ -29,7 +29,7 @@ class my_int is int  // Error:  Sealed class cannot be inherited: int
 
 ## Deriving Subclasses from a Sealed Classes With More Functors
 
-You can have a subclass of a sealed class with additional [functors](Functor.md) using [separated function forms](SeparatedFunctionForm.md). Each function form add one more functor in the derived class:
+You can have a subclass of a sealed class with additional [functors](Functor.md) using [functions](FunctionClass.md). Each function form add one more functor in the derived class:
 ```altro
 sealed_class_base derived_class (input1) : output1
 {
