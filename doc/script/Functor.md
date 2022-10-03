@@ -21,7 +21,7 @@ is a function call where `Σ()` is a constructor call to to generate an object o
 
 In some cases, a function call can use the class name directly.
 
-One case is when the enclosing class is a [stateless class](KindsOfClasses.md). A stateless class defines only functors and meta members. It has no members oror constructors defined in the object scope. Therefore  we do not need to create an object of the class to perform the function call. For instance:
+One case is when the enclosing class is a [stateless class](StatelessClasse.md). A stateless class defines only functors and meta members. It has no members oror constructors defined in the object scope. Therefore  we do not need to create an object of the class to perform the function call. For instance:
 ```altscript
 class Σ implements functional   // Σ is a subclass that implements the functional interface
 {
@@ -103,3 +103,4 @@ See [Free Functor](FreeFunctor.md) for more details.
 * [Routine type](Routine.md)
 * [Free functor](FreeFunctor.md)
 * [Function class and functions](FunctionClass.md)
+* [Stateless Class](StatelessClasse.md)
