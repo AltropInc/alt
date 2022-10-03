@@ -2,36 +2,36 @@
 
 A declaration introduces a [name](Names.md) in a scope. The scope is the region of a program text in which the declared name is valid. A scope has a lifetime. When the scope is ending its life, all names introduced in the scope will go away and values associated with these names will also go away.
 
-There are four kinds of scopes: object scope, class scope, input/output scope, and block scope.
+There are four kinds of scopes: instance scope, class scope, input/output scope, and block scope.
 
-The object scope or the class scope is an owner scope created for the lifetime of its associated object or class (owner). Names introduced in an owner scope are stored in a space allocated in the common value pool (or [heap memeory](https://www.geeksforgeeks.org/stack-vs-heap-memory-allocation/) for its associated owner. When the owner is created, the space required by the storage of the names within the scope are allocated in the pool. When the owner is deleted, the space allocated for the owner is released and all names introduced in the owner scope are gone.
+The instance scope or the class scope is an owner scope created for the lifetime of its associated owner, i.e. a class instance (object or data) or a class itself. Names introduced in an owner scope are stored in a space allocated in the common value pool (or [heap memeory](https://www.geeksforgeeks.org/stack-vs-heap-memory-allocation/) for its associated owner. When the owner is created, the space required by the storage of the names within the scope are allocated in the pool. When the owner is deleted, the space allocated for the owner is released and all names introduced in the owner scope are gone.
 
 The input/output scope and block scope are local scopes, kind of temporary scopes created for a [routine call](Routine.md). Names introduced in a local scope are stored in a call [stack memeory](https://www.geeksforgeeks.org/stack-vs-heap-memory-allocation/). When the execution enters into a local scope, the space required by the storage of the names within the scope are pushed into the stack. When the execution exits from a local scope, the space pushed for the scope is popped out and all names introduced in the local scope are gone. The stack naturally maintains a nested structure so that local sopes can be nested inside one another.
 
-## Object Scope.
+## Instance Scope
 
-A name, except for a meta name, declared in a class body is local to an instance of this class. A name declared in a [singleton body](Singleton.md) is local to this singleton object. Since a singleton implicitly defines a class, meta names in a singleton object are the same as names that are not meta. The class instance or the singleton is the owner object of the name. The name must be accessed through its owner object:
-```altscript
+A name, except for a meta name, declared in a class body is local to an instance of this class. If a class defines objects, we often use object scope for instance scope. A name declared in a [singleton body](Singleton.md) is local to this singleton object. Since a singleton implicitly defines a class, meta names in a singleton object are the same as names that are not meta. The class instance or the singleton is the owner object of the name. The name must be accessed through its owner object:
+```altro
 class test
 {
     object foo      // 'foo' is a singleton object.
     {
-        n : int;    // The name 'n' is in the object scope.
+        n : int;    // The name 'n' is in the object instance scope.
                     // 'n' also belongs to the class scope of the singleton class.
     }
     foo.n = 1;      // Access the name 'n' through its enclosing object 'foo'.
     class bar       // 'bar' is a class.
     {
-        m : int;    // The name 'm' is in the object scope of 'bar'.
+        m : int;    // The name 'm' is in the object instance scope of 'bar'.
     }
     bar.m = 2;      // This is an error. 'm' must be accessed through an instance of 'bar'.
-    b:=bar();       // The name 'b' is in the object scope of 'test', and initialized with
+    b:=bar();       // The name 'b' is in the instance scope of 'test', and initialized with
                     // an instance of 'bar'.
     b.m = 2;        // Access the name 'm' through a 'bar' instance referred by 'b'.
 }
 ```
 If the expression of the name appears with the class body, the owner of the name is the [`self`](SelfAndOwner.md) object:
-```altscript
+```altro
 class test
 {
     class bar           // 'bar' is a member class of 'test'.
@@ -46,7 +46,7 @@ class test
 }
 ```
 If the expression of the name appears with a member class body, the owner of the name is the [`owner`](SelfAndOwner.md) object:
-```altscript
+```altro
 class test
 {
     n : int;            // The name 'n' is in the object scope of 'test'.
@@ -67,7 +67,7 @@ class test
 ## Class Scope
 
 Names declared as class parameters or meta members are local to this class. The name is accessed through the (enclosing) class:
-```altscript
+```altro
 class test
 {
     class bar          // 'bar' is a member class of 'test'.
@@ -83,7 +83,7 @@ class test
 }
 ```
 If the expression of the meta name appears with the class body, the owner of the name is the [`selfclass`](SelfAndOwner.md) type:
-```altscript
+```altro
 class test
 {
     class bar           // 'bar' is a member class.
@@ -97,7 +97,7 @@ class test
 }
 ```
 If the expression of the meta name appears with a member class body, the owner of the name is the [`ownerclass`](SelfAndOwner.md) type:
-```altscript
+```altro
 object test
 {
     meta n : int;         // The meta name 'n' is in the class scope of the singleton class.
@@ -120,7 +120,7 @@ object test
 }
 ```
 Please note, a meta member class can only access meta members in its enclosing class. Consider:
-```altscript
+```altro
 object test
 {
     class foo              // 'foo' is a member class of 'test'.
@@ -139,7 +139,7 @@ object test
 }
 ```
 However, when a meta member class is enclosed in a singleton, then, accessing a meta name or a non-meta name will have no difference:
-```altscript
+```altro
 object test
 {
     object foo              // 'foo' is a singleton object in 'test'.
@@ -164,7 +164,7 @@ A block is a compound statement, beginning at opening of the block by ‘{‘ an
 
 The block scope starts when the program execution enters into the block, and will end of its life when the program execution exits from the block. For instance,
 
-```altscript
+```altro
 {                              // A block scope starts.
     s1: string;                // A name 's1' is introduced in the block.
     s2: string;                // A name 's2' is introduced in the bloc.k
@@ -185,7 +185,7 @@ The input/output scope (abbreviation: IO scope) is an input and output parameter
 
 For instance
 
-```altscript
+```altro
 func hello (x: string) : string
 {
    str := "Hello ";
@@ -199,7 +199,7 @@ func clone (x: string) : string
 
 When the function hello is called, say hello("World"), we get the following scopes:
 
-```altscript
+```altro
 // for s:= hello("World");       // Call 'hello' with a string literal
 hello:
 {                                // The IO scope of the function 'hello' starts here
@@ -222,7 +222,7 @@ If a name decalred in an outer scope is obscured by the same name in an innder s
 When the self appears in the block scope of a class constructor (enter block), it refers to the instance of this class. When the owner appears
 in the block scope of an enter block of a member class, it refers the instance of the class that owns the member. For instance:
 
-```altscript
+```altro
 class A
 {
     class bar is func
@@ -241,7 +241,7 @@ class A
     }
 }
 ```
-The self in func foo is potentially surprising and thus worth noting. Altscript treats a function as a class, and a member function as a
+The self in func foo is potentially surprising and thus worth noting. Altro treats a function as a class, and a member function as a
 member class. Thus declarations of bar and foo within the class A are equivalent. This is an important difference than any of the other 
 OO languages. Since foo is a class, the instance of foo can have its own members and the self reference within foo is used to access foo's
 member. This unification of function and class opens door to user-defined functional objects.
@@ -250,7 +250,7 @@ The selfclass appears in the block scope of a class's enter block referes to the
 appears in the block scope of a member class's enter block referes to the actual class from witch the instance that owns the member is created.
 For instance:
 
-```altscript
+```altro
 class A
 {
     class bar is func
