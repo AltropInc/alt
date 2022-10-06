@@ -6,7 +6,7 @@ Numeric classes representing numeric values that have the property of arithmetic
 
 All concrete numeric classes such as int, short, long, double, float, etc. re derived from the interface class **numeric**.
 ```
-                                                  nemric
+                                                 numeric
                               ┌─────────────────────┴────────────┬──────── ─ ─ ─ ─ ┬ ─ ─ ─ ─ ─ ─ ┐
                           integral                              real           rational       complex
               ┌───────────────┴─────────────┐            ┌───────┼───────┐
