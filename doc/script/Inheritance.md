@@ -207,48 +207,14 @@ class Person
 }  // Error: The class interface is not implemented: occupation
 ```
 
-## Multiple Inheritance
+## Multiple Inheritance Through Interface Classes
 
-In Multiple Inheritance, one child or subclass class can have more than one base class or superclass and inherit features from every base class which it inherits. Multiple base class are given in a comma separated list:
+Altro supports single inheritance through the is-a relation (`class A is B`). However, multiple [interface classes](InterfaceClass.md) can be inherited through the implementation-relationship:
 ```Altro
-class Derived is BaseClass1, BaseClass2, BaseClass3
+class Derived is Base implements Interface1, Interface2
 {
 }
 ```
-A derived class can inherit only one base class that is not an interface class. The non-interface base must be listed first in the base class list, althought the first base class can alos be an interface class. All other base classes after the first must be interface classes.
-
-
-
-
-
-
-
-
-The ALT virtual constructor interface is more general than the concept of virtual functions in other traditional programming languages, because the overriding mechanism is not just limited to functions:
-
-```altscript
-sealed class sealed_base
-{
-}
-class base
-{
-    deferred sealed_base member (x: int);
-}
-object derived is base    // a singleton derived from base
-{
-    sealed_base member(x: int)
-    {
-    }
-}
-x: base = derived;   // a polymorphic variable of 'base' and it actually refers to the 'derived' object
-enter ()
-{
-    x.member(3);     // create a 'member' object in the 'derived' object using the constructor provided in the 'derived' object
-}
-```
-
-
-
 
 ## Differences among Shadowing, Overriding and Overloading
 
@@ -256,21 +222,15 @@ Please note the difference between shadowing and overriding. In shadowing, the m
 
 Please also note the difference between overloading and overriding. Overloading is a kind of [ad hoc polymorphism](https://en.wikipedia.org/wiki/Ad_hoc_polymorphism) in which a [function class](FunctionClass) can have multiple interfaces (functions), and which interface to use in a function call is determined by the actual parameters provided in the function call. This ad hoc polymorphism is resolved statically during compile time. Overriding is a kind of [subtype polymorphism](https://en.wikipedia.org/wiki/Subtyping) in which one interface of a [function class](FunctionClass) can have multiple implementations in different subclasses, and which implementation to use in a function call is determined by the actual type of the object that owns the function call. This subtype polymorphism is resolved dynamically at run time.
 
-
-
-
-
-
-
 ## Inheritance in Parametric Class
 
-
-
-
-## self, selfclass, owner, ownerclass
-
-The keyword `self` is the reserved object name used within a class body to represent the actual instance created by this class or by a derived class of this class. It is similar to Java's `this` reference or C++'s `this` pointer. However, there is a major distinction: `self` appearing in a function body refers to the instance of the function instead of the instance of the class that encloses the function. The reason for this distinction is that ALT treats a member function the same as a member class. The function body is just a simple form of member class. To access the instance of the class that encloses the function within the function body, use the keyword `owner`, which is the reserved object name to represent the enclosing object of the `self` instance.
-
-The keyword `selfclass` represents the actual type of the instance represented by  `self`. Therefore, `selfclass` appearing in a class body may refer to the type of this class or a subclass of this class. The keyword `ownerclass` represents the actual type of the instance represented by `owner`.
+## Related Topics
+* [Class](Class.md)
+* [Class Inheritance Tree](InheritanceTree.md)
+* [Class Members](ClassMember.md)
+* [Member Class](MemberClass.md)
+* [Interface Class](InterfaceClass.md)
+* [Sealed Class](SealedClass.md)
+* [Kinds of Classes](KindsOfClasses.md)
 
 
