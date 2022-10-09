@@ -1,12 +1,12 @@
 # Class
 
-A **class** describes a set of objects that have a common structure and a common set of behaviors. The object belonging to the class is called an **instance** of the class. A class in Altro is also referred to as a type. They are the same concept. A class always starts with the keyword `class` followed by the name of the class:
+A **class** describes a set of objects or data that have a common structure and a common set of behaviors. The object or data belonging to the class is called an **instance** of the class. A class in Altro is also referred to as a type. They are the same concept. A class always starts with the keyword `class` followed by the name of the class:
 ```altscript
 class ClassName
 {
 }
 ```
-The object structure tells how the structural representation of the object is composed in terms of a set of member object/value declarations. While this definition is recursive, there are a set of primitive classes whose structural representations are built-in values without member object/value declarations. Examples are classes for integers, floating-point numbers, enumeration values, and characters. Take the example of a `ParticleSystem`, it contains a set of particles and each particle is composed of primitive values to represents its size, color, and other attributes:
+The structure tells how the structural representation of the instance is composed in terms of a set of member object/data declarations. While this definition is recursive, there are a set of primitive classes whose structural representations are built-in values without member object/data declarations. Examples are classes for integers, floating-point numbers, enumeration values, and characters. Take the example of a `ParticleSystem`, it contains a set of particles and each particle is composed of primitive values to represents its size, color, and other attributes:
 
 ```altscript
 class ParticleSystem
