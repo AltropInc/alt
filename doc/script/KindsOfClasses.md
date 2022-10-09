@@ -47,7 +47,7 @@ Since an incorporeal class has no data members, it has no physical storage (stor
 
 ## Abstract Class vs. Concrete Class
 
-An [**abstract class**](Abstract Class.md) is a class that cannot be instantiated, but they can be subclassed. On the other hand, a **concrete** class is an instantiable class.
+An [**abstract class**](AbstractClass.md) is a class that cannot be instantiated, but they can be subclassed. On the other hand, a **concrete** class is an instantiable class.
 
 A class is abstract if it contains deferred member functions or inherits such function that is not overridden with an implementation, or it is declared abstract using the specifier abstract, or it is a parametric class with type parameters unbound. An abstract class can be instantiated either by a concrete subclass or by implementing all the deferred member functions in a singleton.
 
@@ -78,7 +78,7 @@ An [**sealed class**](SealedClass.md) is a class that cannot be inherited, but t
 ## Related Topics
 * [Value Class](ValueClass.md)
 * [Incorporeal Class](IncorporealClass.md)
-* [Abstract Class](Abstract Class.md)
+* [Abstract Class](AbstractClass.md)
 * [Member Class](MemberClass.md)
 * [Interface Class](InterfaceClass.md)
 * [Sealed Class](SealedClass.md)
