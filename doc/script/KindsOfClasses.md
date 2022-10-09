@@ -49,11 +49,11 @@ Since an incorporeal class has no data members, it has no physical storage (stor
 
 An [**abstract class**](AbstractClass.md) is a class that cannot be instantiated, but they can be subclassed. On the other hand, a **concrete** class is an instantiable class.
 
-A class is abstract if it contains deferred member functions or inherits such function that is not overridden with an implementation, or it is declared abstract using the specifier abstract, or it is a parametric class with type parameters unbound. An abstract class can be instantiated either by a concrete subclass or by implementing all the deferred member functions in a singleton.
+A class is abstract if it contains deferred member functions or inherits such a function that is not overridden with an implementation, or it is declared abstract using the specifier abstract, or it is a parametric class with type parameters unbound. An abstract class can be instantiated either by a concrete subclass or by implementing all the deferred member functions in a singleton.
 
 Note that a [parametric class](ParametricClass.md) with unbound type parameters is also an abstract class. This is a different concept than a parametric class provided in other programming languages such as generic classes in Java and C# and templates class in c++. Since a parametric class is a true type, it can be used as an abstract type for polymorphic variable declarations, wherein the type parameters may be left undetermined.
 
-[**Interface classes**](InterfaceClass.md) are special abstract classes in which only deferred functions interfaces are defined. Only interface classes can used as multiple bases in [inheritance](Inheritance.md).
+[**Interface classes**](InterfaceClass.md) are special abstract classes in which only deferred functions and interfaces are defined. Only interface classes can be used as multiple bases in [inheritance](Inheritance.md).
 ```
                                 (all classes)
                ┌────────────────────┴──────────────────┐
@@ -63,11 +63,25 @@ Note that a [parametric class](ParametricClass.md) with unbound type parameters 
 ```
 For detail, see [Abstract Class](AbstractClass.md).
 
-## Member Class vs. Top-Level Class
+## Member Class vs. Parent Class
 
-A [**member class**](MemberClass.md) belongs to the object scope of the enclosing class, and a [**meta member class**](MemberClass.md) belongs to the class scope of the enclosing class, or in other words, an instance of a member class is created as a member of the instance of the enclosing class, and an instance of a meta member class is created as a meta member of the enclosing class. Therefore, to create an instance of a member class, an instance of the enclosing class must be given as the owner (unless the enclsoing class is an incorporeal class), and to create an instance of a meta member class, the enclosing class is given as the owner.
+Altro allows you to define a class within another class. 
 
-In comparison, the instance of a **top-level class** can be created as a member of any object, and you do not give the owner explicitly when you create instances of a top-level class.
+A [**member class**](MemberClass.md) belongs to the instance scope of the enclosing class, and a [**meta member class**](MemberClass.md) belongs to the class scope of the enclosing class. We refer the enclosing class as a **parent class*.
+
+An instance of a member class is created as a member of the instance of the enclosing class, and an instance of a meta member class is created as a meta member of the enclosing class. Therefore, to create an instance of a member class, an instance of the enclosing class must be given as the owner (unless the enclosing class is an incorporeal class), and to create an instance of a meta member class, the enclosing class is given as the owner.
+
+A data class can be a member class of either a data class or an object class, however, an object class can only be a member class of an object class. This is because object classes are automatically chained in a tree structure and an instance of a member object class must reside as a child node of an instance of its parent class.
+
+When we refer an enclosing class as a **parent class**, we sometimes refer a member class as a **child class** of its parent class, and this forms a class tree. When instances of a child class are created as children of the instance of a parent class, the associated object tree is formed. Note that the concept of class tree is different that class inheritance tree where the relationship between a superclass and subclasses (or base class and derived classes).
+
+A **free class** is a class that is specified standalone and is not enclosed in any other class. Note that a free class is typically not used to create a top-level object. In an Altro application, there is only one root object, which is the altro application node. All other objects are created as offsprings of the root node. A free data class is used to create data values that do not reside in the object tree. And a free object class can be used to create member (child) objects of any other object. You do not give the owner explicitly when you create instances of a free class.  Altro provides a set of primitive free classes. User defined free classes can be either defined by external script files to be loaded/unloaded into the application dynamically, or by library extension through other programming languages.
+
+## Superclass vs. Subclass
+
+In [Inheritance](Inheritance.md), the existing class from which the new classes are derived is known as the **superclass**. It is also known as the **base class**. While **subclasses** (also known as **derived classes**) is the new class that inherits [class members](ClassMembers.md) from superclasses and possibly intruduces more class members. The relationship between a subclass and a superclass is an [is-a relationship](https://en.wikipedia.org/wiki/Is-a), and this relationship forms a class inheritance tree. Altro supports single inheritance through the is-a relation (`class A is B`). However, multiple [interface classes](InterfaceClass.md) can be inherited through the implementation-relationship.
+
+A subclass can also be derived from a [parametric class](ParametricClass.md) by reconstraining or binding type paramters. In addition, functional subclasses can be derived through function declaration (see Function Class (FunctionClass.md) for detail).
 
 ## Sealed Class vs. Open Class
 
@@ -81,6 +95,8 @@ An [**sealed class**](SealedClass.md) is a class that cannot be inherited, but t
 * [Abstract Class](AbstractClass.md)
 * [Member Class](MemberClass.md)
 * [Interface Class](InterfaceClass.md)
+* [Function Class](FunctionClass.md)
+* [Parametric Class](ParametricClass.md)
 * [Sealed Class](SealedClass.md)
 * [Tuple](Tuple.md)
 * [Array](Array.md)
