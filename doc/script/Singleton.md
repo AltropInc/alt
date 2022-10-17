@@ -1,7 +1,8 @@
 # Singleton
 
 If a class can have only one instance, the class is a singleton class, and the unique instance is called singleton. The instance is defined together with its class. The declaration of a singleton is similar to the declaration of a [class declaration](Class.md] with the following differences:
-* A singleton declaration starts with the keyword `object` instead of the keyword `class`
+* A singleton declaration starts with the keyword `object` instead of the keyword `class`.
+* A singleton can only inherit from an object class (not from a data class). If the inheritance clause is missing, the default class is [`Object`](object.md).
 * The constructor of a singleton should have no input because a singleton is created in-place and its constructor cannot be called.
 * A singleton declaration cannot introduce its own class parameters.
 * A singleton cannot introduce more virtual function interfaces.
@@ -54,7 +55,7 @@ A singleton can also be written in a separate file, and then be loaded dynamical
 
 Because a singleton unifies the class scope and the object scope, meta members inside a singleton can access names that are not declared as meta. Let's assume `Table` itself is a singleton:
 ```altro
-object Table   // Table is a singleton here
+object Table   // Table is a singleton here, which inherits the default base 'Object'
 {
     length := 64.0;
     leg_thickness := 4;
