@@ -7,7 +7,7 @@ If a class can have only one instance, the class is a singleton class, and the u
 * A singleton cannot introduce more virtual function interfaces.
 * A singleton cannot introduce any deferred function interfaces.
 * A singleton must implement all deferred function interfaces in base classes and interface classes.
-* The class scope and the object scope in a singleton is the same scope. Therefore, there is no distinction between meta members and object members.
+* The class scope and the object scope in a singleton is the same scope. Therefore, meta members are not allowed in a singleton. All members declared in a singleton belongs to the singleton object scope.
 
 Singletons are commonly used for unique member objects contained in parent objects, and these member objects are permanently attached to its parent. Let's take an example of a pseudo code for table that contains a top surface and four legs:
 ```altro
