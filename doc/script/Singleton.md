@@ -13,12 +13,12 @@ Singletons are commonly used for unique member objects contained in parent objec
 ```altro
 class Table
 {
-    length = 64.0;
-    width = 22.0;
-    height = 30.0;
-    leg_thickness = 4;
-    top_thickness = 1;
-    leg_height = height-top_thickness;
+    length := 64.0;
+    width := 22.0;
+    height := 30.0;
+    leg_thickness := 4;
+    top_thickness := 1;
+    leg_height := height-top_thickness;
     object TableTop is RectangularCuboid   // TableTop is a singleton, a member object of the table
     {
         material = wood;
@@ -56,8 +56,8 @@ Because a singleton unifies the class scope and the object scope, meta members i
 ```altro
 object Table   // Table is a singleton here
 {
-    length = 64.0;
-    leg_thickness = 4;
+    length := 64.0;
+    leg_thickness := 4;
     class Leg is RectangularCuboid   // Leg is a member class used as the base for its four legs
     {
         material = wood;
