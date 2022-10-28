@@ -11,7 +11,9 @@ class any
     meta func is_value(): bool;
     meta func is_object(): bool;
     meta func is_trivial(): bool;
+    meta func super_class(): type_t;
     meta func subtype_check(type t: any): int;
+    meta func accept(type t: any): bool;
 }
 ```
 * `meta func name(): string` -- returns the name of this type.
@@ -21,4 +23,6 @@ class any
 * `meta func is_value(): bool` -- returns true if this type is a [value class](ValueClass.md).
 * `meta func is_object(): bool` -- returns true if this type is an [object class](Object.md).
 * `meta func is_trivial(): bool` -- returns true if this type is trivial, that is, its instances can be freed without using [destructor](Desctructor.md).
+* `meta func super_class(): type_t` -- returns [superclass](Inheritance.md) of this type.
 * `meta func subtype_check(type t: any): int` -- returns a positive integer if `t` is a (pure) subtype of this type; zero if `t` is the same of this type; or a negative integer otherwise.
+* `meta func accept(type t: any): bool` -- returns true if the type `t` is [convertible](ConvertibleType.md) to this type.
