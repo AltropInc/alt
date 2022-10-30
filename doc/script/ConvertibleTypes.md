@@ -42,7 +42,7 @@ y: int = cast x;   // y gets value 2
 
 ### Type Promotion
 
-**Type promotion** is an automatic widening conversion when a binary operation is uses on two operands. For instance, in the expression
+**Type promotion** is an automatic widening conversion when a binary operation is used on two operands. For instance, in the expression
 ```altro
 4 + 4.2
 ```
@@ -50,8 +50,15 @@ The owner (integer 4) will be promoted to double before the expression is execut
 ```altro
 4.2 + 4
 ```
-The input (integer 4) will be promoted to double before the expression is executed. And the result of the execution will be in the type of double. For type promotion rulels, see [Type Promotion](TypePromotion.md).
+The input (integer 4) will be promoted to double before the expression is executed. And the result of the execution will be in the type of double. For type promotion rules, see [Type Promotion](TypePromotion.md).
 
-## Composite Data Type Conversion
+## String and Charater Conversion
+
+A string can be automatically converted to a stream of characters, for instance,
+```altro
+ss: char... = "Hello 世界";
+s: string = ss;
+```
+Here `ss` is stream that contains eight 32-bit unicode characters which is initialialized by the value converted from an UTF-8 string "Hello 世界". And `s` is a string that gets the initial value converted from a stream of characters contained in `ss`.
 
 
