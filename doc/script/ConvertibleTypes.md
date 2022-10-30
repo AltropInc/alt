@@ -52,13 +52,24 @@ The owner (integer 4) will be promoted to double before the expression is execut
 ```
 The input (integer 4) will be promoted to double before the expression is executed. And the result of the execution will be in the type of double. For type promotion rules, see [Type Promotion](TypePromotion.md).
 
-## String and Charater Conversion
+## Charater and String Conversion
 
-A string can be automatically converted to a stream of characters, for instance,
+The character type `char` (32-bit unicode) and `utf8` (UTF-8 encoded char) are interchangeable:
+```altro
+c1: utf8 = 'A';
+c2: char = c1;
+```
+A character cannot be converted to an integer. The method `code` must be called in ordder to get its integral code:
+```altro
+c: char = 'A';
+A_code : uint = 'A'.code();  // A_code gets value 65
+```
+Because `char` and `utf8` are interchangeable, a string and a stream of `char` are also interchangeable:
 ```altro
 ss: char... = "Hello 世界";
 s: string = ss;
 ```
-Here `ss` is stream that contains eight 32-bit unicode characters which is initialialized by the value converted from an UTF-8 string "Hello 世界". And `s` is a string that gets the initial value converted from a stream of characters contained in `ss`.
+Here `ss` is a stream that contains eight 32-bit unicode characters which is initialialized by the value converted from an UTF-8 string "Hello 世界". And `s` is a string that gets the initial value converted from a stream of characters contained in `ss`.
 
+## Tuple Conversion
 
