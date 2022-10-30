@@ -2,21 +2,37 @@
 
 [Type conversion or typecasting](https://en.wikibooks.org/wiki/Computer_Programming/Type_conversion) refers to changing the value of one data type into another. **Convertible type rules** determine if the value of one type can be converted to the value of another type.
 
-**Widening Conversion** converts a smaller type to a larger or the same type size without data loss. Or in other words, converting a value of T1 to a value of T2 is a widening conversion if we can convert the value of T2 back to the original value of T1. For example, converting a 4-byte integer to a 8-byte integer is a widening conversion because a 8-byte integer is able to hold any value of a 4-byte integer. On the otherhand, **Narrowing  Conversion** is a typecasting that may cause data loss and the converted value cannot be converted back to the original value. For example, converting a 8-byte integer to a 4-byte integer is a narrowing conversion.
-
-Altro performs widening conversion automatically. Narrowing conversions must be explicitly stated, otherwise, Altro wparser will report an error about potential data loss.
-
-
 ## Numeric Conversion
 
-[Numeric types](TypeNumeric.md) such as integers and floating numbers are convertible to each other.  For instance, a `float` value can be converted to a `double` value or an `int` value, and an `int` value can be converted to a `float` value or an `double` value. The limited number of bits of a numeric type determines the range of possible values that the type can represent.  The important thing to remember about numeric conversion is that when converting a value of a numeric type to the value of another numeric type with less number of bits, data loss may result, and when signed is converted to unsigned, signs can be lost. For instance:
+[Numeric types](TypeNumeric.md) such as integers and floating numbers are convertible to each other.
 
-```altro
-i: int = 65536;
-s : short = i;   // data loss here because short integer can only represent a range [-32,768, 32,767]
-j : int = -2;
-u: uint = j;     // sign loss here because unsigned int cannot represent a negative value
+**Widening Conversion** converts a smaller numeric type to a larger or the same type size without data loss. Or in other words, converting a value of T1 to a value of T2 is a widening conversion if we can convert the value of T2 back to the original value of T1. For example, converting a 4-byte integer to a 8-byte integer is a widening conversion because a 8-byte integer is able to hold any value of a 4-byte integer. On the other hand, **Narrowing  Conversion** is a typecasting that may cause data loss and the converted value may not be able to be converted back to the original value. For example, converting a 8-byte integer to a 4-byte integer is a narrowing conversion.
+
+Altro performs widening conversion automatically. The following automatic widening conversions are supported:
 ```
-The parser warns you about potential data/sign loss. Take these warnings very seriously. If you are certain that no data loss will occur because the values in the larger variable will always fit in the smaller variable, then add an explicit cast so that the parser will no longer issue a warning. If you aren't sure that the conversion is safe, add to your code some kind of runtime check to handle possible data loss so that it doesn't cause your program to produce incorrect results.
+tiny  ⟶ short  ⟶ int  ⟶ long  ⟶ llong  ──┐
+ ⥮         ⥮        ⥮       ⥮        ⥮      ├──► float ⟶ double ⟶ ldouble
+utiny ⟶ ushort ⟶ uint ⟶ ulong ⟶ ullong ──┘
+```
+In the above chart, for example, the value of a tiny or utiny can be automatically converted to any other primitive numeric type. Note that the conversion between signed and unsigned may cause sign change, but the bitwise data is retained because the value of the original type can be recovered when we convert the value back. For example,
+```altro
+  x: short = -2;
+  y: ushort = x;  // after converting from ushort to short, y gets value 65534
+  z: short = y;   // after converting back from ushort to short, z gets value -2
+```
+Narrowing conversions must be explicitly stated, otherwise, Altro parser will report an error about potential data loss. Explicit type cast can be stated by the keyword `cast`, for instance,
+```altro
+i: int = 65537;
+j: short = cast i;
+```
+Here the 4-byte integer value `65537` is forced to be converted into a 2-byte integer and the value in j is 1, which is a result of data loss. Without the keyword `cast`, an error will be reported.
 
-Any conversion from a floating point type to an integral type will cause data loss because the fractional portion of the floating point value is discarded and lost.
+Converting a floating-point number to an integer is always a narrowing conversion because the fractional portion of the floating-point number is discarded and lost during the conversion. Explicit cast must be used for this conversion:
+```altro
+x = 2.14;
+y: int = cast x;   // y gets value 2
+```
+
+## Composite Data Type Conversion
+
+
