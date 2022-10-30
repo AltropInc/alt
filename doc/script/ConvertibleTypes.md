@@ -4,9 +4,11 @@
 
 ## Numeric Conversion
 
-[Numeric types](TypeNumeric.md) such as integers and floating numbers are convertible to each other.
+[Numeric types](TypeNumeric.md) such as integers and floating numbers are convertible to each other. Numeric type conversion can be classified into widening type conversion and narrowing type conversion.
 
-**Widening Conversion** converts a smaller numeric type to a larger or the same type size without data loss. Or in other words, converting a value of T1 to a value of T2 is a widening conversion if we can convert the value of T2 back to the original value of T1. For example, converting a 4-byte integer to a 8-byte integer is a widening conversion because a 8-byte integer is able to hold any value of a 4-byte integer. On the other hand, **Narrowing  Conversion** is a typecasting that may cause data loss and the converted value may not be able to be converted back to the original value. For example, converting a 8-byte integer to a 4-byte integer is a narrowing conversion.
+### Widening Conversion
+
+**Widening Conversion** converts a smaller numeric type to a larger or the same type size without data loss. Or in other words, converting a value of T1 to a value of T2 is a widening conversion if we can convert the value of T2 back to the original value of T1. For example, converting a 4-byte integer to a 8-byte integer is a widening conversion because a 8-byte integer is able to hold any value of a 4-byte integer.
 
 Altro performs widening conversion automatically. The following automatic widening conversions are supported:
 ```
@@ -20,6 +22,11 @@ In the above chart, for example, the value of a tiny or utiny can be automatical
   y: ushort = x;  // after converting from ushort to short, y gets value 65534
   z: short = y;   // after converting back from ushort to short, z gets value -2
 ```
+
+### Narrowing Conversion
+
+On the other hand, **Narrowing Conversion** is a typecasting that may cause data loss and the converted value may not be able to be converted back to the original value. For example, converting a 8-byte integer to a 4-byte integer is a narrowing conversion.
+ 
 Narrowing conversions must be explicitly stated, otherwise, Altro parser will report an error about potential data loss. Explicit type cast can be stated by the keyword `cast`, for instance,
 ```altro
 i: int = 65537;
@@ -32,6 +39,18 @@ Converting a floating-point number to an integer is always a narrowing conversio
 x = 2.14;
 y: int = cast x;   // y gets value 2
 ```
+
+### Type Promotion
+
+**Type promotion** is an automatic widening conversion when a binary operation is uses on two operands. For instance, in the expression
+```altro
+4 + 4.2
+```
+The owner (integer 4) will be promoted to double before the expression is executed. And the result of the execution will be in the type of double. On the other hand,
+```altro
+4.2 + 4
+```
+The input (integer 4) will be promoted to double before the expression is executed. And the result of the execution will be in the type of double. For type promotion rulels, see [Type Promotion](TypePromotion.md).
 
 ## Composite Data Type Conversion
 
