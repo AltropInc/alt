@@ -30,3 +30,33 @@ sealed value class char is character
     ctor(code: uint);                   // constructor from UTF-32 code in numeric value
 }
 ```
+
+## Character Literal
+
+A character literal contains a character in single quotation mark symbols, for example 'c', '1'，'字'，'✅', and etc. A character literal can also be an escape sequence enclosed in single quotation mark symbols. An escape sequence starts with a blackslash (\) with a number of ordinary characters for an alternative interpretation of a single special character (an escape character). The escape sequence is used as an escape character for the following cases:
+```altscript
+\'          single quote
+\"          double quote
+\\          backslash
+\n          new line
+\r          carriage return
+\t          tab
+\b          backspace
+\f          form feed
+\v          vertical tab (If cross-browser compatibility is a concern, use \x0B instead of \v.)
+\0          null character (only if the next character is not a decimal digit; Otherwise it is an octal escape sequence
+\xFF        one character byte represented by the hexadecimal byte "FF" (Validness is unchecked. If this is a concern, use \uFFFF instead of \xFF)
+\uFFFF      one unicode character in UTF-16 Encoding represented by the hexadecimal "FFFF" (Validness is checked)
+\UFFFFFFFF  one unicode character in UTF-32 Encoding represented by the hexadecimal "FFFFFFFF" (Validness is checked)
+\#00000;    one unicode character represented by the decimal "00000" (Validness is checked)
+\000        one unicode character represented by the octal number "000" (Validness is checked)
+```
+Example code:
+```altscript
+'\u2705'                    // character '✅' in UTF-16 encoding
+'\U0001F174'                // character '🅴' in UTF-32 encoding
+'\xE4\xB8\x96'              // character '世' in UTF-8 encoding
+'\#19990;'                  // character '世' in UTF-32 decimal encoding
+```
+
+
