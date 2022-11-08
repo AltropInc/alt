@@ -44,22 +44,38 @@ A character literal contains a character in single quotation mark symbols, for e
 \b                backspace
 \f                form feed
 \v                vertical tab (If cross-browser compatibility is a concern, use \x0B instead of \v.)
-\0                null character (only if the next character is not a decimal digit; Otherwise it is an octal escape sequence
-\xFF              one character byte represented by the hexadecimal byte "FF" (Validness is unchecked. If this is a concern, use \uFFFF instead of \xFF)
-\xFF\xFF          two character bytes in UTF-8 Encoding (Validness is checked)
-\xFF\xFF\xFF      three character bytes in UTF-8 Encoding (Validness is checked)
-\xFF\xFF\xFF\xFF  four character bytes in UTF-8 Encoding (Validness is checked)
-\uFFFF            one unicode character in UTF-16 Encoding represented by the hexadecimal "FFFF" (Validness is checked)
-\UFFFFFFFF        one unicode character in UTF-32 Encoding represented by the hexadecimal "FFFFFFFF" (Validness is checked)
-\#00000;          one unicode character represented by the decimal "00000" (Validness is checked)
-\000              one unicode character represented by the octal number "000" (Validness is checked)
+\0                null character (only if the next character is not an octal digit; Otherwise it is an octal escape sequence
+\o...             one character byte represented by at least one octal digits (validity is unchecked, but overflow is checked)
+\xhh              one unicode character in UTF-8 encoding by a pair of hexadecimal digits (validity is checked)
+\xhh\xhh          one unicode character in UTF-8 encoding by 2 pairs of hexadecimal digits (validity is checked)
+\xhh\xhh\xhh      one unicode character in UTF-8 encoding by 3 pairs of hexadecimal digits (validity is checked)
+\xhh\xhh\xhh\xhh  one unicode character in UTF-8 encoding by 4 pairs of hexadecimal digits (validity is checked)
+\uhhhh            one unicode character in UTF-16 encoding represented by 4 hexadecimal digits(validity is checked)
+\U00hhhhhh        one unicode character in UTF-32 encoding represented by 6 hexadecimal digits (validity is checked)
+\#d...            one unicode character represented by decimal digits (Validness is checked)
 ```
 Example code:
 ```altscript
-'\u2705'                    // character '✅' in UTF-16 encoding
-'\U0001F174'                // character '🅴' in UTF-32 encoding
-'\xE4\xB8\x96'              // character '世' in UTF-8 encoding
-'\#19990;'                  // character '世' in UTF-32 decimal encoding
+'\0'              // a null character
+'\#126'           // a null character
+'\u2705'          // character '✅' in UTF-16 encoding
+'\U0001F174'      // character '🅴' in UTF-32 encoding
+'\xE4\xB8\x96'    // character '世' in UTF-8 encoding
+'\#19990;'        // character '世' in UTF-32 decimal encoding
 ```
+Note that the octal-digit sequence `\o...` may generate invalid unicode characters because the validity of the unicode code point is not checked. It is here just for the compatibility to [C-like escape sequence](https://en.wikipedia.org/wiki/Escape_sequences_in_C), and it is at your own risk to use it. Unlike the C escape sequence, you can use more than 3 octal digits in the escape sequence as long as the number is within the boundary of a 32-bit unsigned integer. The digits '8' and '9' cannot be used in the octal-digit sequence.
+
+The escape sequence '\uhhhh' cannot represent unicode with code point greater than '\uFFFF'. Use the escape sequence `\U00hhhhhh` for those unicodes beyond the linit of '\uhhhh'.
+
+Unlike the escape sequence in a (string)(TypeString.md), the escape sequence '\#d...' does not require a semicolon at the end because only one character is expected here.
+
+Expect for the octal-digit sequence, all other escape sequence will report error for an invalid unicode. For examples:
+```altscript
+'\xE4\xB8\x96'        // character '世' in UTF-8 encoding
+'\xE4\xB8\x96\x32'    // Error: Too many bytes in UTF-8 character encoding
+'\xE4\xB8'            // Error:  Missing byte(s) in UTF-8 character encoding
+'\xF4\xB8\x96'        // character '世' in UTF-8 encoding
+```
+
 
 
