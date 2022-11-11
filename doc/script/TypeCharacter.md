@@ -31,9 +31,31 @@ sealed value class char is character
 }
 ```
 
+## Type `utf8`
+
+The primitive type `utf8` is a variable-length character type based on the [UTF-8 encoding](https://en.wikipedia.org/wiki/UTF-8) that uses one to four bytes (8-bit). The type `utf8` is primarily used as the element type of [string](String.md). When it is used in declaration of a variable, the maximum storage (four bytes) is always allocated.
+```altro
+sealed value class char is character
+{
+    final func <=> (other: char): int;  // implements deferred methods in the comparable interface
+    final func code(): uint;            // return UTF-8 code in numeric value
+    final func is_valid(): bool;        // return if UTF-8 code is a valid character
+}
+```
+The character type `char` and `utf8` can be converted to each other automatically:
+```altro
+c1: utf8 = 'A';
+c2: char = c1;
+```
+Because char and utf8 are interchangeable, a string and a stream of char are also interchangeable:
+```altro
+ss: char... = "Hello 世界";
+s: string = ss;
+```
+
 ## Character Literal
 
-A character literal contains a character in single quotation mark symbols, for example 'c', '1'，'字'，'✅', and etc. A character literal can also be an escape sequence enclosed in single quotation mark symbols. An escape sequence starts with a blackslash (\) with a number of ordinary characters for an alternative interpretation of a single special character (an escape character). The escape sequence is used as an escape character for the following cases:
+A character literal contains a character in single quotation mark symbols, for example 'c', '1'，'字'，'😀', and etc. A character literal can also be an escape sequence enclosed in single quotation mark symbols. An escape sequence starts with a blackslash (\) with a number of ordinary characters for an alternative interpretation of a single special character (an escape character). The escape sequence is used as an escape character for the following cases:
 ```altscript
 \'                single quote
 \"                double quote
@@ -59,7 +81,7 @@ Example code:
 '\0'              // a null character
 '\#126'           // a null character
 '\u2705'          // character '✅' in UTF-16 encoding
-'\U0001F174'      // character '🅴' in UTF-32 encoding
+'\U0001F600'      // character '😀' in UTF-32 encoding
 '\xE4\xB8\x96'    // character '世' in UTF-8 encoding
 '\#19990;'        // character '世' in UTF-32 decimal encoding
 ```
@@ -74,8 +96,8 @@ Expect for the octal-digit sequence, all other escape sequence will report error
 '\xE4\xB8\x96'        // character '世' in UTF-8 encoding
 '\xE4\xB8\x96\x32'    // Error: Too many bytes in UTF-8 character encoding
 '\xE4\xB8'            // Error:  Missing byte(s) in UTF-8 character encoding
-'\xF4\xB8\x96'        // character '世' in UTF-8 encoding
+'\U0011FFFF'          // Error: Invalid unicode
 ```
-
+The type of a character literal is automatically inferred as `char`.
 
 
