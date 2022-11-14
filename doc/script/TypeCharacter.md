@@ -30,6 +30,7 @@ sealed value class char is character
     ctor(code: uint);                   // constructor from UTF-32 code in numeric value
 }
 ```
+Note that the character methods +, -, +=, -=, ++, --, and the constructor from unsigned integer may generate characters with invalid code points. Use them with your own caution and care. An invalid character will be displayed in '�' ('\uFFFD'), a special character used to replace an invalid character whose code point is unknown or unrepresentable in Unicode
 
 ## Type `utf8`
 
@@ -48,7 +49,7 @@ The character type `char` and `utf8` can be converted to each other automaticall
 c1: utf8 = 'A';
 c2: char = c1;
 ```
-Because char and utf8 are interchangeable, a string and a stream of char are also interchangeable:
+Because char and utf8 are convertible automatically, a string and a stream of char are also implicitly convertible:
 ```altro
 ss: char... = "Hello 世界";
 s: string = ss;
