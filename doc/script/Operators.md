@@ -4,7 +4,7 @@ An operator is a special [function](FunctionClass.md) name composed of operator 
 ```altro
 ! @ $ % & * - + = / \ ? > < ~ | ^ # . [ ] ÷ 
 ```
-Operator characters also includes:
+Operator characters also include:
 * Mathematical operators '\u2000' ~ '\u22FF', except for '\u221E' (∞)
 * Modifiers '\u02B0' ~ '\u02FF'
 * General punctuations '\u2013' ~ '\u204A'
@@ -57,6 +57,15 @@ a++
 s[2..3]
 ```
 Note that ∑ is an operator name and `∑S` are two lexical elements: `∑` (the operator) and `S` (the operand).
+
+In Altro, you can combine any number operator characters to form an operator (except for a few restrictions we have described before). This requires you to use a white space to separate two operator names. For example, in expression,
+```altro
+x+++--y
+```
+`+++--` is treated as one operator in Altro and it is wrong if you acually mean the following expression:
+```altro
+x++ + --y
+```
 
 ## Built-in Operators
 
