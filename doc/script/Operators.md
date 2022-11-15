@@ -1,9 +1,66 @@
-# Builtin Operators
+# Operator
 
-Altscript provides a complete collection of built-in operators across all of its primitive
-types in numeric, enum, enum set and character.
+An operator is a special [function](FunctionClass.md) name composed of operator characters. The following characters are operator characters:
+```altro
+! @ $ % & * - + = / \ ? > < ~ | ^ # . [ ] ÷ 
+```
+Operator characters also includes:
+* Mathematical operators '\u2000' ~ '\u22FF', except for '\u221E' (∞)
+* Modifiers '\u02B0' ~ '\u02FF'
+* General punctuations '\u2013' ~ '\u204A'
+* Arrows, mathematical operators, and miscellaneous technical  '\u2190' ~ '\u23FF'
+* Number superscripts '\u00A1' ~'\u00BF'
 
-## Operators
+A operator character will discontinue an identifier sequence on the lexical grammar of Altro. For example, in
+```altro
+width*height
+```
+the operator character '\*' terminates the identifier sequence  "width". In
+```altro
+distance²
+```
+the operator character '²' terminates the identifier sequence  "distance".
+
+On the other hand, a non-operator character will discontinue an operator sequence. For example, in
+```altro
+width>=height
+```
+the starting character 'h' in identifier "height" terminates the operator sequence ">=".
+
+The operator characters  '\[' and '\]' are separators. A separator will terminate both identifier and operator sequences. The operator character '.' is a also a separator when it is used for function name, but it is not an operator character when it is used as a decimal point or it is used in the combination `..` for range token or `...` for [stream](Stream.md) token.
+
+The following combinations of operator characters are not allowed, and these combination will automatically terminate the operator sequence:
+```altro
+:<   =<   ><
+=+  =-  =*  =/  =%  =|  =&  =~  =!  =^  =? 
+```
+For instance:
+```altro
+pi=-3.14
+```
+Here the operator sequence starts with the character '=' and terminates  with the character '-' because operator name "=-" is not allowed. As result, we get lexical elements `pi`, '=`, `-`, and `3.14`.
+
+An operator can be used as a function name just like an [identifier](Identifier.md]. For examples:
+```altro
+func + (x, y: int) : int;                   // the operator name + is used for this function 
+func ++ (): ownerclass;                     // the operator name ++ is used for this function 
+func ∑ (int_stream: int...): int;           // the operator name ∑ is used for this function 
+prefix func |()|: ownerclass;               // the operator || is a prefix operator where the first character is put at front
+func [(start: int) .. (end: int)]: string   // the operator name [..] that is separated by multiple input sections 
+```
+We can use the above operator names to make the following function calls:
+```altro
+a+b
+a++
+∑S
+|a|
+s[2..3]
+```
+Note that ∑ is an operator name and `∑S` are two lexical elements: `∑` (the operator) and `S` (the operand).
+
+## Built-in Operators
+
+Altscript provides a complete collection of built-in operators across all of its primitive types in numeric, enum, enum set and character.
 
 The following builtin operators are provided
 
