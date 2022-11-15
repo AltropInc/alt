@@ -19,14 +19,15 @@ sealed value class char is character
     final func <=> (other: char): int;  // implements deferred methods in the comparable interface
     final func code(): uint;            // returns UTF-32 code in numeric value
     final func is_valid(): bool;        // returns if UTF-32 code is a valid character
+    final func is_rtl(): bool;          // returns true if this is a right-to-left script (e.g. an Arabic or Hebrew alphabet)
     func + (offset: uint): char;        // returns a character whose code point is greater by the given offset
     func - (offset: uint): char;        // returns a character whose code point is smaller by the given offset
     func += (offset: uint): char;       // augmented assignment that is equivalent to { self = self + offset; self }
     func -= (offset: uint): char;       // augmented assignment that is equivalent to { self = self - offset; self }
-    func ++ (): char;                   // postfix increment that is equivalent to { self += 1; self }
-    func -- (): char;                   // postfix decrement that is equivalent to { self -= 1; self }
-    prefix func ++ (): char;            // prefix increment that is equivalent to { temp:=self; self += 1; temp }
-    prefix func -- (): char;            // prefix increment that is equivalent to { temp:=self; self -= 1; temp }
+    prefix func ++ (): ref#(char);      // prefix increment that is equivalent to { self += 1; self }
+    prefix func -- (): ref#(char);      // prefix decrement that is equivalent to { self -= 1; self }
+    func ++ (): char;                   // postfix increment that is equivalent to { temp: char =self; self += 1; temp }
+    func -- (): char;                   // postfix increment that is equivalent to { temp: char =self; self -= 1; temp }
     ctor(code: uint);                   // constructor from UTF-32 code in numeric value
 }
 ```
