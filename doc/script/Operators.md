@@ -58,7 +58,7 @@ s[2..3]
 ```
 Note that ∑ is an operator name and `∑S` are two lexical elements: `∑` (the operator) and `S` (the operand).
 
-In Altro, you can combine any number operator characters to form an operator (except for a few restrictions we have described before). This requires you to use a white space to separate two operator names. For example, in expression,
+In Altro, you can combine any number of operator characters to form an operator name (with a few restrictions we have described before). This requires you to use a white space to separate two operator names. For example, in expression,
 ```altro
 x+++--y
 ```
@@ -69,9 +69,9 @@ x++ + --y
 
 ## Built-in Operators
 
-Altscript provides a complete collection of built-in operators across all of its primitive types in numeric, enum, enum set and character.
+Altro provides a complete collection of built-in operators across all of its primitive types in numeric, enum, enumset, character and etc.
 
-The following builtin operators are provided
+The following builtin operators are provided with certain properties regarding to precedence and associativity:
 
 | Op     | unicode  | Name             | category      | precedence    | associativity    |
 |:------ |:-------- |:---------------- |:------------- |:------------- |:--------------   |
@@ -119,7 +119,7 @@ The following builtin operators are provided
 | =      |          | assign           | access        | assignment(12)| right            |
 | +=     |          | add assign       | addable       | assignment(12)| right            |
 | -=     |          | sub assign       | addable       | assignment(12)| right            |
-| *=     |          | mul assign       | scalable      | assignment(12)| right            |
+| \*=     |          | mul assign       | scalable      | assignment(12)| right            |
 | /=     |          | div assign       | scalable      | assignment(12)| right            |
 | %=     |          | mod assign       | scalable      | assignment(12)| right            |
 | /#=    | ÷=       | int div assign   | scalable      | assignment(12)| right            |
@@ -131,3 +131,28 @@ The following builtin operators are provided
 | <<=    |          | R-hift assign    | shiftable     | assignment(12)| right            |
 | ,      |          | seperator        | access        | sequence(13)  | right            |
 
+## Operator Precedence
+
+Operator precedence, also referred as [order of operations](https://en.wikipedia.org/wiki/Order_of_operations), determines which operations to perform first in order to evaluate a given expression. Operators with higher precedence become the operands of operators with lower precedence. For example, multiplication is granted a higher precedence than addition. Thus, the expression 3 + 4 * 2 is interpreted as 3 + (4 × 2), not (3 + 4) * 2. Each built-in operator is assigned with a precedence number. The smaller number indicates the higher precedence. All user defined operators has the  precedence number 12:
+
+| Precedence Group     | Order  |
+|:-------------------- |:------ |
+| Scope                | 0      |
+| Selection            | 1      |
+| Prefix               | 2      |
+| Postfix              | 3      |
+| Exponent             | 4      |
+| Scaling              | 5      |
+| Addition             | 6      |
+| Shift                | 7      |
+| Relation             | 8      |
+| Logical And          | 9      |
+| Logical Or           | 10     |
+| Condition            | 11     |
+| User Defined         | 12     |
+| Assignment           | 13     |
+| Sequencing           | 14     |
+
+## Operator Associativity
+
+[Operator associativity](https://en.wikipedia.org/wiki/Operator_associativity) is a property that determines how operators of the same precedence are grouped in the absence of parentheses. 
