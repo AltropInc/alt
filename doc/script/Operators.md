@@ -133,7 +133,7 @@ The following builtin operators are provided with certain properties regarding t
 
 ## Operator Precedence
 
-Operator precedence, also referred as [order of operations](https://en.wikipedia.org/wiki/Order_of_operations), determines which operations to perform first in order to evaluate a given expression. Operators with higher precedence become the operands of operators with lower precedence. For example, multiplication is granted a higher precedence than addition. Thus, the expression 3 + 4 * 2 is interpreted as 3 + (4 × 2), not (3 + 4) * 2. Each built-in operator is assigned with a precedence number. The smaller number indicates the higher precedence. All user defined operators has the  precedence number 12:
+Operator precedence, also referred as [order of operations](https://en.wikipedia.org/wiki/Order_of_operations), determines which operations to perform first in order to evaluate a given expression. Operators with higher precedence become the operands of operators with lower precedence. For example, multiplication is granted a higher precedence than addition. Thus, the expression 3 + 4 * 2 is interpreted as 3 + (4 × 2), not (3 + 4) * 2. Each built-in operator is assigned with a precedence number. The smaller number indicates the higher precedence.
 
 | Precedence Group     | Order  |
 |:-------------------- |:------ |
@@ -153,6 +153,18 @@ Operator precedence, also referred as [order of operations](https://en.wikipedia
 | Assignment           | 13     |
 | Sequencing           | 14     |
 
+All prefix operators have the `Prefix` precedence (2).  All user defined operators has the  precedence number 12.
+
 ## Operator Associativity
 
-[Operator associativity](https://en.wikipedia.org/wiki/Operator_associativity) is a property that determines how operators of the same precedence are grouped in the absence of parentheses. 
+[Operator associativity](https://en.wikipedia.org/wiki/Operator_associativity) is a property that determines how operators of the same precedence are grouped when they appear in a row in an expression. Left associative means we bind operands to an operator in the expression from left to right, while right associative means we  bind operands to an operator in the expression from from right to left. Associativity is required when the operators in an expression have the same precedence in the absence of parentheses. For instance, `+` and `-` have the same precedence and have the left associative property. Consider the expression:
+```altro
+a - b + c
+```
+The result is (a - b) + c, not a - (b + c), becuase operands in the expression must be grouped from left to right. Consider another expression using operator with right associative property:
+```altro
+a = b += c
+```
+The result is a = (b += c), not (a = b) += c, becuase operands in the expression must be grouped from right to left.
+
+All prefix operators and assignment operators have the right associativity. All user-defined non-prefix operators have the left associativity.
