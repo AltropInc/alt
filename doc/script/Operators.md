@@ -153,7 +153,21 @@ Operator precedence, also referred as [order of operations](https://en.wikipedia
 | Assignment           | 13     |
 | Sequencing           | 14     |
 
-All prefix operators have the `Prefix` precedence (2).  All user defined operators has the  precedence number 12.
+All prefix operators have the `Prefix` precedence (2). Therefore, when we apply a prefix operator to an expression that contains operators in lower precedence, we have to use parentheses. For instance, the root symbol √ is traditionally prolongated by a bar (vinculum) over the expression, but we cannot make this notation in Altro lexical. If we use the root symbol √ to define a prefix operator, we have to use parentheses in order to get the desired result:
+```altro
+√(x+y)
+```
+Even the prefix operator defined has a closing operator such as in |x| for getting absolute value, we still need to use parentheses for expression containing operators in lower precedence:
+```altro
+|(x+y)|
+```
+Otherwise, the expression
+```altro
+|x+y|
+```
+will ne interpreted as `(|x) + (y|)`, which is ill-formed.
+
+All user defined operators has the  precedence number 12.
 
 ## Operator Associativity
 
