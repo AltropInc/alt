@@ -157,7 +157,7 @@ All user defined non-prefix operators has the precedence number 12.
 
 ## Prefix Operators
 
-A prefix operator is the operator placed before the operand((s), as in prefix increment and decrement operators, positive and negative signs, root:
+A prefix operator is the operator placed before the operand (the owner), as in prefix increment and decrement operators, positive and negative signs, square root:
 ```altro
 ++x  // prefix increment
 -x   // negation
@@ -165,6 +165,14 @@ A prefix operator is the operator placed before the operand((s), as in prefix in
 !x   // logic not
 ~x   // bitwise flip
 ```
+A prefix operator must have an empty input interface, and the operand of the prefix operator is the instance of the owner class that contains the prefix operation: 
+```altro
+class test
+{
+    prefix func √(n: double);  // Error: Prefix interface should not have input
+}
+```
+
 All prefix operators have the `Prefix` precedence (2). Therefore, when we apply a prefix operator to an expression that contains operators in lower precedence, we have to use parentheses. For instance, the root symbol √ is traditionally prolongated by a bar (vinculum) over the expression, but we cannot make this notation in Altro lexical. If we use the root symbol √ to define a prefix operator, we have to use parentheses in order to get the desired result:
 ```altro
 √(x+y)
@@ -180,7 +188,7 @@ Parentheses are only required when the enclosed expression has an operator with 
 ```
 The expression placed between the opening part and the closing part can have operators upto `Assigment`.
 
-The opening part of a multipart prefix operator can be a sequence of any horizontally-mirrorable characters. For a list of such characters, see [List of Mirrored Characters](https://www.compart.com/en/unicode/mirrored). The opening part in the multipart prefix operator must use the mirrored sequence for the closing part. For instances:
+The opening part of a multipart prefix operator can be a sequence of any horizontally-mirrorable characters. For a list of such characters, see [List of Mirrored Characters](https://www.compart.com/en/unicode/mirrored). The multipart prefix operator must use the mirrored opening sequence for the closing part. For instances:
 ```altro
 class test
 {
@@ -190,7 +198,6 @@ class test
 ctor()
 {
   t := test();
-  --> t <--;
   --> t <--;
   ⇒⁅ t ⁆⇐;
 }
