@@ -1,33 +1,58 @@
 # Operator
 
-An operator is a special [function](FunctionClass.md) name composed of operator characters. The following characters are operator characters:
-```altro
-! @ $ % & * - + = / \ ? > < ~ | ^ # . [ ] ÷ 
-```
-Operator characters also include:
-* Mathematical operators '\u2000' ~ '\u22FF', except for '\u221E' (∞)
-* Modifiers '\u02B0' ~ '\u02FF'
-* General punctuations '\u2013' ~ '\u204A'
-* Arrows, mathematical operators, and miscellaneous technical  '\u2190' ~ '\u23FF'
-* Number superscripts '\u00A1' ~'\u00BF'
+An operator is a special [function](FunctionClass.md) name composed of operator characters.
 
-A operator character will discontinue an identifier sequence on the lexical grammar of Altro. For example, in
+## Operator Character Sequence
+
+The following characters in the [Basic Latin](https://www.compart.com/en/unicode/block/U+0000) block are operator characters:
+```altro
+! @ $ % & * - + = / \ ? > < ~ | ^ # [ ] 
+```
+And the following characters in the [Latin-1 Supplement](https://www.compart.com/en/unicode/block/U+0080) block are operator characters:
+```altro
+¡ ¦  «  ¬  ±  ²  ³  ·  ¹  »  ¿ ÷ 
+```
+Operator characters also include the following characters not in the Basic Latin block:
+* [Spacing Modifier Letters](https://www.compart.com/en/unicode/block/U+02B0) '\u02B0' ~ '\u02FF'
+* [Arrows](https://www.compart.com/en/unicode/block/U+2190) '\u2190' ~ '\u21FF'
+* [Mathematical Operators](https://www.compart.com/en/unicode/block/U+2200) '\u2200' ~ '\u22FF', except for '\u221E' (∞)
+* [Miscellaneous Mathematical Symbols-A](https://www.compart.com/en/unicode/block/U+27C0) '\u27C0' ~ '\u27EF'
+* [Supplemental Arrows-A](https://www.compart.com/en/unicode/block/U+27F0) '\u27F0' ~ '\u27FF'
+* [Supplemental Arrows-B](https://www.compart.com/en/unicode/block/U+2900) '\u2900' ~ '\u297F'
+* [Miscellaneous Mathematical Symbols-B](https://www.compart.com/en/unicode/block/U+2980) '\u2980' ~ '\u29FF'
+* [Supplemental Mathematical Operators](https://www.compart.com/en/unicode/block/U+2A00) '\u2A00' ~ '\u2AFF'
+* [Miscellaneous Symbols and Arrows](https://www.compart.com/en/unicode/block/U+2B00) '\u2B00' ~ '\u2BFF'
+* [Supplemental Punctuation](https://www.compart.com/en/unicode/block/U+2E00) '\u2E00' ~ '\u2E7F'
+
+The double dot `..` is treated as a single token, which is eqivalent to `‥` ('\u2025'), it can be used as a single operator character.
+
+An operator character will discontinue an identifier sequence on the lexical grammar of Altro. For example, in
 ```altro
 width*height
 ```
-the operator character '\*' terminates the identifier sequence  "width". In
+the operator character '\*' terminates the identifier sequence  "width", and in the following expression,
 ```altro
 distance²
 ```
 the operator character '²' terminates the identifier sequence  "distance".
 
-On the other hand, a non-operator character will discontinue an operator sequence. For example, in
+On the other hand, a non-operator character will discontinue an operator sequence. For example,
 ```altro
 width>=height
 ```
-the starting character 'h' in identifier "height" terminates the operator sequence ">=".
+Here the starting character 'h' in identifier "height" terminates the operator sequence ">=".
 
-The operator characters  '\[' and '\]' are separators. A separator will terminate both identifier and operator sequences. The operator character '.' is a also a separator when it is used for function name, but it is not an operator character when it is used as a decimal point or it is used in the combination `..` for range token or `...` for [stream](Stream.md) token.
+The operator character sequence will also discontinue with an operator character that is also a separator. The following operator characters are separators:
+| character | unicode  | Comments                                          |
+|:--------- |:-------- |:------------------------------------------------- |
+| \[        | \u005B   | Left Square Bracket                               |
+| \]        | \u005D   | Right Square Bracket                              |
+| ..        | \u005D   | Range (double dots)                               |
+| >\u007F   |  >\u007F | All non-basic-latin operator chars are separators |
+
+Therefore, the operator sequence `+=` or `==>` is a single operator, but `[[` or `∛∛` contains two operators. 
+
+A separator will terminate both identifier and operator sequences. The operator character '.' is a also a separator when it is used for function name, but it is not an operator character when it is used as a decimal point or it is used in the combination `..` for range token or `...` for [stream](Stream.md) token.
 
 The following combinations of operator characters are not allowed, and these combination will automatically terminate the operator sequence:
 ```altro
@@ -38,7 +63,7 @@ For instance:
 ```altro
 pi=-3.14
 ```
-Here the operator sequence starts with the character '=' and terminates  with the character '-' because operator name "=-" is not allowed. As result, we get lexical elements `pi`, '=`, `-`, and `3.14`.
+Here the operator sequence starts with the character '=' and terminates with the character '-' because operator name "=-" is not allowed. As result, we get lexical elements `pi`, '=`, `-`, and `3.14`.
 
 An operator can be used as a function name just like an [identifier](Identifier.md]. For examples:
 ```altro
@@ -67,6 +92,28 @@ x+++--y
 x++ + --y
 ```
 
+## Multipart Operator
+
+A multipart operator has an operator name separated in multiple sections. For instance, the operator `[]` is a multipart operator (note that the character `[` is a separator) and it has two sections: `[` and `]`, which can be separated by an operand:
+```
+[x+2]
+```
+A multipart operator, like a multipart function name, is specified in a [multi-section function interface](RoutineInterface.md). For instance,,
+```
+class string
+{
+    func [(start: int) .. (end: int)]: string;  // Gets a substring from start index up to end index.
+                                                // The character at the end index is excluded
+}
+x := "abcdefg";
+y := x[2..4];   // y gets "cd"
+```
+Here the function interface uses a multipart operator `[`, `..`, `]`, and the name is separated by operands the `start` and the `end` index. Each section of a multipart operator can only contain one operator sequence. For instance,
+```
+func [(start: int) >..< (end: int)];  //  Error: Multiple operator sequences are used in the same interface section
+```
+Because `..` is a separator, `>..<` contains three operator sequences: `>', '..', and '<'.
+
 ## Built-in Operators
 
 Altro provides a complete collection of built-in operators across all of its primitive types in numeric, enum, enumset, character and etc.
@@ -85,7 +132,7 @@ The following builtin operators are provided with certain properties regarding t
 | <      |          | less             | comparible    | relation(8)   | left             |
 | >=     | ≥        | greater or equal | comparible    | relation(8)   | left             |
 | <=     | ≤        | less or equal    | comparible    | relation(8)   | left             |
-| ..     |          | between          | comparible    | addition(6)   | left             |
+| ..     | ‥        | between          | comparible    | addition(6)   | left             |
 | +      |          | add              | addable       | addition(6)   | left             |
 | -      |          | substract        | addable       | addition(6)   | left             |
 | *      |          | multiply         | scalable      | scaling(5)    | left             |
@@ -97,8 +144,8 @@ The following builtin operators are provided with certain properties regarding t
 | -      |          | negative         | addable       | postfix(2)    | right            |
 |        | ²        | exponent 2       | scalable      | Prefix(3)     | right            |
 |        | ³        | exponent 3       | scalable      | Prefix(3)     | right            |
-|        | √        | square root      | scalable      | postfix(2)    | right            |
-|        | ∛        | cubic root       | scalable      | postfix(2)    | right            |
+|        | √        | square root      | scalable      | Prefix(2)    | right            |
+|        | ∛        | cubic root       | scalable      | Prefix(2)    | right            |
 | ++     |          | increment        | Incrementable | Prefix(3)     | left             |
 | --     |          | decrement        | Incrementable | Prefix(3)     | left             |
 | ++     |          | post increment   | Incrementable | postfix(2)    | right            |
@@ -130,6 +177,8 @@ The following builtin operators are provided with certain properties regarding t
 | >>=    |          | L-hift assign    | shiftable     | assignment(12)| right            |
 | <<=    |          | R-hift assign    | shiftable     | assignment(12)| right            |
 | ,      |          | seperator        | access        | sequence(13)  | right            |
+
+Note that `::` and `.` has special meaning and cannot be used as an operator character in a function name. They are listed here just for lexcial processing purpose.
 
 ## Operator Precedence
 
@@ -177,7 +226,7 @@ All prefix operators have the `Prefix` precedence (2). Therefore, when we apply 
 ```altro
 √(x+y)
 ```
-However, if the prefix operator is a multipart including an opening part and a closing part, such as in |x|, ⌈x⌉, using parentheses is then unneccessary:
+However, if the prefix operator is a multipart including an opening part and a closing part, such as in |x|, ⌈x⌉, using parentheses is then unneccessary under certain condition:
 ```altro
 |x+y|   // absolute value of x+y
 ⌈x+y⌉    //ceiling of x+y
@@ -186,20 +235,18 @@ Parentheses are only required when the enclosed expression has an operator with 
 ```altro
 |(x|y)|   // absolute value of x|y
 ```
-The expression placed between the opening part and the closing part can have operators upto `Assigment`.
-
-The opening part of a multipart prefix operator can be a sequence of any horizontally-mirrorable characters. For a list of such characters, see [List of Mirrored Characters](https://www.compart.com/en/unicode/mirrored). The multipart prefix operator must use the mirrored opening sequence for the closing part. For instances:
+The expression placed between the opening part and the closing part can have operator precedence  up to `Assignment` (13), and the  opening part and the closing part of the operator serve as a pair of parentheses. In order to achieve this, the opening part of the operator must be a sequence of any horizontally-mirrorable characters (for a list of such characters, see [List of Mirrored Characters](https://www.compart.com/en/unicode/mirrored)), and the closing part must use the mirrored character sequence. For instances:
 ```altro
 class test
 {
     prefix func --> () <--;
-    prefix func ⇒⁅ () ⁆⇐;
+    prefix func ⇒ () ⇐;
 }
 ctor()
 {
   t := test();
   --> t <--;
-  ⇒⁅ t ⁆⇐;
+  ⇒ t ⇐;
 }
 ```
 
