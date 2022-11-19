@@ -151,11 +151,11 @@ The following builtin operators are provided with certain properties regarding t
 | ~      | ≅, ∈    | regex equal      | reg-equality  | Relation(8)   | left             | false             | false         |
 | !~     | ≇ ∉     | regex inequal    | reg-equality  | Relation(8)   | left             | false             | false         |
 | !      |          | logical not      | logical       | Postfix(2)    | right            | false             | false         |
-| ||     | ⋁       | logical or        | logical       | Logic-or(10)  | left             | false             | false         |
+| \|\|     | ⋁       | logical or        | logical       | Logic-or(10)  | left             | false             | false         |
 | &&     | ⋀       | logical and       | logical       | Logic-and(9)  | left             | false             | false         |
-| \      | ⊻       | exclusive or      | clusivity     | Addtion(6)    | left             | false             | false         |
-| |      | ∪       | inclusive or      | clusivity     | Addtion(6)    | left             | false             | false         |
-| |      | ∩       | conjunction       | clusivity     | Scaling(5)    | left             | false             | false         |
+| \\      | ⊻       | exclusive or      | clusivity     | Addtion(6)    | left             | false             | false         |
+| \|      | ∪       | inclusive or      | clusivity     | Addtion(6)    | left             | false             | false         |
+| &      | ∩       | conjunction       | clusivity     | Scaling(5)    | left             | false             | false         |
 | ~      |          | flip             | clusivity     | Prefix(2)     | right            | false             | false         |
 | <<     |          | left shift       | shiftable     | Shift(7)      | left             | false             | false         |
 | >>     |          | right shift      | shiftable     | Shift(7)      | left             | false             | false         |
@@ -169,7 +169,7 @@ The following builtin operators are provided with certain properties regarding t
 | %=     |          | mod assign       | scalable      | Assignment(12)| right            | true             | true         |
 | /#=    | ÷=       | int div assign   | scalable      | Assignment(12)| right            | true             | true         |
 | ^=     |          | exp assign       | scalable      | Assignment(12)| right            | true             | true         |
-| \=     | ⊻=       | excl-or assign   | clusivity     | Assignment(12)| right            | true             | true         |
+| \\=     | ⊻=       | excl-or assign   | clusivity     | Assignment(12)| right            | true             | true         |
 | \|=     | ∪=       | incl-or assign   | clusivity     | Assignment(12)| right            | true             | true         |
 | &=     | ∩=       | conjunct assign  | clusivity     | Assignment(12)| right            | true             | true         |
 | >>=    |          | L-hift assign    | shiftable     | Assignment(12)| right            | true             | true         |
