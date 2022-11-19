@@ -203,6 +203,20 @@ Operator precedence, also referred as [order of operations](https://en.wikipedia
 
 All user defined non-prefix operators has the precedence number 12.
 
+## Operator Associativity
+
+[Operator associativity](https://en.wikipedia.org/wiki/Operator_associativity) is a property that determines how operators of the same precedence are grouped when they appear in a row in an expression. Left associative means we bind operands to an operator in the expression from left to right, while right associative means we  bind operands to an operator in the expression from from right to left. Associativity is required when the operators in an expression have the same precedence in the absence of parentheses. For instance, `+` and `-` have the same precedence and have the left associative property. Consider the expression:
+```altro
+a - b + c
+```
+The result is (a - b) + c, not a - (b + c), becuase operands in the expression must be grouped from left to right. Consider another expression using operator with right associative property:
+```altro
+a = b += c
+```
+The result is a = (b += c), not (a = b) += c, becuase operands in the expression must be grouped from right to left.
+
+All prefix operators and assignment operators have the right associativity. All user-defined non-prefix operators have the left associativity.
+
 ## Prefix Operators
 
 A prefix operator is the operator placed before the operand (the owner), as in prefix increment and decrement operators, positive and negative signs, square root:
@@ -238,27 +252,44 @@ The expression placed between the opening part and the closing part can have ope
 ```altro
 class test
 {
-    prefix func --> () <--;
-    prefix func ⇒ () ⇐;
+    class foo
+    {
+        prefix func --> () <-- : foo { owner }  // returns the owner object, i.e. this instance of foo
+        prefix func ⇒ () ⇐ { /* do something here */ }
+    }
+    ctor()
+    {
+      ⇒-->foo()<--⇐;
+    }
 }
-ctor()
-{
-  t := test();
-  --> t <--;
-  ⇒ t ⇐;
-}
 ```
-
-## Operator Associativity
-
-[Operator associativity](https://en.wikipedia.org/wiki/Operator_associativity) is a property that determines how operators of the same precedence are grouped when they appear in a row in an expression. Left associative means we bind operands to an operator in the expression from left to right, while right associative means we  bind operands to an operator in the expression from from right to left. Associativity is required when the operators in an expression have the same precedence in the absence of parentheses. For instance, `+` and `-` have the same precedence and have the left associative property. Consider the expression:
+Note that `⇒` and `⇐` are separators, the sequence `⇒-->` contains two operators, one is the operator for function call to `⇒()⇐`, and another is the operator for function call to `-->()<--`. Because the prefix operator is right associative, the inner expression `-->foo()<--` is executed first, which returns an object of `foo`, and then the function `⇒()⇐` is applied on the returned object from the function `-->()<--`. This is illustrated as below:
 ```altro
-a - b + c
+⇒(-->foo()<--)⇐
 ```
-The result is (a - b) + c, not a - (b + c), becuase operands in the expression must be grouped from left to right. Consider another expression using operator with right associative property:
-```altro
-a = b += c
-```
-The result is a = (b += c), not (a = b) += c, becuase operands in the expression must be grouped from right to left.
 
-All prefix operators and assignment operators have the right associativity. All user-defined non-prefix operators have the left associativity.
+## Lvalue Operators
+
+An lvalue operator is an operator that requires a modifiable [lvalue](https://en.wikipedia.org/wiki/Value_(computer_science)#lrvalue) for its operand (its owner or executor). An lvalue, also referred as a locator value, represents an instance that occupies some identifiable location in memory where its value or state can be changed. All assignment operators are lvalue operators. Increment operator `++` and decrement operator `--` are also lvalue operators. Using an lvalue operator on a non-modifiable value is not allowed.
+
+Any of the following expressions can be lvalue expressions:
+* A variable name
+* A subscript expression with a variable name
+* A member-selection expression with a variable name
+* A function output that is a reference
+* An lvalue in parentheses
+
+Consider the following examples:
+```altro
+x := ++3;   // Error: Cannot alter the value of a constant value
+3 = x;      // Error: Cannot alter the value of a constant value
+func bar():int;
+bar() = x;  // Error: An lvalue expression is expected for operator: =
+x++ ++      // Error:: An lvalue expression is expected for operator: ++
+++x++;      // Okay, because prefix increment returns a value reference, which is an lvalue
+```
+Note that post increment `x++` returns a integer value, not a reference. Therefore, the lvalue operator `++` cannot be applied to the expression `x++`. However, the prefix increment `++x` returns a reference to the value contained in `x`, thus the lvalue operator `++` can be applied to the expression `++x`.
+
+
+
+
