@@ -62,7 +62,7 @@ For instance:
 ```altro
 pi=-3.14
 ```
-Here the operator sequence starts with the character '=' and terminates with the character '-' because operator name "=-" is not allowed. As result, we get lexical elements `pi`, '=`, `-`, and `3.14`.
+Here the operator sequence starts with the character '=' and terminates with the character '-' because operator name "=-" is not allowed. As result, we get lexical elements `pi`, `=`, `-`, and `3.14`.
 
 An operator can be used as a function name just like an [identifier](Identifier.md]. For examples:
 ```altro
