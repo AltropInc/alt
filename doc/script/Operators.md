@@ -123,7 +123,7 @@ The following builtin operators are provided with certain properties regarding t
 |:------ |:-------- |:---------------- |:------------- |:------------- |:--------------   | ----------------- | --------------|
 | ::     |          | scope            | access        | Scope(0)      | left             | false             | false         |
 | []     |          | selection        | access        | Selection(1)  | left             | false             | true          |
-| .      |          | selection        | access        | Selection(1)  | left             | false             | false         |
+| .      |          | selection        | access        | Selection(1)  | left             | false             | true         |
 | ==     |          | equal            | equality      | Relation(8)   | left             | false             | false         |
 | !=     | ≠        | inequal          | equality      | Relation(8)   | left             | false             | false         |
 | >      |          | greater          | comparible    | Relation(8)   | left             | false             | false         |
