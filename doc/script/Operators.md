@@ -140,17 +140,17 @@ The following builtin operators are provided with certain properties regarding t
 | /#     | ÷        | int divide       | scalable      | Scaling(5)    | left             | false             | false         |
 | +      |          | positive         | addable       | Prefix(2)     | right            | false             | false         |
 | -      |          | negative         | addable       | Prefix(2)     | right            | false             | false         |
-|        | ²        | exponent 2       | scalable      | Prefix(3)     | right            | false             | false         |
-|        | ³        | exponent 3       | scalable      | Prefix(3)     | right            | false             | false         |
+|        | ²        | exponent 2       | scalable      | Postfix(3)     | left            | false             | false         |
+|        | ³        | exponent 3       | scalable      | Postfix(3)     | left            | false             | false         |
 |        | √        | square root      | scalable      | Prefix(2)    | right            | false             | false         |
 |        | ∛        | cubic root       | scalable      | Prefix(2)    | right            | false             | false         |
-| ++     |          | increment        | Incrementable | Prefix(3)     | right           | true             | true         |
-| --     |          | decrement        | Incrementable | Prefix(3)     | right           | true             | true         |
-| ++     |          | post increment   | Incrementable | Postfix(2)    | left            | true             | false         |
-| --     |          | post decrement   | Incrementable | Postfix(2)    | left            | true             | false         |
+| ++     |          | increment        | Incrementable | Prefix(2)     | right           | true             | true         |
+| --     |          | decrement        | Incrementable | Prefix(2)     | right           | true             | true         |
+| ++     |          | post increment   | Incrementable | Postfix(3)    | left            | true             | false         |
+| --     |          | post decrement   | Incrementable | Postfix(3)    | left            | true             | false         |
 | ~      | ≅, ∈    | regex equal      | reg-equality  | Relation(8)   | left             | false             | false         |
 | !~     | ≇ ∉     | regex inequal    | reg-equality  | Relation(8)   | left             | false             | false         |
-| !      |          | logical not      | logical       | Postfix(2)    | right            | false             | false         |
+| !      |          | logical not      | logical       | Prefix(2)     | right            | false             | false         |
 | \|\|     | ⋁       | logical or        | logical       | Logic-or(10)  | left             | false             | false         |
 | &&     | ⋀       | logical and       | logical       | Logic-and(9)  | left             | false             | false         |
 | \\      | ⊻       | exclusive or      | clusivity     | Addtion(6)    | left             | false             | false         |
@@ -269,7 +269,7 @@ Note that `⇒` and `⇐` are separators, the sequence `⇒-->` contains two ope
 
 ## Lvalue Operators
 
-An lvalue operator is an operator that requires a modifiable [lvalue](https://en.wikipedia.org/wiki/Value_(computer_science)#lrvalue) for its operand (its owner or executor). An lvalue, also referred as a locator value, represents an instance that occupies some identifiable location in memory where its value or state can be changed. All assignment operators are lvalue operators. Increment operator `++` and decrement operator `--` are also lvalue operators. Using an lvalue operator on a non-modifiable value is not allowed.
+An lvalue operator is an operator that requires a modifiable [lvalue](https://en.wikipedia.org/wiki/Value_(computer_science)#lrvalue) for its operand (its owner or executor if we view the operator as a member funcion). An lvalue, also referred as a locator value, represents an instance that occupies some identifiable location in memory where its value or state can be changed. All assignment operators are lvalue operators. Increment operator `++` and decrement operator `--` are also lvalue operators. Using an lvalue operator on a non-modifiable value is not allowed.
 
 Any of the following expressions can be lvalue expressions:
 * A variable name
@@ -288,7 +288,6 @@ x++ ++      // Error:: An lvalue expression is expected for operator: ++
 ++x++;      // Okay, because prefix increment returns a value reference, which is an lvalue
 ```
 Note that post increment `x++` returns a integer value, not a reference. Therefore, the lvalue operator `++` cannot be applied to the expression `x++`. However, the prefix increment `++x` returns a reference to the value contained in `x`, thus the lvalue operator `++` can be applied to the expression `++x`.
-
 
 
 
