@@ -121,62 +121,60 @@ The following builtin operators are provided with certain properties regarding t
 
 | Op     | unicode  | Name             | category      | precedence    | associativity    | is lvaue operator | returns lvale |
 |:------ |:-------- |:---------------- |:------------- |:------------- |:--------------   | ----------------- | --------------|
-| ::     |          | scope            | access        | Scope(0)      | left             | false             | false         |
-| []     |          | selection        | access        | Selection(1)  | left             | false             | true          |
-| .      |          | selection        | access        | Selection(1)  | left             | false             | true         |
-| ==     |          | equal            | equality      | Relation(8)   | left             | false             | false         |
-| !=     | ≠        | inequal          | equality      | Relation(8)   | left             | false             | false         |
-| >      |          | greater          | comparible    | Relation(8)   | left             | false             | false         |
-| <      |          | less             | comparible    | Relation(8)   | left             | false             | false         |
-| >=     | ≥        | greater or equal | comparible    | Relation(8)   | left             | false             | false         |
-| <=     | ≤        | less or equal    | comparible    | Relation(8)   | left             | false             | false         |
-| ..     | ‥        | between          | comparible    | Addition(6)   | left             | false             | false         |
-| +      |          | add              | addable       | Addition(6)   | left             | false             | false         |
-| -      |          | substract        | addable       | Addition(6)   | left             | false             | false         |
-| *      |          | multiply         | scalable      | Scaling(5)    | left             | false             | false         |
-| /      |          | divide           | scalable      | Scaling(5)    | left             | false             | false         |
-| %      |          | modulo           | scalable      | Scaling(5)    | left             | false             | false         |
-| ^      |          | exponent         | scalable      | Exponent(4)   | left            | false             | false         |
-| /#     | ÷        | int divide       | scalable      | Scaling(5)    | left             | false             | false         |
-| +      |          | positive         | addable       | Prefix(2)     | right            | false             | false         |
-| -      |          | negative         | addable       | Prefix(2)     | right            | false             | false         |
-|        | ²        | exponent 2       | scalable      | Postfix(3)     | left            | false             | false         |
-|        | ³        | exponent 3       | scalable      | Postfix(3)     | left            | false             | false         |
-|        | √        | square root      | scalable      | Prefix(2)    | right            | false             | false         |
-|        | ∛        | cubic root       | scalable      | Prefix(2)    | right            | false             | false         |
-| ++     |          | increment        | Incrementable | Prefix(2)     | right           | true             | true         |
-| --     |          | decrement        | Incrementable | Prefix(2)     | right           | true             | true         |
-| ++     |          | post increment   | Incrementable | Postfix(3)    | left            | true             | false         |
-| --     |          | post decrement   | Incrementable | Postfix(3)    | left            | true             | false         |
-| ~      | ≅, ∈    | regex equal      | reg-equality  | Relation(8)   | left             | false             | false         |
-| !~     | ≇ ∉     | regex inequal    | reg-equality  | Relation(8)   | left             | false             | false         |
-| !      |          | logical not      | logical       | Prefix(2)     | right            | false             | false         |
-| \|\|     | ⋁       | logical or        | logical       | Logic-or(10)  | left             | false             | false         |
-| &&     | ⋀       | logical and       | logical       | Logic-and(9)  | left             | false             | false         |
-| \\      | ⊻       | exclusive or      | clusivity     | Addtion(6)    | left             | false             | false         |
-| \|      | ∪       | inclusive or      | clusivity     | Addtion(6)    | left             | false             | false         |
-| &      | ∩       | conjunction       | clusivity     | Scaling(5)    | left             | false             | false         |
-| ~      |          | flip             | clusivity     | Prefix(2)     | right            | false             | false         |
-| <<     |          | left shift       | shiftable     | Shift(7)      | left             | false             | false         |
-| >>     |          | right shift      | shiftable     | Shift(7)      | left             | false             | false         |
-| .?     |          | contain          | containment   | Condition(11) | left             | false             | false         |
-| ?:     |          | conditional      | access        | Condition(11) | right            | false             | false         |
-| =      |          | assign           | access        | Assignment(12)| right            | true             | true         |
-| +=     |          | add assign       | addable       | Assignment(12)| right            | true             | true         |
-| -=     |          | sub assign       | addable       | Assignment(12)| right            | true             | true         |
-| \*=     |          | mul assign       | scalable      | Assignment(12)| right            | true             | true         |
-| /=     |          | div assign       | scalable      | Assignment(12)| right            | true             | true         |
-| %=     |          | mod assign       | scalable      | Assignment(12)| right            | true             | true         |
-| /#=    | ÷=       | int div assign   | scalable      | Assignment(12)| right            | true             | true         |
-| ^=     |          | exp assign       | scalable      | Assignment(12)| right            | true             | true         |
-| \\=     | ⊻=       | excl-or assign   | clusivity     | Assignment(12)| right            | true             | true         |
-| \|=     | ∪=       | incl-or assign   | clusivity     | Assignment(12)| right            | true             | true         |
-| &=     | ∩=       | conjunct assign  | clusivity     | Assignment(12)| right            | true             | true         |
-| >>=    |          | L-hift assign    | shiftable     | Assignment(12)| right            | true             | true         |
-| <<=    |          | R-hift assign    | shiftable     | Assignment(12)| right            | true             | true         |
-| ,      |          | seperator        | access        | Assignment(13)  | right            | false             | false         |
+| []     |          | subscript        | access        | Postfix    | left             | false             | true          |
+| .      |          | selection        | access        | Postfix    | left             | false             | true         |
+| ==     |          | equal            | equality      | Relation   | left             | false             | false         |
+| !=     | ≠        | inequal          | equality      | Relation   | left             | false             | false         |
+| >      |          | greater          | comparible    | Relation   | left             | false             | false         |
+| <      |          | less             | comparible    | Relation   | left             | false             | false         |
+| >=     | ≥        | greater or equal | comparible    | Relation   | left             | false             | false         |
+| <=     | ≤        | less or equal    | comparible    | Relation   | left             | false             | false         |
+| ..     | ‥        | between          | comparible    | Addition   | left             | false             | false         |
+| +      |          | add              | addable       | Addition   | left             | false             | false         |
+| -      |          | substract        | addable       | Addition   | left             | false             | false         |
+| *      |          | multiply         | scalable      | Scaling    | left             | false             | false         |
+| /      |          | divide           | scalable      | Scaling    | left             | false             | false         |
+| %      |          | modulo           | scalable      | Scaling    | left             | false             | false         |
+| ^      |          | exponent         | scalable      | Exponent   | left            | false             | false         |
+| /#     | ÷        | int divide       | scalable      | Scaling    | left             | false             | false         |
+| +      |          | positive         | addable       | Prefix     | right            | false             | false         |
+| -      |          | negative         | addable       | Prefix     | right            | false             | false         |
+|        | ²        | exponent 2       | scalable      | Postfix    | left            | false             | false         |
+|        | ³        | exponent 3       | scalable      | Postfix    | left            | false             | false         |
+|        | √        | square root      | scalable      | Prefix     | right            | false             | false         |
+|        | ∛        | cubic root       | scalable      | Prefix     | right            | false             | false         |
+| ++     |          | increment        | Incrementable | Prefix     | right           | true             | true         |
+| --     |          | decrement        | Incrementable | Prefix     | right           | true             | true         |
+| ++     |          | post increment   | Incrementable | Postfix    | left            | true             | false         |
+| --     |          | post decrement   | Incrementable | Postfix    | left            | true             | false         |
+| ~      | ≅, ∈    | regex equal      | reg-equality  | Relation    | left             | false             | false         |
+| !~     | ≇ ∉     | regex inequal    | reg-equality  | Relation    | left             | false             | false         |
+| !      |          | logical not      | logical       | Prefix      | right            | false             | false         |
+| \|\|     | ⋁       | logical or        | logical       | Logic-or  | left             | false             | false         |
+| &&     | ⋀       | logical and       | logical       | Logic-and   | left             | false             | false         |
+| \\      | ⊻       | exclusive or      | clusivity     | Addtion    | left             | false             | false         |
+| \|      | ∪       | inclusive or      | clusivity     | Addtion    | left             | false             | false         |
+| &      | ∩       | conjunction       | clusivity     | Scaling     | left             | false             | false         |
+| ~      |          | flip             | clusivity     | Prefix      | right            | false             | false         |
+| <<     |          | left shift       | shiftable     | Shift       | left             | false             | false         |
+| >>     |          | right shift      | shiftable     | Shift       | left             | false             | false         |
+| .?     |          | contain          | containment   | Condition   | left             | false             | false         |
+| ?:     |          | conditional      | access        | Condition   | right            | false             | false         |
+| =      |          | assign           | access        | Assignment  | right            | true             | true         |
+| +=     |          | add assign       | addable       | Assignment  | right            | true             | true         |
+| -=     |          | sub assign       | addable       | Assignment  | right            | true             | true         |
+| \*=     |          | mul assign       | scalable      | Assignment | right            | true             | true         |
+| /=     |          | div assign       | scalable      | Assignment  | right            | true             | true         |
+| %=     |          | mod assign       | scalable      | Assignment  | right            | true             | true         |
+| /#=    | ÷=       | int div assign   | scalable      | Assignment  | right            | true             | true         |
+| ^=     |          | exp assign       | scalable      | Assignment  | right            | true             | true         |
+| \\=     | ⊻=       | excl-or assign   | clusivity     | Assignment  | right            | true             | true         |
+| \|=     | ∪=       | incl-or assign   | clusivity     | Assignment  | right            | true             | true         |
+| &=     | ∩=       | conjunct assign  | clusivity     | Assignment  | right            | true             | true         |
+| >>=    |          | L-hift assign    | shiftable     | Assignment  | right            | true             | true         |
+| <<=    |          | R-hift assign    | shiftable     | Assignment  | right            | true             | true         |
 
-Note that `::` and `.` has special meaning and cannot be used as an operator character in a function name. They are listed here just for lexcial processing purpose.
+Note that `.` has special meaning and cannot be used as an operator character in a function name. They are listed here just for lexcial processing purpose on [expressions](Expressions.md).
 
 ## Operator Precedence
 
