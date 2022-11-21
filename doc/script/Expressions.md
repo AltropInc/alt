@@ -19,15 +19,28 @@ Primary expressions are the building blocks of more complex expressions. They ma
 
 *primary-expression*<br>
 &nbsp;&nbsp;&nbsp;&nbsp;[*literal*](Literals.md)<br>
-&nbsp;&nbsp;&nbsp;;&nbsp;[**self**](SelfAndOwner.md)<br>
-&nbsp;&nbsp;&nbsp;;&nbsp;[**owner**](SelfAndOwner.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[**self**](SelfAndOwner.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[**owner**](SelfAndOwner.md)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;;[**selfclass**](SelfAndOwner.md)<br>
-&nbsp;&nbsp;&nbsp;;&nbsp;[**ownerclass**](SelfAndOwner.md)<br>
-&nbsp;&nbsp;&nbsp;;&nbsp;[*name*](Names.md)<br>
-&nbsp;&nbsp;&nbsp;;&nbsp;::[*name*](Names.md) ( expression )
-&nbsp;&nbsp;&nbsp;;&nbsp;(expression)
-&nbsp;&nbsp;&nbsp;;&nbsp;[routine-call](Routine.md)
+&nbsp;&nbsp;&nbsp;&nbsp;[**ownerclass**](SelfAndOwner.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[*name*](Names.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;::[*name*](Names.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(expression)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[routine-call](Routine.md)<br>
    
- 
+A literal is a constant primary expression. Its type depends on the form of its presentation. For complete information about specifying literals, see [Literals](Literals.md).
+
+The keyword `self` appearing in a class body refers to the current instance created by this class or by a derived class of this class, and `selfclass` refers to the type of `self`. The keyword `owner` appearing in a member class body refers to the enclosing instance of the current instancecreated by the member class or by a derived class of the member class, and `ownerclass` refers to the type of `owner`. For complete information about `self` and `owner`, see [self, selfclass, owner, and ownerclass](SelfAndOwner.md).
+
+The scope-resolution operator (::) followed by a name refers to a name at global scope, not a member name.
+
+An expression enclosed in parentheses is a primary expression.
+
+A call to a routine in the forma of `function_name(optional-input-list)`, except for calls to functions with pecial operator strings, is a primary expression. See [Routine](Routine.md) for complete information about routine calls.
+
+
+
+
+
 
 
