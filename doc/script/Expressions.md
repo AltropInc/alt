@@ -110,21 +110,22 @@ All other compound expressions at level N are made of operators at precedence le
 
 Altro has the following precedence level:
 
-| Precedence Group     | Order of Level  |
-|:-------------------- |:--------------- |
-| Postfix              | 1               |
-| Prefix               | 2               |
-| Exponent             | 3               |
-| Scaling              | 4               |
-| Addition             | 5               |
-| Shift                | 6               |
-| Relation             | 7               |
-| Logical And          | 8               |
-| Logical Or           | 9               |
-| Condition            | 10              |
-| User Defined         | 11              |
-| Assignment           | 12              |
-| Sequencing           | 13              |
+| Precedence Group     | Level  | Operators      |
+|:-------------------- |:------ | :---------------------------------------- |
+| Postfix              | 1      | [()], ., ², ³, --, ++,                    |
+| Prefix               | 2      | +, -, √, ∛, |()|, ⌈()⌉, ⌊()⌋, ++, --, !, ~  | 
+| Exponent             | 3      | ^                                         |
+| Scaling              | 4      | \*, /, %, &                              |
+| Addition             | 5      | +, -, .., \\, \|                              |
+| Shift                | 6      | <<, >>, 
+| Relation             | 7      | ==, !=, <, >, >=, <=, ~, !~,                               |
+| Logical And          | 8      | &&                              |
+| Logical Or           | 9      | \|\|,                              |
+| Condition            | 10     | .?, ?:                              |
+| User Defined         | 11     |                              |
+| Assignment           | 12     | =, +=, -=, \*=, /=, %=, /#=, ^=, \\=, \|=, &=, >>=, <<=, <-, @=, @@=, -> |
+| Sequencing           | 13     | ,
+
 
 The smaller the order of level, the higher the precedence in grouping expressions.
 
