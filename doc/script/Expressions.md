@@ -115,7 +115,7 @@ Altro has the following precedence level:
 | Postfix              | 1      | [()], ., ², ³, --, ++,                    |
 | Prefix               | 2      | +, -, √, ∛, \|()\|, ⌈()⌉, ⌊()⌋, ++, --, !, ~  | 
 | Exponent             | 3      | ^                                         |
-| Scaling              | 4      | \*, /, %, &                              |
+| Scaling              | 4      | \*, /, %, &, ÷                              |
 | Addition             | 5      | +, -, .., \\, \|                              |
 | Shift                | 6      | <<, >>, 
 | Relation             | 7      | ==, !=, <, >, >=, <=, \~, !\~,                         |
@@ -123,7 +123,7 @@ Altro has the following precedence level:
 | Logical Or           | 9      | \|\|,                              |
 | Condition            | 10     | .?, ?:                              |
 | User Defined         | 11     |                              |
-| Assignment           | 12     | =, +=, -=, \*=, /=, %=, /#=, ^=, \\=, \|=, &=, >>=, <<=, <-, @=, @@=, -> |
+| Assignment           | 12     | =, +=, -=, \*=, /=, %=, ÷=, ^=, \\=, \|=, &=, >>=, <<=, <-, @=, @@=, -> |
 | Sequencing           | 13     | ,
 
 
