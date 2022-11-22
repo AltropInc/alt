@@ -113,7 +113,7 @@ Altro has the following precedence level:
 | Precedence Group     | Level  | Operators      |
 |:-------------------- |:------ | :---------------------------------------- |
 | Postfix              | 1      | [()], ., ², ³, --, ++,                    |
-| Prefix               | 2      | +, -, √, ∛, |()|, ⌈()⌉, ⌊()⌋, ++, --, !, ~  | 
+| Prefix               | 2      | +, -, √, ∛, \|()\|, ⌈()⌉, ⌊()⌋, ++, --, !, ~  | 
 | Exponent             | 3      | ^                                         |
 | Scaling              | 4      | \*, /, %, &                              |
 | Addition             | 5      | +, -, .., \\, \|                              |
