@@ -118,7 +118,7 @@ Altro has the following precedence level:
 | Scaling              | 4      | \*, /, %, &                              |
 | Addition             | 5      | +, -, .., \\, \|                              |
 | Shift                | 6      | <<, >>, 
-| Relation             | 7      | ==, !=, <, >, >=, <=, ~, !~,                               |
+| Relation             | 7      | ==, !=, <, >, >=, <=, \~, !\~,                         |
 | Logical And          | 8      | &&                              |
 | Logical Or           | 9      | \|\|,                              |
 | Condition            | 10     | .?, ?:                              |
