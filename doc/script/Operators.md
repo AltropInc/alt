@@ -119,7 +119,7 @@ Altro provides a complete collection of built-in operators across all of its pri
 
 The following builtin operators are provided with certain properties regarding to precedence and associativity:
 
-| Op     | unicode  | Name             | category      | precedence    | associativity    | is lvaue operator | returns lvale |
+| Op     | unicode  | Name             | category      | precedence    | associativity    | is lvaue operator | returns lvalue  |
 |:------ |:-------- |:---------------- |:------------- |:------------- |:--------------   | ----------------- | --------------|
 | []     |          | subscript        | access        | Postfix    | left             | false             | true          |
 | .      |          | selection        | access        | Postfix    | left             | false             | true         |
@@ -161,6 +161,10 @@ The following builtin operators are provided with certain properties regarding t
 | .?     |          | contain          | containment   | Condition   | left             | false             | false         |
 | ?:     |          | conditional      | access        | Condition   | right            | false             | false         |
 | =      |          | assign           | access        | Assignment  | right            | true             | true         |
+| <-      |          | test assign     | access        | Assignment  | right            | true             | true         |
+| ->      |          | tag assign     | access        | Assignment  | right            | true             | true         |
+| @=      |          | copy assign     | access        | Assignment  | right            | true             | true         |
+| @@=     |          | deep copy assign  | access        | Assignment  | right            | true             | true         |
 | +=     |          | add assign       | addable       | Assignment  | right            | true             | true         |
 | -=     |          | sub assign       | addable       | Assignment  | right            | true             | true         |
 | \*=     |          | mul assign       | scalable      | Assignment | right            | true             | true         |
@@ -177,26 +181,24 @@ The following builtin operators are provided with certain properties regarding t
 Note that `.` has special meaning and cannot be used as an operator character in a function name. They are listed here just for lexcial processing purpose on [expressions](Expressions.md).
 
 ## Operator Precedence
-
+==, !=, <, >, >=, <=, , !,
 Operator precedence, also referred as [order of operations](https://en.wikipedia.org/wiki/Order_of_operations), determines which operations to perform first in order to evaluate a given expression. Operators with higher precedence become the operands of operators with lower precedence. For example, multiplication is granted a higher precedence than addition. Thus, the expression 3 + 4 * 2 is interpreted as 3 + (4 × 2), not (3 + 4) * 2. Each built-in operator is assigned with a precedence number. The smaller number indicates the higher precedence.
 
 | Precedence Group     | Order  |
 |:-------------------- |:------ |
-| Scope                | 0      |
-| Selection            | 1      |
+| Postfix              | 1      |
 | Prefix               | 2      |
-| Postfix              | 3      |
-| Exponent             | 4      |
-| Scaling              | 5      |
-| Addition             | 6      |
-| Shift                | 7      |
-| Relation             | 8      |
-| Logical And          | 9      |
-| Logical Or           | 10     |
-| Condition            | 11     |
-| User Defined         | 12     |
-| Assignment           | 13     |
-| Sequencing           | 14     |
+| Exponent             | 3      |
+| Scaling              | 4      |
+| Addition             | 5      |
+| Shift                | 6      |
+| Relation             | 7      |
+| Logical And          | 8      |
+| Logical Or           | 9     |
+| Condition            | 10     |
+| User Defined         | 11     |
+| Assignment           | 12     |
+| Sequencing           | 13     |
 
 All user defined non-prefix operators has the precedence number 12.
 
