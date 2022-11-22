@@ -63,7 +63,7 @@ Here is a list of postfix operators:
 &nbsp;&nbsp;&nbsp;&nbsp;*primary-expression*<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*postfix-expression*.*name*<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*postfix-expression*(*expression-list*)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*postfix-expression *postfix-operator*
+&nbsp;&nbsp;&nbsp;&nbsp;*postfix-expression *postfix-operator*<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*postfix-expression*\[*expression*\]<br>
 
 The postfix expression with operator `[expression]` is a subscript expression which is typically used to specify an element of a container in terms of the index expression inside the brackets`[]`. 
@@ -93,8 +93,8 @@ A prefix operator is the operator placed before the operand (the owner). Users c
 
 *prefix-expression*:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*postfix-expression*<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*prefix-operator* *prefix-expression*
-&nbsp;&nbsp;&nbsp;&nbsp;*prefix-operator-opening* *prefix-expression* *prefix-operator-closing* 
+&nbsp;&nbsp;&nbsp;&nbsp;*prefix-operator* *prefix-expression*<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*prefix-operator-opening* *prefix-expression* *prefix-operator-closing* <br>
 &nbsp;&nbsp;&nbsp;&nbsp;*prefix-operator-opening* *expression* *mirrored-prefix-operator-opening* 
 
 If the prefix operator is a multipart including an opening part and a closing part and the closing part string is a horizontally-mirrored string to the opening part,  such as in `⌈x⌉`, the expression between the opening part and a closing part can be any expression. In this case, the opening part and the closing part serve as a pair of parentheses, for instance, `⌈x+y⌉`.
