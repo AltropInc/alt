@@ -63,7 +63,7 @@ Here is a list of postfix operators:
 &nbsp;&nbsp;&nbsp;&nbsp;*primary-expression*<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*postfix-expression*.*name*<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*postfix-expression*(*expression-list*)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;*postfix-expression *postfix-operator*<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*postfix-expression* *postfix-operator*<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*postfix-expression*\[*expression*\]<br>
 
 The postfix expression with operator `[expression]` is a subscript expression which is typically used to specify an element of a container in terms of the index expression inside the brackets`[]`. 
