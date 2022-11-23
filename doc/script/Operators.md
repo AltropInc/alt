@@ -218,7 +218,15 @@ All prefix operators and assignment operators have the right associativity. All 
 
 ## Prefix Operators
 
-A prefix operator is the operator placed before the operand (the owner), as in prefix increment and decrement operators, positive and negative signs, square root:
+For a prefix member function, we use the expression `prefix_member_function instance` to call the prefix member function, where the instance is actually the owner to execute the member function. This is equivalent to a member function call `instance.member_function_name()`. For instance,
+value class double
+{
+    prefix func sin();
+}
+```
+In calling a prefix member function `sin`, the expression `sin x`, the value contained in `x` is the owner, and `sin` is the member function that the value will execute, it is theoretically equivalent to `x.sin()`, though you cannot write it this way for a prefix function.
+
+A prefix operator is just a prefix member function whose name is an operator string. Like a prefix member function, the operator is placed before the operand (the owner) as in prefix increment and decrement operators, positive and negative signs, square root:
 ```altro
 ++x  // prefix increment
 -x   // negation
@@ -231,18 +239,15 @@ A prefix operator must have an empty input interface, and the operand of the pre
 value class double
 {
     prefix func √();           // Okay
-    prefix func sin();         // Okay
     prefix func √(n: double);  // Error: Prefix interface should not have input
 }
 ```
-In the expression to call a prefix operator, `operator operand`, the operand is actually the owner instance to execute the operator, whihc is equivalent to a member function call `owner.member_function_name`, where the `operand` is the `owner`, and the `operator` is the `member_function_name`.
+All prefix functions have the `Prefix` precedence (2). Therefore, when we apply a prefix operator to an expression that contains operators in lower precedence, we have to use parentheses. For instance, the expression `sin x + y` means `(sin x) + y`. If you actually need the `sin` value of the sum, you need to write `sin (x+y)`.
 
-All prefix operators have the `Prefix` precedence (2). Therefore, when we apply a prefix operator to an expression that contains operators in lower precedence, we have to use parentheses. For tinstance, the expression `sin x + y` means `sin(x) + y`. If you actually need the `sin` value of the sum, you need to write `sin (x+y)`.
-The root symbol √ is traditionally prolongated by a bar (vinculum) over the expression, but we cannot make this notation in Altro lexical. If we use the root symbol √ to define a prefix operator, we have to use parentheses in order to get the desired result:
+The root symbol √ is traditionally prolonged by a bar (vinculum) over the expression, but we cannot make this notation in a text-based lexical, and we have to use parentheses in order to get the desired result on an expression:
 ```altro
 √(x+y)
 ```
-
 However, if the prefix operator is a multipart including an opening part and a closing part, such as in |x|, ⌈x⌉, using parentheses is then unneccessary under certain condition:
 ```altro
 |x+y|   // absolute value of x+y
