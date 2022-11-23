@@ -228,16 +228,21 @@ A prefix operator is the operator placed before the operand (the owner), as in p
 ```
 A prefix operator must have an empty input interface, and the operand of the prefix operator is the instance of the owner class that contains the prefix operation: 
 ```altro
-class test
+value class double
 {
+    prefix func √();           // Okay
+    prefix func sin();         // Okay
     prefix func √(n: double);  // Error: Prefix interface should not have input
 }
 ```
+In the expression to call a prefix operator, `operator operand`, the operand is actually the owner instance to execute the operator, whihc is equivalent to a member function call `owner.member_function_name`, where the `operand` is the `owner`, and the `operator` is the `member_function_name`.
 
-All prefix operators have the `Prefix` precedence (2). Therefore, when we apply a prefix operator to an expression that contains operators in lower precedence, we have to use parentheses. For instance, the root symbol √ is traditionally prolongated by a bar (vinculum) over the expression, but we cannot make this notation in Altro lexical. If we use the root symbol √ to define a prefix operator, we have to use parentheses in order to get the desired result:
+All prefix operators have the `Prefix` precedence (2). Therefore, when we apply a prefix operator to an expression that contains operators in lower precedence, we have to use parentheses. For tinstance, the expression `sin x + y` means `sin(x) + y`. If you actually need the `sin` value of the sum, you need to write `sin (x+y)`.
+The root symbol √ is traditionally prolongated by a bar (vinculum) over the expression, but we cannot make this notation in Altro lexical. If we use the root symbol √ to define a prefix operator, we have to use parentheses in order to get the desired result:
 ```altro
 √(x+y)
 ```
+
 However, if the prefix operator is a multipart including an opening part and a closing part, such as in |x|, ⌈x⌉, using parentheses is then unneccessary under certain condition:
 ```altro
 |x+y|   // absolute value of x+y
@@ -284,8 +289,9 @@ x := ++3;   // Error: Cannot alter the value of a constant value
 3 = x;      // Error: Cannot alter the value of a constant value
 func bar():int;
 bar() = x;  // Error: An lvalue expression is expected for operator: =
-x++ ++      // Error:: An lvalue expression is expected for operator: ++
-++x++;      // Okay, because prefix increment returns a value reference, which is an lvalue
+x++ ++      // Error: An lvalue expression is expected for operator: ++
+++x++;      // Error: An lvalue expression is expected for operator: ++. Note that postfix operator has higher precedence.
+(++x)++;    // Okay, because prefix increment returns an lvalue
 ```
 Note that post increment `x++` returns a integer value, not a reference. Therefore, the lvalue operator `++` cannot be applied to the expression `x++`. However, the prefix increment `++x` returns a reference to the value contained in `x`, thus the lvalue operator `++` can be applied to the expression `++x`.
 
