@@ -27,17 +27,17 @@ In the above chart, for example, the value of a tiny or utiny can be automatical
 
 On the other hand, **Narrowing Conversion** is a typecasting that may cause data loss and the converted value may not be able to be converted back to the original value. For example, converting a 8-byte integer to a 4-byte integer is a narrowing conversion.
  
-Narrowing conversions must be explicitly stated, otherwise, Altro parser will report an error about potential data loss. Explicit [type cast](TypeCast.md) can be stated by the keyword `cast`, for instance,
+Narrowing conversions must be explicitly stated, otherwise, Altro parser will report an error about potential data loss. Explicit [type cast](TypeCast.md) can be stated by [cast expression](Expressions.md), for instance,
 ```altro
 i: int = 65537;
-j: short = cast i;
+j: short = cast(short, i);
 ```
-Here the 4-byte integer value `65537` is forced to be converted into a 2-byte integer and the value in j is 1, which is a result of data loss. Without the keyword `cast`, an error will be reported.
+Here the 4-byte integer value `65537` is forced to be converted into a 2-byte integer and the value in j is 1, which is a result of data loss. Without `cast`, an error will be reported.
 
 Converting a floating-point number to an integer is always a narrowing conversion because the fractional portion of the floating-point number is discarded and lost during the conversion. Explicit cast must be used for this conversion:
 ```altro
 x = 2.14;
-y: int = cast x;   // y gets value 2
+y: int = cast(int, x);   // y gets value 2
 ```
 
 ### Type Promotion
@@ -87,7 +87,7 @@ In the above conversion, the integer value of the first element in t1 is convere
 If element conversion involves narrowing conversion, explicit type cast must be used:
 ```altro
 t1: (double; string) = (1, "text");
-t2: (int; char[]) = cast t1;
+t2: (int; char[]) = cast((int; char[]), t1);
 ```
 ### Tuple to Array Conversion
 
@@ -99,5 +99,5 @@ a: int[2] = t;
 If element conversion involves narrowing conversion, explicit type cast must be used:
 ```altro
 t: (int; int; string) = (1, 2, "text");
-a: short[2] = cast t;
+a: short[2] = cast(short[2], t);
 ```
