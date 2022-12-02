@@ -41,34 +41,55 @@ value class double is real
 ```
 Then you can use prefix expression `sin x` or `sin(x)` to call the `sin` function. However, the prefix expression has a limitation to accept convertable types. For instance, the expression `sin 3` will ill-formed because the class `int` does not have a member funcion `sin`. But if we put the function `sin` in the `math` class, we will find an overloaded input interface provided for the `sin` function to accept an integer, which is convertable to a floating-point number, and in this case, the interface `(x: double): double` will be selected.
 
-## Constants in Floating-Number Types 
+## Constants in Floating-Number Types (hfloat, float, double, and ldouble)
 
 The following (meta) constants are defined in floating-number types to represent the information about floating-point types (hfloat, float, double, or ldouble):
-| name      | description                                                                               |
-|:--------- |:----------------------------------------------------------------------------------------- |
-| max_val   | the largest positive finite value of the given type |
-| min_val   | the lowest negative finite value of the given type  |
-| smallest  | the smallest positive nonzero value of the given type |
-| epsilon   | the difference between 1.0 and the next representable value of the given floating-point type |
-| max_exp   | the largest positive number n such that 2ⁿ⁻¹ is a representable value of the given floating-point type |
-| min_exp   | the lowest negative number n such that 2ⁿ⁻¹ is a representable value of the given floating-point type |
-| max_exp10 | the largest positive number n such that 10ⁿ is a representable value of the given floating-point type |
-| min_exp10 | the lowest negative number n such that 10ⁿ is a representable value of the given floating-point type |
-| dig       | the number of digits in base-2 that can be represented by the given floating-point type without change |
-| dig10     | number of decimal digits that can represent a value of the given floating-point type |
-| infinity  | positive [infinity](https://en.wikipedia.org/wiki/Infinity), ∞ can also be used. Use -infinity for negative infinity |
-| nan       | a value representing “not a number” of the given floating-point type |
+| name      | type      |description                                                                               |
+|:--------- |:--------- |:---------------------------------------------------------------------------------------- |
+| max_val   | selfclass | the largest positive finite value of the given type |
+| min_val   | selfclass | the lowest negative finite value of the given type  |
+| smallest  | selfclass | the smallest positive nonzero value of the given type |
+| epsilon   | selfclass | the difference between 1.0 and the next representable value of the given floating-point type |
+| max_exp   | int       | the largest positive number n such that 2ⁿ⁻¹ is a representable value of the given floating-point type |
+| min_exp   | int       | the lowest negative number n such that 2ⁿ⁻¹ is a representable value of the given floating-point type |
+| max_exp10 | int       | the largest positive number n such that 10ⁿ is a representable value of the given floating-point type |
+| min_exp10 | int       | the lowest negative number n such that 10ⁿ is a representable value of the given floating-point type |
+| dig       | int       | the number of digits in base-2 that can be represented by the given floating-point type without change |
+| dig10     | int       | number of decimal digits that can represent a value of the given floating-point type |
+| infinity  | selfclass | positive [infinity](https://en.wikipedia.org/wiki/Infinity), ∞ can also be used. Use -infinity for negative infinity |
+| nan       | selfclass | a value representing “not a number” of the given floating-point type |
 
 The following (meta) constants are defined in floating-number types to represent special values in different precision according to the given floating-point type (hfloat, float, double, or ldouble):
-| name      | description                                                                               |
-|:--------- |:----------------------------------------------------------------------------------------- |
-| pi        | [π](https://en.wikipedia.org/wiki/Pi) approximately equal to 3.14159... |
-| tau       | 2 * π approximately equal to 6.28319... |
-| e         | [euler's number](https://en.wikipedia.org/wiki/E_(mathematical_constant)) approximately equal to 2.71828... |
-| phi       | [golden ratio](https://en.wikipedia.org/wiki/Golden_ratio) approximately equal to 1.61803... |
-| sqrt2     | √2 approximately equal to 1.41421... |
-| sqrt_e    | √e approximately equal to 1.64872... |
-| sqrt_pi   | √π approximately equal to 1.77245... |
-| ln2       | [natural logarithm](https://en.wikipedia.org/wiki/Natural_logarithm) of 2 approximately equal to 0.69315... |
-| ln10      | [natural Logarithm](https://en.wikipedia.org/wiki/Natural_logarithm) of 10 approximately equal to 2.30259... |
+| name      | type      | description                                                                               |
+|:--------- |:--------- |:----------------------------------------------------------------------------------------- |
+| pi        | selfclass | [π](https://en.wikipedia.org/wiki/Pi) approximately equal to 3.14159... |
+| tau       | selfclass | 2 * π approximately equal to 6.28319... |
+| e         | selfclass | [euler's number](https://en.wikipedia.org/wiki/E_(mathematical_constant)) approximately equal to 2.71828... |
+| phi       | selfclass | [golden ratio](https://en.wikipedia.org/wiki/Golden_ratio) approximately equal to 1.61803... |
+| sqrt2     | selfclass | √2 approximately equal to 1.41421... |
+| sqrt_e    | selfclass | √e approximately equal to 1.64872... |
+| sqrt_pi   | selfclass | √π approximately equal to 1.77245... |
+| ln2       | selfclass | [natural logarithm](https://en.wikipedia.org/wiki/Natural_logarithm) of 2 approximately equal to 0.69315... |
+| ln10      | selfclass | [natural Logarithm](https://en.wikipedia.org/wiki/Natural_logarithm) of 10 approximately equal to 2.30259... |
 
+## Functions in Floating-Number Types (hfloat, float, double, and ldouble)
+
+```altro
+func + (other: ownerclass): ownerclass;   // addable
+func - (other: ownerclass): ownerclass;   // addable
+func * (other: ownerclass): ownerclass;   // scalable
+func / (other: ownerclass): ownerclass;   // scalable
+func ÷ (other: ownerclass): ownerclass;   // scalable
+func % (other: ownerclass): ownerclass;   // scalable
+func ^ (other: ownerclass): ownerclass;   // scalable
+func += (other: ownerclass): ownerclass;  // addable
+func -= (other: ownerclass): ownerclass;  // addable
+func *= (other: ownerclass): ownerclass;  // scalable
+func /= (other: ownerclass): ownerclass;  // scalable
+func ÷= (other: ownerclass): ownerclass;  // scalable
+func %= (other: ownerclass): ownerclass;  // scalable
+func ^= (other: ownerclass): ownerclass;  // scalable
+prefix func +(): ownerclass;              // negatable
+prefix func -(): ownerclass;              // negatable
+prefix func |()|: ownerclass;             // negatable
+```
