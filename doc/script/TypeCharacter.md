@@ -37,7 +37,7 @@ Note that the character methods +, -, +=, -=, ++, --, and the constructor from u
 
 The primitive type `utf8` is a variable-length character type based on the [UTF-8 encoding](https://en.wikipedia.org/wiki/UTF-8) that uses one to four bytes (8-bit). The type `utf8` is primarily used as the element type of [string](String.md). When it is used in declaration of a variable, the maximum storage (four bytes) is always allocated.
 ```altro
-sealed value class char is character
+sealed value class utf8 is character
 {
     final func <=> (other: char): int;  // implements deferred methods in the comparable interface
     final func code(): uint;            // returns UTF-8 code in numeric value
