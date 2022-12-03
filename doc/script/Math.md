@@ -92,4 +92,35 @@ func ^= (other: ownerclass): ownerclass;  // scalable
 prefix func +(): ownerclass;              // negatable
 prefix func -(): ownerclass;              // negatable
 prefix func |()|: ownerclass;             // negatable
+prefix func ⌈()⌉: ownerclass;
+prefix func ⌊()⌋: ownerclass;
+func ²() : ownerclass;
+func ³() : ownerclass;
+func √() : ownerclass;
+func ∛() : ownerclass;
 ```
+| func   | Alias    | Common Name      | Example   |   Description                                       |
+|:------ |:-------- |:---------------- |:--------- |:--------------------------------------------------- |
+| +      |          | Addition         | x + y     | Returns the sum of x and y                          |
+| -      |          | Subtraction      | x - y     | Returns the difference by subtracting y from x      |
+| *      |          | Multiplication   | x * y     | Returns the multiplies of x by the factor y         |
+| /      |          | Division         | x / y     | Returns the quotient of dividing x by the divisor y |
+| ÷      | /#       | Integer Division | x ÷ y     | Returns the integral part of the quotient from x/y  |
+| %      |          | Modulus          | x % y     | Returns the integral division remainder             |
+| ^      |          | Power            | x ^ y     | Returns the value of x raised to the power of y     |
+| +=     |          | Add Assign       | x += y    | Adds y to x and x gets the sum                      |
+| -=     |          | Sub Assignn      | x -= y    | Substrcts y from x and x gets the difference        |
+| \*=    |          | Mul Assign       | x \*= y   | Multiplies x by y and x gets the product            |
+| /=     |          | Div Assign       | x /= y    | Divides x by y and x gets the quotient              |
+| ÷=     | /#=      | Int Div Assign   | x ÷= y    | Divides x by y and x gets the integral part of the quotient    |
+| %=     |          | Mod Assign       | x %= y    | Divides x by y and x gets the remainder             |
+| ^=     |          | Power Assign     | x ^= y    | Raised the value of x to the power of y             |
+| +      |          | Positive sign    | +x        | Returns positive (unchanged) value of x            |
+| -      |          | Negative sign    | -x        | Returns the negating value of x                    |
+| \|()\| |          | Absolue value    | \|x\|     | Returns the absolute value of x                    |
+| ⌈()⌉   |           | Absolue value    | ⌈x⌉        | Returns the smallest integer value not less than x |
+| ⌊()⌋   |           | Absolue value    | ⌊x⌋        | Returns the largest integer value not greater than x |
+| ²      |          | Squared          | x²        | Returns x\*x                                       |
+| ³      |          | Cubed            | x³        | Returns x\*x\*x                                    |
+| √      |          | Square Root      | √x        | Returns square root of x                           |
+| ∛      |          | Cube Root        | ∛x        | Returns cube root of x                             |
