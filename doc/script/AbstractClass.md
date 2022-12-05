@@ -1,30 +1,31 @@
 # Abstract Class
 
-An abstract class is a class that cannot be instantiated, but they can be subclassed. A class is abstract if it
-
-* contains deferred member functions or inherits such function that is not overridden with an implementation,
-* is declared abstract using the specifier `abstract`, or
-* is a [parametric class](ParametricClass.md) with type parameters unbound.
-
-If a class contains a member function with any deferred interface, this class must be declared as an abstract or interface class:
-```Altro
-class Base
-{
-    deferred func foo(); // Error: Class contains deferred members must be declared as an abstract or interface class
-}
-```
-If a class inherits any deferred interface but not implemented, this class is abstract too, but the error will be reported the first time when the class is used to create an instance:
-```Altro
+An abstract class is a class that cannot be instantiated, but they can be subclassed. A class is abstract if it is declared abstract using the specifier `abstract` or it is a [parametric class](ParametricClass.md) with type parameters unbound. An abstract class can contain deferred member function interfaces or deferred meta constants:
+```altro
 abstract class Base
 {
-    deferred func foo();
+    deferred func foo();  // a deferred member function interface
+    deferred meta const length: int; // a deferred meta constant
 }
-class Derived is Base
-{
-}
-d := Derived(); // Error:  Object instantiation failed -- the deferred interface 'foo' is not implemented
 ```
-The purpose of using lazy error detection here is to avoid checking inherited but unimplemented functions for every class, which may slow down the parsing speed in code loading.
+
+If a derived class inherits an abstarct interface with any deferred items, the derived class must provide implementation to any deferred member function interface, and  provide initialization value to any deferred meta constants unless the derived class is abstract:
+```altro
+class Derived
+{
+    func foo() { /* do something */ }  // the implementation to the deferred member function interface
+    length = 10;                       // the initialization value to the deferred meta constant
+}
+abstract class AbstractDerived is Base
+{
+    // Okay, this derived class is abstarct
+}
+class IncompleteDerived is Base
+{
+    // Error: the deferred const name 'length' is not initialized in IncompleteDerived
+    // Error: the deferred interface 'foo' is not implemented in IncompleteDerived
+}
+```
 
 An [interface class](InterfaceClass.md) is an abstract class because it can only have deferred member functions.  
 
