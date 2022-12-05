@@ -8,8 +8,9 @@ abstract class Base
     deferred meta const length: int; // a deferred meta constant
 }
 ```
+Deferred items can only be declared in an abstract class.
 
-If a derived class inherits an abstarct interface with any deferred items, the derived class must provide implementation to any deferred member function interface, and  provide initialization value to any deferred meta constants unless the derived class is abstract:
+If a derived class inherits an abstract interface with any deferred items, the derived class must provide implementation to any deferred member function interface, and  provide initialization value to any deferred meta constants unless the derived class is abstract:
 ```altro
 class Derived
 {
@@ -18,7 +19,7 @@ class Derived
 }
 abstract class AbstractDerived is Base
 {
-    // Okay, this derived class is abstarct
+    // Okay, this derived class is abstract 
 }
 class IncompleteDerived is Base
 {
