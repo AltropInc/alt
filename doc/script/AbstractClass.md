@@ -12,7 +12,7 @@ Deferred items can only be declared in an abstract class.
 
 If a derived class inherits an abstract interface with any deferred items, the derived class must provide implementation to any deferred member function interface, and  provide initialization value to any deferred meta constants unless the derived class is abstract:
 ```altro
-class Derived
+class Derived is Base
 {
     func foo() { /* do something */ }  // the implementation to the deferred member function interface
     length = 10;                       // the initialization value to the deferred meta constant
