@@ -22,3 +22,18 @@ d: double = cast(double, n);
 ```
 Here `n` is a polymorphic variable of the type `numeric`, which can hold a value of any numeric type. The cast expression `cast(int, n)` is successful but the cast expression `cast(double, n)` is not.
 
+Because downcasting may fail if the type of the current value is not the type of the destination, a better way is to use [type introspection](TypeIntrospection.md) to determine whether the type of the referenced object is indeed the one being cast to or a derived type of it, and thus issue an error if it is not the case:
+```altro
+if (n -> i is int)
+{
+    // do someting on i as an integer
+}
+elsif (n -> d is double)
+{
+    // do someting on d as a double
+}
+else
+{
+    // do nothing or retport an error
+}
+```
