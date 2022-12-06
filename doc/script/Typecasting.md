@@ -34,6 +34,6 @@ elsif (n -> d is double)
 }
 else
 {
-    // do nothing or retport an error
+    // do nothing or report an error
 }
 ```
