@@ -20,5 +20,5 @@ n: numeric = 65537;
 i: int = cast(int, n);
 d: double = cast(double, n);
 ```
-Here `n` is a polymorphic variable of the type `numeric1, which can hold a value of any numeric type. The cast expression `cast(int, n)` is successful but the cast expression `cast(double, n)` is not.
+Here `n` is a polymorphic variable of the type `numeric`, which can hold a value of any numeric type. The cast expression `cast(int, n)` is successful but the cast expression `cast(double, n)` is not.
 
