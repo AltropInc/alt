@@ -42,7 +42,7 @@ y: int = cast(int, x);   // y gets value 2
 
 ### Type Promotion
 
-**Type promotion** is an automatic widening conversion when a binary operation is used on two operands. For instance, in the expression
+**Type promotion** is an automatic widening conversion when a binary operation is used on two operands and one of the operand will be promoted (widened) to macth the other. For instance, in the expression
 ```altro
 4 + 4.2
 ```
@@ -51,6 +51,8 @@ The owner (integer 4) will be promoted to double before the expression is execut
 4.2 + 4
 ```
 The input (integer 4) will be promoted to double before the expression is executed. And the result of the execution will be in the type of double. For type promotion rules, see [Type Promotion](TypePromotion.md).
+
+Type promotion can also happen when a prefix operation is used on an operand (the owner that performs the operand) and the operand will be promoted to the type required by the operator. For example, in the prefix expression `∛9`, the operand is an integer `9`, which is promoted to a value of double `9.0` before the operator `∛` is applied.
 
 ## Charater and String Conversion
 
