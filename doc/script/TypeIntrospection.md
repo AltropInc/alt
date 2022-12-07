@@ -44,5 +44,41 @@ Let's consider a declaration `x: any` that declare a polymorphic variable `x` th
 | #  | x# | returns the type of the current value held by the varaible `x`    |
 | typeof  | typeof x | the same as x#    |
 
+Note that the type returned by functions of `typeof` and `super_class` cannot be used for type declaration. For instance:
+``altro
+n: numeric := 3;
+m: typeof n;
+```
+The above declaration of `m` is ill-formed, before `typeof n` returns the actual type of the current value conatined in the variable of `n`, not a fixed one as the declared type `numeric` for the variable of `n`. The `typeof` expression is only used for type checking.
+
 ## Type Check Using Type Condition
+
+The type condition appeared in an if-statment is a type assumption expression  in the format of "expresion -> tag is type". If the actual type of the expression is the subtype of the given type, the expression evaluates to true and the value of the expression is assigned to the tag. For example
+``altro
+n: numeric := 3;
+if (n -> i is int)
+{
+    // do something with i
+}
+elif (n -> d is double)
+{
+    // do something with d
+}
+```
+The tag in the type assumption expression is optional. It provides a convenient name for accessing the result of the evaluated expression and in the block of the true clause of the if-statement. If the expression is a varaible name alone, the tag can be omitted, and the type of the name in the true clause is statically assumed to be the type given in the type assumption expression. for instance:
+``altro
+n: numeric := 3;
+if (n is int)
+{
+    // do something with n as an integer
+}
+elif (n is double)
+{
+    // do something with n as a double
+}
+```
+
+## Type Check Using Type Case
+
+
 
