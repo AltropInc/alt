@@ -53,7 +53,7 @@ The above declaration of `m` is ill-formed, before `typeof n` returns the actual
 
 ## Type Check Using Type Condition
 
-The type condition appearing in an if-statement is a type assumption expression  in the format of "expression -> tag is type". If the actual type of the expression is the subtype of the given type, the expression evaluates to true and the value of the expression is assigned to the tag. For example
+The type condition appearing in an [if-statement](StatementIf.md) is a type assumption expression  in the format of "expression -> tag is type". If the actual type of the expression is the subtype of the given type, the expression evaluates to true and the value of the expression is assigned to the tag. For example
 ```altro
 n: numeric := 3;
 if (n -> i is int)
