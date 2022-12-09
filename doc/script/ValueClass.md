@@ -1,6 +1,6 @@
-# Value Class
+# Value Class and Non-Value Class
 
-A value class declaration introduces a type whose instances are values. Values are passed among arguments by copying ([pass-by-value](ArgumentPassing.md)). 
+A **value class** declaration introduces a type whose instances are values that are passed among arguments by copying ([pass-by-value](ArgumentPassing.md)). A **non-value class** declaration introduces a type whose instances are values or objects passed among arguments by reference ([pass-by-reference](ArgumentPassing.md)).
 
 These primitive types are value classes: all concrete [numeric types](TypeNumeric.md), [character type](Character.md], [enumeration type](TypeEnumeration.md], [enumeration set type](TypeEnumerationSet.md], [iterator type](TypeIterator.md], [reference type](TypeReference.md] and value tuple(TypeTuple.md).
 
