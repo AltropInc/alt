@@ -1,6 +1,15 @@
 # Convertible Types
 
-[Type conversion or typecasting](https://en.wikibooks.org/wiki/Computer_Programming/Type_conversion) refers to changing the value of one data type into another. **Convertible type rules** determine if the value of one type can be converted to the value of another type.
+[Type conversion or typecasting](https://en.wikibooks.org/wiki/Computer_Programming/Type_conversion) refers to changing the value of one data type into another. **Convertible type rules** determine if the value of one type can be converted to the value of another type. There are two kinds of type conversions: **implicit conversion** and **explicit type-casting**. Implicit conversions are automatically performed when a value is copied to a convertible type. For example:
+```altro
+a: short = 10;
+b: int = a;
+```
+Here, the value of `a` is promoted from `short` to `int` without the need of any explicit type conversion. Implicit conversions affect some fundamental data type such as numerical types, character types, and some composite types and object references. Converting to `int` from some smaller integer type, or to `double` from `float` is guaranteed to produce an integrated value in the destination type without any information loss. But not all conversions between types may preserve this integrity. Some of these conversions may imply a loss of precision, for example, convert a `int` value to a `short`, or a `float` value to an integer. These conversions will not be performed in an implicit way, and explicit [type-casting](Typecasting.md) must be used to force the conversion:
+```altro
+a: int = 10;
+b: short = cast(short, a);
+```
 
 ## Numeric Conversion
 
@@ -103,3 +112,26 @@ If element conversion involves narrowing conversion, explicit type cast must be 
 t: (int; int; string) = (1, 2, "text");
 a: short[2] = cast(short[2], t);
 ```
+
+### Reference Conversion (Upcasting and Downcasting)
+
+A variable of [non-value class](ValueClass.md) is actually a [reference variable](TypeReference.md) that points to the instance (object or value) of the class stored in a heap space. Whenever an instance of non-value class is passed from one variable to another, a copy of the reference value is created which points to the same location of the instance in heap memory as the original reference variable. This process is called [passed by reference](ArgumentPassing.md).
+
+A reference variable in a non-value class can pass its reference value to another reference variable in a different non-value class. For example:
+```altro
+class Person {}
+class Student is person {}
+s := Student();
+p : Person = s;
+```
+Here the reference to a `Student` instance is generalized to a `Person` instance without the need of any explicit type conversion. Implicit reference conversion is supported when passing a reference of a subtype to a reference variable declared in its supertype. This reference conversion is also referred as **upcasting**(generalization or widening), which is a casting from a lower type to a higher type in the class [inheritance tree](InheritanceTree.md) or in the super/subtype tree. 
+
+On the other hand, passing a reference of a supertype to a reference variable declared in one of its subtype is called **downcasting** (specialization or narrowing), which cannot be done automatically. Explicit type cast must be used:
+```altro
+p : Person = Student();
+s : Student = cast(Student, p);
+t : Teacher = cast(Teacher, p);
+```
+The cast expression is used here to check the type  of 'p': if `p` refers to the instance of the type given in the cast expression, the reference will be passed, otherwise, a null reference will be passed. In the above example, `s` gets a reference of `Student` referred to by `p`, but `t` gets a null reference.
+
+
