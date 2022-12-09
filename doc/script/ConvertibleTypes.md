@@ -113,7 +113,7 @@ t: (int; int; string) = (1, 2, "text");
 a: short[2] = cast(short[2], t);
 ```
 
-### Reference Conversion (Upcasting and Downcasting)
+## Reference Conversion (Upcasting and Downcasting)
 
 A variable of [non-value class](ValueClass.md) is actually a [reference variable](TypeReference.md) that points to the instance (object or value) of the class stored in a heap space. Whenever an instance of non-value class is passed from one variable to another, a copy of the reference value is created which points to the same location of the instance in heap memory as the original reference variable. This process is called [passed by reference](ArgumentPassing.md).
 
