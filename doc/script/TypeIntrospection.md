@@ -100,7 +100,7 @@ switch (typeof n)
 }
 ```
 
-Notes that when using a tag to hold the result of an expression, the tag is a reference if the expression is an [l-value expression](https://en.wikipedia.org/wiki/Value_(computer_science)#lrvalue). Changing the value through the tag will affect the original l-value:
+Note that when using a tag to hold the result of an expression, the tag is a reference if the expression is an [l-value expression](https://en.wikipedia.org/wiki/Value_(computer_science)#lrvalue). Changing the value through the tag will affect the original l-value:
 ```altro
 n : numeric = 2; 
 switch (typeof n -> tag)
