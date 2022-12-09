@@ -55,17 +55,29 @@ The above declaration of `m` is ill-formed, before `typeof n` returns the actual
 
 The type condition appearing in an [if-statement](StatementIf.md) is a type assumption expression  in the format of "expression -> tag is type". If the actual type of the expression is the subtype of the given type, the expression evaluates to true and the value of the expression is assigned to the tag. For example
 ```altro
-n: numeric := 3;
-if (n -> i is int)
+func numeric_generator(): numeric { /* generate some number in any numeric type */ }
+if (numeric_generator() -> num is int)
 {
-    // do something with i
-}
-elif (n -> d is double)
-{
-    // do something with d
+    // do something with num which is an integer
 }
 ```
-
+The tag name in the type condition is optional.  In the true-block of the if-statement, the tag name provides a convenient name for accessing the evaluated result of the expression in the type condition. If the expression in the type condition is a variable name alone, the tag name can be omitted, and the type of the name in the true-clause is statically assumed to be the type given in the type condition. for instance:
+```altro
+func numeric_generator(): numeric { /* generate some number in any numeric type */ }
+n := numeric_generator(); 
+if (n is int)
+{
+    // do something with n which is assumed to be an integer in this block
+    n = 3.2;  // Error: expect int but a value of double is provided
+    n = 3;    // Okay
+}
+elif (n is double)
+{
+    // do something with n which is assumed to be an integer in this block
+    m1: int = n;       // Error: expect int but a value of double is provided
+    m2: double = n;    // Okay
+}
+```
 ## Type Check Using Type Case
 
 The [switch statement](StatementSwitch.md), if the control expression is a type expression, can be used for type checking:
@@ -75,6 +87,16 @@ switch (typeof numeric_generator() -> result)
 {
     case int: // do something when the result is an integer
     case double:  // do something when the result is a double
+}
+```
+If the expression in the type expression is a variable name alone, the tag name can be omitted, and the type of the name in the case-clause is statically assumed to be the type given in the case condition. for instance:
+```altro
+func numeric_generator(): numeric { /* generate some number in any numeric type */ }
+n := numeric_generator(); 
+switch (typeof n)
+{
+    case int:     /* do something with n as an integer */;
+    case double:  /* do something with n as a doubler */;
 }
 ```
 
