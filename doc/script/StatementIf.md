@@ -73,7 +73,7 @@ elif (n is double)
     m2: double = n;    // Okay
 }
 ```
-Note that when using a tag to hold the result of an condition expression, the tag is a reference if the expression is an l-value expression. Changing the value through the tag will affect the original value:
+Note that when using a tag to hold the result of an condition expression, the tag is a reference if the expression is an [l-value expression](LvalueExpression.md). Changing the value through the tag will affect the original value:
 ```altro
 d: int[2]=(1,2);
 n: array = d;
