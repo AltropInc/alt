@@ -27,4 +27,25 @@ switch (fruit_picker())
     fruit_price = 0.0;
 }
 ```
-The execution of the switch statement is completed after the statement of the matched case is executed. However, if a [continue statement](ContinueStatement.md) is encountered, the execution flow will jump to the statement of the next case clause.
+
+## Branch Fall Through and Break
+
+Only the matching block is executed. That is, the execution of the switch statement is completed after the statement of the matched case is executed. this behavior is different that the switch staement in other languages derived from C.
+
+However, if a [gonext statement](JumpStatement.md) is encountered, the execution flow will fall through to the statement of the next case clause. For example,
+```altro
+switch (options)
+{
+    case option_a:
+    {
+        // do something for option A
+        gonext // execution will not complete from this switch but will go to the next case.
+    }
+    case option_a1:
+    {
+        // do something for option A1
+    }
+}
+```
+
+However, if a [gonext statement](JumpStatement.md) is encountered, the execution 
