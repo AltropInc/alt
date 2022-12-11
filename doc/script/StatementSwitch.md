@@ -28,9 +28,9 @@ switch (fruit_picker())
 }
 ```
 
-## Branch Fall Through and Break
+## Branch Fall Through or Break
 
-Only the matching block is executed. That is, the execution of the switch statement is completed after the statement of the matched case is executed. this behavior is different that the switch staement in other languages derived from C.
+Only the matching block is executed. That is, the execution of the switch statement is completed after the statement of the matched case is executed. This behavior is different from the [switch statement in other languages derived from C](https://en.wikipedia.org/wiki/Switch_statement).
 
 However, if a [gonext statement](JumpStatement.md) is encountered, the execution flow will fall through to the statement of the next case clause. For example,
 ```altro
@@ -48,4 +48,37 @@ switch (options)
 }
 ```
 
-However, if a [gonext statement](JumpStatement.md) is encountered, the execution 
+If a [break statement](JumpStatement.md) is encountered, execution of the switch statement is then completed and then the execution will continue at the end of the switch statement, or if the break statement has a label, at the end of an outside breakable statement that is labeled with the same name.
+
+## Branch on Type
+
+The switch statement can be used for type checking if the control expression is a type expression. For example,
+```altro
+func numeric_generator(): numeric { /* generate some number in any numeric type */ }
+switch (typeof numeric_generator() -> result)
+{
+    case int: // do something when the result is an integer
+    case double:  // do something when the result is a double
+}
+```
+If the expression in the type expression is a variable name alone, the tag name can be omitted, and the type of the name in the case-clause is statically assumed to be the type given in the case condition. for instance:
+```altro
+func numeric_generator(): numeric { /* generate some number in any numeric type */ }
+n := numeric_generator(); 
+switch (typeof n)
+{
+    case int:     /* do something with n as an integer */;
+    case double:  /* do something with n as a doubler */;
+}
+```
+
+Note that when using a tag to hold the result of an expression, the tag is a reference if the expression is an [l-value expression](LvalueExpression.md). Changing the value through the tag will affect the original l-value:
+```altro
+n : numeric = 2; 
+switch (typeof n -> tag)
+{
+    case int:     tag += 1;
+    case double:  tag = 3.0;
+}
+// n holds the integer value 3 here.
+```
