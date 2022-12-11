@@ -47,6 +47,7 @@ switch (options)
     }
 }
 ```
+Note that the fallthrough will directly execute the statement of the next case clause without checking if the next case is a match.
 
 If a [break statement](JumpStatement.md) is encountered, execution of the switch statement is then completed and then the execution will continue at the end of the switch statement, or if the break statement has a label, at the end of an outside breakable statement that is labeled with the same name.
 
