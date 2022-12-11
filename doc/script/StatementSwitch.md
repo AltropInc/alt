@@ -32,7 +32,7 @@ switch (fruit_picker())
 
 Only the matching block is executed. That is, the execution of the switch statement is completed after the statement of the matched case is executed. This behavior is different from the [switch statement in other languages derived from C](https://en.wikipedia.org/wiki/Switch_statement).
 
-However, if a [gonext statement](JumpStatement.md) is encountered, the execution flow will fall through to the statement of the next case clause. For example,
+However, if a [gonext statement](StatementsJump.md) is encountered, the execution flow will fall through to the statement of the next case clause. For example,
 ```altro
 switch (options)
 {
@@ -49,7 +49,7 @@ switch (options)
 ```
 Note that the fallthrough will directly execute the statement of the next case clause without checking if the next case is a match.
 
-If a [break statement](JumpStatement.md) is encountered, execution of the switch statement is then completed and then the execution will continue at the end of the switch statement, or if the break statement has a label, at the end of an outside breakable statement that is labeled with the same name.
+If a [break statement](StatementsJump.md) is encountered, execution of the switch statement is then completed and then the execution will continue at the end of the switch statement, or if the break statement has a label, at the end of an outside breakable statement that is labeled with the same name.
 
 ## Branch on Type
 
