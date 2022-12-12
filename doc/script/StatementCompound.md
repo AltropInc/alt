@@ -15,15 +15,13 @@ A compound statement is most often used as the bodies of another compound statem
 
 A compound statement can also be used to provide a [concrete free functor](FreeFunctor.md), or a lambda function, for an argument specified in the type of an abstract free functor (or a lambda function interface). For example:
 ```altro
+func fn_sum (nums: double...;  f: fn(x: double): double): double
 {
-   func fn_sum (nums: double...;  f: fn(x: double): double): double
-   {
-       sum:=0.0;
-       foreach (n in nums) sum += f(n);
-       sum
-   }
-   cubic_sum := fn_sum((1,2,3,4), {x³});
+    sum:=0.0;
+    foreach (n in nums) sum += f(n);
+    sum
 }
+cubic_sum := fn_sum((1,2,3,4), {x³});
 ```
 Here the input parameter `f` in function `fn_sum` expects a free functor with the interface `(x:double):double`, and in calling the function `fn_sum`, the actual parameter provided for `f` is a compound statement `{x³}`, which is actually the body of the free functor (lambda function) `fn(x: double): double {x³}`.
 
