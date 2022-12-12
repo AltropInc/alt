@@ -124,7 +124,7 @@ switch (event)
 
 The **return** statement exits the code block of a [routine](Routine.md) and returns to the point where the routine was called. If the routine is an function and the interface of the function has a output specified, the return statement in the associated block must have an [expression](Expressions.md) for the **return value** to be returned. The return statement has the following syntax:
 
-**return** *expression*<sup>opt</sup>
+**return** *expression*<sub>opt</sub>
 
 Example:
 ```altro
@@ -133,7 +133,7 @@ func first_matched_position(int_stream: int...; numer_to_match: int): int
    for (position:=0; position < int_stream.length(); position++)
       if (numer_to_match == int_stream[position])
          return position;  // exits the function body and returns the index position here
-   return -1;  // returns -1 here to indicate the number is not found
+   return -1  // returns -1 here to indicate the number is not found
 }
 ```
 If no return statement appears in a routine block, the control automatically returns to the calling point after the last statement of the called routine is executed. In this case, if the interface requires an output, the the last statement must be an expression for the return value:
@@ -146,11 +146,24 @@ func first_matched_position(int_stream: int...; numer_to_match: int): int
    -1  // the last statement implies the return, and the value of the expression is the return value
 }
 ```
-If the function interface has an output type, it's an error if the last statement is not the expression for the value of the specified output type.
-
-
-
-
+If the function interface has an output type, it's an error if the last statement is not the expression for the value or does not return the value in the specified output type. For example:
+```altro
+func compare_two(n1, n2: int): int
+{
+   if (n1 == n2) return 0;
+   elif (n1 < n2) return -1;
+}  // Error: expect a return value. Not all paths have a return value
+```
+An error will be caught in the above code because not all programmed paths have a return value. The correct one should be something like below:
+```altro
+func compare_two(n1, n2: int): int
+{
+   if (n1 == n2) return 0;
+   elif (n1 < n2) return -1;
+   else return 1
+}
+```
+It's okay to have no return statement for a function that has no output, or for a [constructor](Constructor.md) or a [destructor](Destructor.md).
 
 
 
