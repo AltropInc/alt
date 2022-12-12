@@ -1,6 +1,6 @@
 # Free Functor
 
-A free functor is a [function routine type](Routine.md) that does not belong to any enclosing class. It can be passed as a first-class object that can be dynamically created, destroyed, passed to a function, returned as a value, and have all the rights as other variables have.
+A free functor is a [function routine type](Routine.md) that does not belong to any enclosing class. It can be passed as a first-class object that can be dynamically created, destroyed, passed to a function, returned as a value, and have all the rights as other variables have. This is a term often referred as [lambda function or anonymous function](https://en.wikipedia.org/wiki/Anonymous_function) in other programming languages.
 
 Here is an example to pass a free functor to a variable named as `f`, and then use the name `f` to create function routine ([function call](Functor.md)) to take the input `(1,2,3,4)` and generate a summary of `10`:
 ```altscript
@@ -117,7 +117,7 @@ class test
 
 ## Captures
 
-Becuase a free functor is not a member of any class, what if it needs to access values of constants and variables from the surrounding context in which the functor is defined? A free functor can capture these values from the surrounding context where it is defined. The function routine instantialted by the functor can then refer to and modify these captured values, even if the original scope that defined these values no longer exists. Therefore we can do things like this:
+Because a free functor is not a member of any class, what if it needs to access values of constants and variables from the surrounding context in which the functor is defined? A free functor can capture these values from the surrounding context where it is defined. The function routine instantiated by the functor can then refer to and modify these captured values, even if the original scope that defined these values no longer exists. Therefore we can do things like this:
 ```altscript
 func check_1s() : fn(i: int): bool
 {
