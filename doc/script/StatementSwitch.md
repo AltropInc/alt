@@ -28,18 +28,18 @@ switch (fruit_picker())
 }
 ```
 
-## Branch Fall Through or Break
+## Fall Through or Break
 
 Only the matching block is executed. That is, the execution of the switch statement is completed after the statement of the matched case is executed. This behavior is different from the [switch statement in other languages derived from C](https://en.wikipedia.org/wiki/Switch_statement).
 
-However, if a [gonext statement](StatementsJump.md) is encountered, the execution flow will fall through to the statement of the next case clause. For example,
+However, if a [fallthrough statement](StatementsJump.md) is encountered, the execution flow will fall through to the statement of the next case clause. For example,
 ```altro
 switch (options)
 {
     case option_a:
     {
         // do something for option A
-        gonext // execution will not complete from this switch but will go to the next case.
+        fallthrough // execution will not complete from this switch but will go to the next case.
     }
     case option_a1:
     {
@@ -51,7 +51,7 @@ Note that the fallthrough will directly execute the statement of the next case c
 
 If a [break statement](StatementsJump.md) is encountered, execution of the switch statement is then completed and then the execution will continue at the end of the switch statement, or if the break statement has a label, at the end of an outside breakable statement that is labeled with the same name.
 
-## Branch on Type
+## Case on Type
 
 The switch statement can be used for type checking if the control expression is a type expression. For example,
 ```altro
