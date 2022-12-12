@@ -91,23 +91,31 @@ The continue statement with label `set_iteration` will skip the current iteratio
 
 ## The `fallthrough` Statement
 
-The fallthrough statement is used to skip the rest of the code in the current branch in a branch statement and continue to execute the code present in the next branch without checking if the next branch is a match. The following branch statements may have a fallthrough statement in their bodies:
+A branch statement such as switch and match causes the program to begin executing a selected block, or branch code, that matches the case given for that block. Once the branch code is executed, the branch statement is completed. The **fallthrough** statement is used to skip the rest of the code in the current branch and continue to execute the code present in the next branch without checking if case for the next branch is a match. The following branch statements may have a fallthrough statement in their bodies:
 
 * [**switch** statement](StatementSwitch.md)
 * [**match** statement](StatementMatch.md)
 
 Here is an example of fallthrough statement in a `switch` statement:
 ```altro
-switch (options)
+event: enum (LeftButtonDown, MiddleButtonDown, RightButtonDown);
+button := 0;
+switch (event)
 {
-    case option_a:
+    case LeftButtonDown:
     {
-        // do something for option A
+        button = 1;
         fallthrough // execution will not complete from this switch but will go to the next case.
     }
-    case option_a1:
+    case MiddleButtonDown:
     {
-        // do something more for option A1
+        ++button;
+        fallthrough // execution will not complete from this switch but will go to the next case.
+    }
+    case RightButtonDown:
+    {
+        ++button;
+        handleButtonDown(button)
     }
 }
 ```
