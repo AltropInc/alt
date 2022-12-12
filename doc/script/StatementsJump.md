@@ -1,6 +1,6 @@
 # Jump Staements
 
-Jumping statements are control statements that transfer execution control from one point to another point in the program. The following jump statements that are provided in the Altro:
+Jumping statements are control statements that transfer execution control from one point to another point in the program. The following jump statements are provided in the Altro:
 
 * **break** statement
 * **continue** statement
@@ -91,7 +91,7 @@ The continue statement with label `set_iteration` will skip the current iteratio
 
 ## The `fallthrough` Statement
 
-A branch statement such as switch and match causes the program to begin executing a selected block, or branch code, that matches the case given for that block. Once the branch code is executed, the branch statement is completed. The **fallthrough** statement is used to skip the rest of the code in the current branch and continue to execute the code present in the next branch without checking if case for the next branch is a match. The following branch statements may have a fallthrough statement in their bodies:
+A branch statement such as switch and match causes the program to begin executing a selected block, or branch code, that matches the case given for that block. Once the branch code is executed, the branch statement is completed. Unlike the switch statement in C-derived languages, the execution does not continue (fallthrough) to the next branch after the matching branch is executed. The **fallthrough** statement is used to implement the C-style fallthrough behavior. It skips the rest of the code in the current branch and continues to execute the code present in the next branch without checking if the case for the next branch is a match. The following branch statements may have a fallthrough statement in their bodies:
 
 * [**switch** statement](StatementSwitch.md)
 * [**match** statement](StatementMatch.md)
@@ -119,4 +119,38 @@ switch (event)
     }
 }
 ```
+
+## The `return` Statement
+
+The **return** statement exits the code block of a [routine](Routine.md) and returns to the point where the routine was called. If the routine is an function and the interface of the function has a output specified, the return statement in the associated block must have an [expression](Expressions.md) for the **return value** to be returned. The return statement has the following syntax:
+
+**return** *expression*<sup>opt</sup>
+
+Example:
+```altro
+func first_matched_position(int_stream: int...; numer_to_match: int): int
+{
+   for (position:=0; position < int_stream.length(); position++)
+      if (numer_to_match == int_stream[position])
+         return position;  // exits the function body and returns the index position here
+   return -1;  // returns -1 here to indicate the number is not found
+}
+```
+If no return statement appears in a routine block, the control automatically returns to the calling point after the last statement of the called routine is executed. In this case, if the interface requires an output, the the last statement must be an expression for the return value:
+```altro
+func first_matched_position(int_stream: int...; numer_to_match: int): int
+{
+   for (position:=0; position < int_stream.length(); position++)
+      if (numer_to_match == int_stream[position])
+         return position;  // exits the function body and returns the index position here
+   -1  // the last statement implies the return, and the value of the expression is the return value
+}
+```
+If the function interface has an output type, it's an error if the last statement is not the expression for the value of the specified output type.
+
+
+
+
+
+
 
