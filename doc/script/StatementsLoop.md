@@ -76,9 +76,9 @@ The foreach loop statement is for traversing items in an instance of an [iterabl
 
 **foreach** (*element* **in** *iterable*) *statement*
 
-The satement starts with the keyword `foreach`. Instead of declaring and initializing a loop control expressions, you declare a variable that represents an element, followed by the keyword `in`, which is then followed by an expression og an iterable instance. The variable is actually an [iterator](TypeIterable.md) that can be used to access an element in the iterable instance in each loop traversal.
+The statement starts with the keyword `foreach`. Instead of declaring and initializing a loop control expression, you declare a variable that represents an element, followed by the keyword `in`, which is then followed by an expression of an iterable instance. The variable is actually an [iterator](TypeIterable.md) that can be used to access an element in the iterable instance in each loop traversal.
 
-The following `froeach` loop multiplies each number in an integer stream by 10:
+The following `foreach` loop multiplies each number in an integer stream by 10:
 ```altro
 int_stream : int... = (1,2,3,4);
 foreach (num in int_stream)
@@ -97,4 +97,4 @@ foreach (num in int_stream)
 
 ## Break and Continue in Loop
 
-Break-statement and continue-statement can be used in a loop statement body to change the execution flow. The break statement is used to terminate the loop immediately when it is encountered. The continue statement is used to skip the current iteration of the loop and the control flow of the program goes to the next iteration. See [Jump Statements](StatementsJump.md) for detail.
+Break-statement and continue-statement can be used in a loop statement body to change the execution flow. The break statement is used to terminate the loop immediately when it is encountered. The continue statement is used to skip the current iteration of the loop and the control flow of the program goes to the next iteration. When you have more than one loop nested, you can use labels with break and continue statements to break or continue a specific outer loop by providing labels. See [Jump Statements](StatementsJump.md) for detail.
