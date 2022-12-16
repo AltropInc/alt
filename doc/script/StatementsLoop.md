@@ -74,9 +74,9 @@ After the `for` loop, the integer stream `nums` contains (1,6,11,16).
 
 The foreach loop statement is for traversing items in an instance of an [iterable](TypeIterable.md) type. Unlike other for loop statements, a `foreach` loop has no explicit control expression to tell when the loop is out, rather, it essentially tells "do this to everything in this collection". An iterator is implicitly used as the means of traversal. The syntax is roughly as follows:
 
-**foreach** (*element* **in** *iterable*) *statement*
+**foreach** **backward**<sub>opt</sub> (*element* *filter*<sub>opt</sub> **in** *iterable*) *statement*
 
-The statement starts with the keyword `foreach`. Instead of declaring and initializing a loop control expression, you declare a variable that represents an element, followed by the keyword `in`, which is then followed by an expression of an iterable instance. The variable is actually an [iterator](TypeIterable.md) that can be used to access an element in the iterable instance in each loop traversal.
+The statement starts with the keyword `foreach`. If `backward` present, the traversal will start from the last element toward the first. Instead of declaring and initializing a loop control expression, you declare a variable that represents an element, possibly by a `filer` type, and followed by the keyword `in`, which is then followed by an expression of an iterable instance. The variable is actually an [iterator](TypeIterable.md) that can be used to access an element in the iterable instance in each loop traversal.
 
 The following `foreach` loop multiplies each number in an integer stream by 10:
 ```altro
@@ -94,6 +94,16 @@ foreach (num in int_stream)
     num *= 10; // Error: cannot alter the value of a constant name
 }
 ```
+If a filter type is given, elements that are not subtype of the filter type will be skipped. For example:
+```altro
+a_tuple := (0, 3.2, "xyz", 2);
+sum_of_integers:=0;
+foreach (ele: int in a_tuple)
+{
+    sum_of_integers += ele;
+}
+```
+Here only integer elements (the first and the foruth) are added to `sum_of_integers`.
 
 ## Break and Continue in Loop
 
