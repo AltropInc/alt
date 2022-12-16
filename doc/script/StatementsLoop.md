@@ -86,7 +86,7 @@ foreach (num in int_stream)
     num *= 10;
 }
 ```
-However, if the collection is constant, you cannot use the iterable to alter the value in the collection:
+However, if the collection is constant, you cannot use the iterator to alter the value in the collection:
 ```altro
 const int_stream : int... = (1,2,3,4);
 foreach (num in int_stream)
