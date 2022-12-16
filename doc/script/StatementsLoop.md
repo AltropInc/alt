@@ -72,7 +72,28 @@ After the `for` loop, the integer stream `nums` contains (1,6,11,16).
 
 ## The `foreach` Loop
 
+The foreach loop statement is for traversing items in an instance of an [iterable](TypeIterable.md) type. Unlike other for loop statements, a `foreach` loop has no explicit control expression to tell when the loop is out, rather, it essentially tells "do this to everything in this collection". An iterator is implicitly used as the means of traversal. The syntax is roughly as follows:
 
+**foreach** (*element* **in** *iterable*) *statement*
+
+The satement starts with the keyword `foreach`. Instead of declaring and initializing a loop control expressions, you declare a variable that represents an element, followed by the keyword `in`, which is then followed by an expression og an iterable instance. The variable is actually an [iterator](TypeIterable.md) that can be used to access an element in the iterable instance in each loop traversal.
+
+The following `froeach` loop multiplies each number in an integer stream by 10:
+```altro
+int_stream : int... = (1,2,3,4);
+foreach (num in int_stream)
+{
+    num *= 10;
+}
+```
+However, if the collection is constant, you cannot use the iterable to alter the value in the collection:
+```altro
+const int_stream : int... = (1,2,3,4);
+foreach (num in int_stream)
+{
+    num *= 10; // Error: cannot alter the value of a constant name
+}
+```
 
 ## Break and Continue in Loop
 
