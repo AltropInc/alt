@@ -1,4 +1,4 @@
-# Jump Staements
+# Jump Statements
 
 Jumping statements are control statements that transfer execution control from one point to another point in the program. The following jump statements are provided in the Altro:
 
