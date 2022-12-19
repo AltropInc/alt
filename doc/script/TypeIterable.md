@@ -6,7 +6,7 @@ An iterable is an instance capable of returning its members one at a time, permi
 * A tuple
 * An [object class](Object.md)
 * A type has a delegated iterable member
-* A [data class](KindsOfClasses.md) that has custom iterator implementation
+* A class that implements a custom iterator
 
 ## The `iterable` Interface
 
@@ -73,5 +73,91 @@ For any type that implement the iterable interface, you can also iterate their e
 Note that the iterator `ch` is used the same way as a [reference](TypeReference.md). The iterator `ch` points to the first byte of a byte sequence for a character in UTF-8 encoding and dereferencing iterator `ch` to get the value of the character (in `utf8` type) is done implicitly. Explicit dereferencing by calling `ch.value()` is not necessary. Also, note that the conversion from `utf8` to `char` (32-bit unicode character type) is also done implicitly here.
 
 ## Iteration on Tuple and Object
+
+Unlike array, stream and strings, tuple and object classes are not parameterized by `element_type` so they do not implement the `iterable` interface that requires type parameter `element_type`. However, instances of a tuple or object class are iterable in terms of their members, and iterators in iteration are implicitly defined. By default, the `element_type` is bound to `any` for a tuple iterator , and the `element_type` is bound to `Object` for an object class iterator. However, you can use filter type to refine the `element_type` in a foreach loop. Here is an example to iterate tuple elements to add up all integers:
+```altro
+t := (1, 3.2, "xyz", 2);
+int_sum:=0;
+foreach (i: int in t) int_sum += i;
+```
+Here the iterator `i` is in the type of `iterator#(int)`, and the iteration through the tuple `t` skips elements that are not integers. As result, `int_sum` gets value 3 after the iteration. Consider:
+```altro
+t := (1, 3.2, "xyz", 2);
+num_sum := 0.0;
+foreach (n: numeric in t) num_sum += cast(doube, n);
+```
+Here the iterator `n` is in the type of `iterator#(numeric)`, and the iteration through the tuple `t` goes over all elements in a subtype of `numeric`. As result, `num_sum` gets the sum of integers and doubles, which is the value 6.2 after the iteration.
+
+## Custom Iterator Implementation
+
+A class is iterable if it implements its own iterator. To implement your own iterator, you will need to provide:
+
+* the data structure your own iterator
+* the `begin` function with interface `(): your_iterator`
+* the optional `rbegin` function with interface `(): your_iterator`, if backward iteration is required
+* the `next` function with interface `(your_iterator): your_iterator`
+* the `is_valid` function with interface `(your_iterator): bool`
+* the `get` function with interface `(your_iterator): ref#(element_type)`
+
+Here is an exmaple:
+```altro
+class MyContainerT#(type element_type: numeric)
+{
+    storage: element_type...;
+
+    // the iterator structure
+    tuple my_iterator
+    (
+        index: int = -1;
+        iter : ref#(element_type)
+    );
+
+    // returns the iterator for the first element
+    func begin() : my_iterator
+    {
+        return (0, storage[0]);
+    }
+    
+    // advance the iterator to the next element
+    func next(iter: my_iterator) : my_iterator
+    {
+        next_index := iter.index + 1;
+        if (next_index >= storage.length())
+        {
+            return (-1, null);
+        }
+        else
+        {
+            return (next_index, storage[next_index]);
+        }
+    }
+    
+     // check if the iterator is valid
+    func is_valid(iter: my_iterator) : bool
+    {
+        return iter.index >=0;
+    }
+    
+    // get the reference to the element from the iterator
+    func get(iter: my_iterator) : ref#(element_type)
+    {
+        return iter.iter;
+    }
+}
+```
+```altro
+   // create an object fron a concreate class derived from MyContainerT
+    object MyIntegerContainer : MyContainerT#(int)
+    {
+        // initialize storage
+        storage = (10,20,30);
+    }
+```
+```altro
+// iterate through the MyIntegerContainer object abd get the sum
+n: int = 0;
+foreach (i in MyContainer) n += πes;
+```
+
 
 
