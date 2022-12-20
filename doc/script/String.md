@@ -85,7 +85,7 @@ All of the above strings represents the same string:
 
 You can create a raw string by prefixing a string literal with r. A raw string treats the backslash character (\) as a literal character, not an escape sequence start, except for the case `\"` where the double quotation mark `"` can still be escaped with a single backslash character `\`. Raw string is useful when a string needs to contain a backslash, such as for a regular expression where you don’t want it to be treated as an escape character. Take note that in a regular string format where backslash `\` is used for escape sequences, e.g., `\n` for newline, `\t` for tab, and you also need to write `\\` for `\`. Consequently, to write regex pattern `\\` (which matches one `\`) in a regular string format, you need to write `\\\\` (two levels of escape). Similarly, you need to write `\\d` for regex metacharacter `\d`. This is cumbersome and error-prone. And here the raw string format will help to resolve this mess.
 
-In addition, because the double quotation mark `"` can still be escaped with a single backslash character `\`,  you can’t create a raw string that ends with a single backslash character, so r"abcd\" is considered an invalid string without the ending quotation mark. Examples of raw strings:
+In addition, because the double quotation mark `"` can still be escaped with a single backslash character `\`,  you can’t create a raw string that ends with a single backslash character, so `r"abcd\"` is considered an invalid string without the ending quotation mark. Examples of raw strings:
 ```altro
 r"[a-z]+\.txt"
 r"quoted \"word\" here"
