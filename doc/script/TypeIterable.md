@@ -5,8 +5,8 @@ An iterable is an instance capable of returning its members one at a time, permi
 * A type implements the `iterable` interface
 * A tuple
 * An [object class](Object.md)
-* A type has a delegated iterable member
 * A class that implements a custom iterator
+* A type has a delegated iterable member
 
 ## The `iterable` Interface
 
@@ -88,6 +88,8 @@ foreach (n: numeric in t) num_sum += cast(doube, n);
 ```
 Here the iterator `n` is in the type of `iterator#(numeric)`, and the iteration through the tuple `t` goes over all elements in a subtype of `numeric`. As result, `num_sum` gets the sum of integers and doubles, which is the value 6.2 after the iteration.
 
+Since tuple and object classes do not implement the `iterable` interface, you cannot use the iterator explicitly in other types of loop like what it is used for arrays and streams, unless, you provide your own iterator implementation in the class (see the section below for custom iterator implementation).
+
 ## Custom Iterator Implementation
 
 A class is iterable if it implements its own iterator. To implement your own iterator, you will need to provide:
@@ -159,5 +161,26 @@ n: int = 0;
 foreach (i in MyContainer) n += πes;
 ```
 
+## Delegated Iterable Member
 
-
+A common practice to implement a custom iterable container is to provide a wrapper that contains a built-in iterable container. For example,
+```atltro
+class Persons
+{
+    person_list: Person...;
+}
+```
+To make the class `Persons` iterable, you can simply add a member function `iterable` to return its iterable member:
+```atltro
+class Persons
+{
+    person_list: Person...;
+    func iterable(): Person... { person_list }
+}
+```
+Then you can use Persons in the foreach loop:
+```atltro
+persons: Persons;
+foreach (person persons) { /* do something with person object */ }
+}
+```
