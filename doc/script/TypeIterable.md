@@ -181,6 +181,6 @@ class Persons
 Then you can use Persons in the foreach loop:
 ```atltro
 persons: Persons;
-foreach (person persons) { /* do something with person object */ }
+foreach (person in persons) { /* do something with person object */ }
 }
 ```
