@@ -3,7 +3,7 @@
 An iterable is an instance capable of returning its members one at a time, permitting it to be iterated over in a [foreach-loop](StatementsLoop.md). Familiar examples of iterables include arrays, streams, tuples, and strings - any such instance can be iterated over in a foreach-loop. An [object](Object.md) is also an iterable, permitting it to be iterated over its child objects. The following types are iterable:
 
 * A type implements the `iterable` interface
-* A tuple
+* A [tuple](Tuple.md)
 * An [object class](Object.md)
 * A class that implements a custom iterator
 * A type has a delegated iterable member
