@@ -1,6 +1,6 @@
 # Match Statement
 
-A `match` statement provides pattern matching via match cases, which are simular [switch cases](StatementSwitch.md). Match cases are more powerful and allows for more complicated pattern matching. 
+A `match` statement provides pattern matching via match cases, which are similar [switch cases](StatementSwitch.md). Match cases are more powerful and allow for more complicated pattern matching. 
 
 The match statement syntax:
 ```altscript
@@ -13,18 +13,15 @@ match (control_expression => tag)  // => tag is used to hold the result of the c
 ```
 Unlike switch, the on value can be variable, and it can be any value type as well as array, stream, tuple, and string.
 
-Pattern match tests are performed top to bottom, if a pattern is matched, the first corresponding block will be executed and the
-control flow is done if there is no continue to fallthrough. In the fallthrough, the pattern followed will be tested and the block
-will be executed only when the test is sucessful.
+Pattern match tests are performed top to bottom, if a pattern is matched, the first corresponding block will be executed and the control flow is done if there is no fallthrough. In the fallthrough, the pattern followed will be tested and the block will be executed only when the test is successful. This fallthrough behavior is different from the one in the `switch` statement where the fallthrough case is not tested.
 
-Three kinds of matches are provided: exact value match, regular expression match, and pattern match.
+Three kinds of match cases are provided: exact value match, regular expression match, and pattern match.
 
 ### Exact Value Match
 
-Exact value match can be used for any type. It simply checks if the control_expression given in the match statement evaluates to
-an value equal to the value of the expression given in the on clause.
+Exact value matches can be used for any type. It simply checks if the control expression given in the match statement evaluates to a value equal to the value of the expression given in the `on` clause.
 
-```altscript
+```altro
 i : int;
 j : int;
 ...
@@ -37,25 +34,23 @@ match (i)
 
 ### Regular Expression Match
 
-Regular expression match is be used for string type.
+Regular expression match is used for string type.
 
-```altscript
+```altro
 file_name : string;
 ...
 match (file_name)
 {
-    on "[a-z]+\.txt" => results: foreach (result in results) print(result);
+    on r"[a-z]+\.txt" => results: foreach (result in results) print(result);
 }
 ```
-Regular expression match checkes if the string given in the control_expression matches the regular expression given in the
-on clause. The matched result, which is in the type of stream of string, can be saved a in variable by "=> results", where
-results is the variable name.
+Regular expression match checkes if the string given in the control_expression matches the regular expression given in the `on` clause. The matched result, which is in the type of stream of string, can be saved a in variable by "=> results", where results is the variable name. Note taht the string `r"[a-z]+\.txt"` is in a raw string format where the backslash character `\` is normally treated as a literal character, not an escape sequence start (expcept for the case `\"`, see [string](String.md) for detail.)
 
 ### Pattern Match
 
 Pattern match can be used for any data type including array, stream, tuple, and string.
 
-```altscript
+```altro
 s : int...;   // an integer stream
 ...
 match (s)
@@ -73,7 +68,7 @@ A pattern is represented in a pair of curly brackets. The result of the match ca
 "=> <variable_name>", and the type of the result is a tuple if the control_expression is in composite type such as
 array, stream, tuple, and string. In the above example, the type of the result is
 
-```altscript
+```altro
 (first:int; second:int; rest:int...)
 ```
 Each element in the pattern represents an element in the tuple type. The tuple elements can be named by the expression
@@ -82,7 +77,7 @@ Each element in the pattern represents an element in the tuple type. The tuple e
 The type of the result is the same type of control_expression if the type of the control_expression is a non-composite
 type. For instance:
  
-```altscript
+```altro
 s : int;
 ...
 match (s)
@@ -95,7 +90,7 @@ match (s)
 ```
 The following pattern elements are provided:
  
-```altscript
+```altro
 on {1, 2, 3}            // for exact value match.
 on {*}                  // for wildcard match
 on {0..9}               // for a range match
@@ -108,14 +103,14 @@ on {...}                // match any number of elements until next match satisfi
 A pattern element (except for the ... pattern element) can have a repeating suffix to indicate how any times of the this pattern
 can be repeatively used:
  
-```altscript
+```altro
 on {6...}          // match any number of elements that has the value 6, including the case of no match
 on {6...2}         // match any up to 2 elements that has the value 6, including the case of no match
 on {6:2}           // match exacly 2 elements that has the value 6
 ``` 
 A match pattern can be nested for nested composite data structure. For example:
  
-```altscript 
+```altro 
 s : string... ...;   // a stream of stream string
 t :string...;        // a stream of string
 match (s)
@@ -134,19 +129,18 @@ match (s)
 }
 ```  
  
-The notation ... for any number of match as well as the notion ... for any number of repeating match can only be used
-for string, stream and array, i.e. the container has the same element type. It can not be used for tuple. This is
-because the result from the match with notation ... is a stream that requires the same element type.
+The notation ... for any number of matches as well as the notion ... for any number of repeating matches can only be used for string, stream and array, i.e. the container has the same element type. It can not be used for tuples. This is because the result from the match with notation ... is a stream that requires the same element type.
  
-Either regular expressions or match patterns can be used for a string. For instance:
-```altscript
+Either regular expressions or match patterns can be used for a string. Here is an example of string match using a match pattern:
+
+```altro
 s: string;
 match (s)
 {
    on {*:2 => first, ['A'..'F', 'a'..'f', '0'..'9']...2 => second} => result:
    {
-       s1 := result.first;   // s is the tuple of (char, char) that contains the first two characters of s
-       s2 := result.second;  // s2 is the string that contains zero or up to 2 characters from the third characters in s
+       s1 := result.first;   // result.first is the tuple of (char, char) that contains the first two characters of s
+       s2 := result.second;  // result.second is the string that contains zero or up to 2 characters from the third characters in s
                              // each character is a valid hexical digit
    }
 }
