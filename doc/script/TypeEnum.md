@@ -21,6 +21,8 @@ value class enum is enumerable
     const func order(): int;                  // returns the order in the enumeration value list
     const func is_valid(): bool;              // returns true if this is not a null value (a valid value)
     const func to_string(): string;           // returns the name of the enumeration value
+    meta func from_string(str: string): ownerclass;   // returns the enumeration value from the enumeration value name
+    meta func from_order(order: int): ownerclass;     // returns the enumeration value from the order in the value list
 }
 ```
 
