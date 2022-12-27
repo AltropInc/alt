@@ -101,7 +101,7 @@ weekend_days: DaySet = DaySet(Sunday, Saturday);
 ## Enumeration Set Class
 
 The enumeration set type `enumset` is a value class that implements the *comparable* interface with a support of all built-in operators in [clusivity group](Operators.md):
-
+```altro
 value class enumset is comparable
 {
     const func <=> (other: ownerclass): int;  // implements comparable interface
