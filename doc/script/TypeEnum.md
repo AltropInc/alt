@@ -50,10 +50,15 @@ or
 ```altro
 first_medal: MedalOrdinal = MedalOrdinal::first;
 ```
-Each enumeration type has an null value, which is implicitly defined. Use meat member function `null_value` to get the null value:
+Each enumeration type has an null value, which is implicitly defined. Use meta member function `null_value` to get the null value:
 ```altro
 invalid_day := Day.null_value();
 ```
+The `null value` is considered an invalid value. Use `is_valid` to check is the enumration value is not an null value. The following expression:
+```altro
+invalid_day.is_valid();
+```
+returns false.
 
 ## Enumeration Set with an Enum Type
 
@@ -112,8 +117,7 @@ value class enumset is comparable
     const func |= (other: ownerclass): ownerclass;  // clusivity operator 'inclusive or assign'
     const func &= (other: ownerclass): ownerclass;  // clusivity operator 'conjunction or assign'
     prefix func ~ (): ownerclass;  // clusivity operator 'flip'
-    const func empty (): bool;  // returns true if the set contains no enumeration value
-    const func empty (): bool;  // returns true if the set contains no enumeration value
+    const func is_empty (): bool;  // returns true if the set contains no enumeration value
     const func length (): int;  // returns the number of elements in this set.
     const func to_string (): string;  // returns string to represent the set.
     const func has (other: ownerclass): bool;  // returns true if this set contains any of the value in other
@@ -131,6 +135,7 @@ value class enumset is comparable
     func set (other: ownerclass): bool;  // adds all elements in another set to this one and returns true if this set is changed.
     func unset (other: ownerclass): bool;  // removes all elements in another set from this one and returns true if this set is changed.
     const meta func all (): ownerclass;  // returns the set that contains all valid enumeration values.
+    const meta func empty (): ownerclass;  // returns an empty set
 }
 ```
 
