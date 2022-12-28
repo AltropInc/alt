@@ -4,6 +4,7 @@ An iterable is an instance capable of returning its members one at a time, permi
 
 * A type implements the `iterable` interface
 * A [tuple](Tuple.md)
+* An [Enumeration Set](TypeEnum.md)
 * An [object class](Object.md)
 * A class that implements a custom iterator
 * A type has a delegated iterable member
@@ -72,9 +73,9 @@ For any type that implement the iterable interface, you can also iterate their e
 ```
 Note that the iterator `ch` is used the same way as a [reference](TypeReference.md). The iterator `ch` points to the first byte of a byte sequence for a character in UTF-8 encoding and dereferencing iterator `ch` to get the value of the character (in `utf8` type) is done implicitly. Explicit dereferencing by calling `ch.value()` is not necessary. Also, note that the conversion from `utf8` to `char` (32-bit unicode character type) is also done implicitly here.
 
-## Iteration on Tuple and Object
+## Iteration on Tuple, Enumeration Set, and Object
 
-Unlike array, stream and strings, tuple and object classes are not parameterized by `element_type` so they do not implement the `iterable` interface that requires type parameter `element_type`. However, instances of a tuple or object class are iterable in terms of their members, and iterators in iteration are implicitly defined. By default, the `element_type` is bound to `any` for a tuple iterator , and the `element_type` is bound to `Object` for an object class iterator. However, you can use filter type to refine the `element_type` in a foreach loop. Here is an example to iterate tuple elements to add up all integers:
+Unlike array, stream and strings, tuple, enumeration set, and object classes are not parameterized by `element_type` so they do not implement the `iterable` interface that requires type parameter `element_type`. However, instances of a tuple, enumeration set, or object class are iterable in terms of their members, and iterators in iteration are implicitly defined. By default, the `element_type` is bound to `any` for a tuple iterator, the `element_type` is bound to `enumeration type` for an enumeration set type iterator, and the `element_type` is bound to `Object` for an object class iterator. You can use filter type to refine the `element_type` in a foreach loop for tuple type and object class, but not for exnumeration set type. Here is an example to iterate tuple elements to add up all integers:
 ```altro
 t := (1, 3.2, "xyz", 2);
 int_sum:=0;
@@ -88,15 +89,15 @@ foreach (n: numeric in t) num_sum += cast(doube, n);
 ```
 Here the iterator `n` is in the type of `iterator#(numeric)`, and the iteration through the tuple `t` goes over all elements in a subtype of `numeric`. As result, `num_sum` gets the sum of integers and doubles, which is the value 6.2 after the iteration.
 
-Since tuple and object classes do not implement the `iterable` interface, you cannot use the iterator explicitly in other types of loop like what it is used for arrays and streams, unless, you provide your own iterator implementation in the class (see the section below for custom iterator implementation).
+Since tuple, enumeration set, and object classes do not implement the `iterable` interface, you cannot use the iterator explicitly in other types of loop like what it is used for arrays and streams, unless, you provide your own iterator implementation in the class (see the section below for custom iterator implementation). Also see [Enumeration and Enumeration Set type](TypeEnum.md) for iteration through an enumeration set.
 
 ## Custom Iterator Implementation
 
 A class is iterable if it implements its own iterator. To implement your own iterator, you will need to provide:
 
-* the data structure your own iterator
+* the data structure of your own iterator
 * the `begin` function with interface `(): your_iterator`
-* the optional `rbegin` function with interface `(): your_iterator`, if backward iteration is required
+* the optional `rbegin` function with interface `(): your_iterator`, if backward iteration is supported
 * the `next` function with interface `(your_iterator): your_iterator`
 * the `is_valid` function with interface `(your_iterator): bool`
 * the `get` function with interface `(your_iterator): ref#(element_type)`
