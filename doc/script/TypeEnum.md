@@ -177,7 +177,7 @@ foreach (day in Day(...))
     // do something for each day
 }
 ```
-If you can also use other loop statement to manually iterate through an enumeration set value, but you have to check if the enumeration value is actually contained in the set:
+You can also use other loop statements to manually iterate through an enumeration set value, but you have to check if the enumeration value is actually contained in the set:
 ```altro
 somedays := Day(MONDAY, WEDNESDAY, FRIDAY);
 for (day:=Day.first(); day.is_valid(); ++day)
