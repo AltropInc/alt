@@ -1,4 +1,4 @@
-# Numeric
+# Numeric Types
 
 Numeric classes representing numeric values that have the property of arithmetic calculation such as addition, subtraction, multiplication, and division. Built-in numeric interfaces can be further divided into two categories: integral and real. The integral class specifies [whole numbers](https://en.wikipedia.org/wiki/Integer) that can be represented without a fractional component. The real class represents [real number](https://en.wikipedia.org/wiki/Real_number) values that have a continuous quantity, but their bit-representation in platform is approximate due to the limited number of bytes used to store their values, and they are often referred as [floating point numbers](https://en.wikipedia.org/wiki/Floating-point_arithmetic).
 
@@ -186,6 +186,91 @@ A real number literal can also be represented as a mantissa with an exponent. Fo
          ┌──┴──┐  ┌┴┐
          1.23456e-67
 ```
+
+The following meta constants are defined in floating-number types to represent the information about floating-point types (hfloat, float, double, or ldouble):
+| name      | type      |description                                                                               |
+|:--------- |:--------- |:---------------------------------------------------------------------------------------- |
+| max_val   | selfclass | the largest positive finite value of the given type |
+| min_val   | selfclass | the lowest negative finite value of the given type  |
+| smallest  | selfclass | the smallest positive nonzero value of the given type |
+| epsilon   | selfclass | the difference between 1.0 and the next representable value of the given floating-point type |
+| max_exp   | int       | the largest positive number n such that 2ⁿ⁻¹ is a representable value of the given floating-point type |
+| min_exp   | int       | the lowest negative number n such that 2ⁿ⁻¹ is a representable value of the given floating-point type |
+| max_exp10 | int       | the largest positive number n such that 10ⁿ is a representable value of the given floating-point type |
+| min_exp10 | int       | the lowest negative number n such that 10ⁿ is a representable value of the given floating-point type |
+| dig       | int       | the number of digits in base-2 that can be represented by the given floating-point type without change |
+| dig10     | int       | number of decimal digits that can represent a value of the given floating-point type |
+| infinity  | selfclass | positive [infinity](https://en.wikipedia.org/wiki/Infinity), alias ∞ can be used also. Use -∞ for negative infinity |
+| nan       | selfclass | a value representing “not a number” of the given floating-point type |
+
+The following meta constants are defined in floating-number types to represent special values in different precision according to the given floating-point type (hfloat, float, double, or ldouble):
+
+| name      | type      | description                                                                               |
+|:--------- |:--------- |:----------------------------------------------------------------------------------------- |
+| pi        | selfclass | [π](https://en.wikipedia.org/wiki/Pi) approximately equal to 3.14159... |
+| tau       | selfclass | 2 * π approximately equal to 6.28319... |
+| e         | selfclass | [euler's number](https://en.wikipedia.org/wiki/E_(mathematical_constant)) approximately equal to 2.71828... |
+| phi       | selfclass | [golden ratio](https://en.wikipedia.org/wiki/Golden_ratio) approximately equal to 1.61803... |
+| sqrt2     | selfclass | √2 approximately equal to 1.41421... |
+| sqrt_e    | selfclass | √e approximately equal to 1.64872... |
+| sqrt_pi   | selfclass | √π approximately equal to 1.77245... |
+| ln2       | selfclass | [natural logarithm](https://en.wikipedia.org/wiki/Natural_logarithm) of 2 approximately equal to 0.69315... |
+| ln10      | selfclass | [natural Logarithm](https://en.wikipedia.org/wiki/Natural_logarithm) of 10 approximately equal to 2.30259... |
+
+Concrete floating-point types (hfloat, float, double, or ldouble) implements all member functions required by the `real` interface, and in addition, they provide a few member functions that are commonly used in math:
+
+```altro
+func + (other: ownerclass): ownerclass;   // addable
+func - (other: ownerclass): ownerclass;   // addable
+func * (other: ownerclass): ownerclass;   // scalable
+func / (other: ownerclass): ownerclass;   // scalable
+func ÷ (other: ownerclass): ownerclass;   // scalable
+func % (other: ownerclass): ownerclass;   // scalable
+func ^ (other: ownerclass): ownerclass;   // scalable
+func += (other: ownerclass): ownerclass;  // addable
+func -= (other: ownerclass): ownerclass;  // addable
+func *= (other: ownerclass): ownerclass;  // scalable
+func /= (other: ownerclass): ownerclass;  // scalable
+func ÷= (other: ownerclass): ownerclass;  // scalable
+func %= (other: ownerclass): ownerclass;  // scalable
+func ^= (other: ownerclass): ownerclass;  // scalable
+prefix func +(): ownerclass;              // negatable
+prefix func -(): ownerclass;              // negatable
+prefix func |()|: ownerclass;             // negatable
+prefix func ⌈()⌉: ownerclass;
+prefix func ⌊()⌋: ownerclass;
+func ²() : ownerclass;
+func ³() : ownerclass;
+func √() : ownerclass;
+func ∛() : ownerclass;
+```
+| func   | Alias    | Common Name      | Example   |   Description                                       |
+|:------ |:-------- |:---------------- |:--------- |:--------------------------------------------------- |
+| +      |          | Addition         | x + y     | Returns the sum of x and y                          |
+| -      |          | Subtraction      | x - y     | Returns the difference by subtracting y from x      |
+| *      |          | Multiplication   | x * y     | Returns the multiplies of x by the factor y         |
+| /      |          | Division         | x / y     | Returns the quotient of dividing x by the divisor y |
+| ÷      | /#       | Integer Division | x ÷ y     | Returns the integral part of the quotient from x/y  |
+| %      |          | Modulus          | x % y     | Returns the integral division remainder             |
+| ^      |          | Power            | x ^ y     | Returns the value of x raised to the power of y     |
+| +=     |          | Add Assign       | x += y    | Adds y to x and x gets the sum                      |
+| -=     |          | Sub Assignn      | x -= y    | Substrcts y from x and x gets the difference        |
+| \*=    |          | Mul Assign       | x \*= y   | Multiplies x by y and x gets the product            |
+| /=     |          | Div Assign       | x /= y    | Divides x by y and x gets the quotient              |
+| ÷=     | /#=      | Int Div Assign   | x ÷= y    | Divides x by y and x gets the integral part of the quotient    |
+| %=     |          | Mod Assign       | x %= y    | Divides x by y and x gets the remainder             |
+| ^=     |          | Power Assign     | x ^= y    | Raised the value of x to the power of y             |
+| +      |          | Positive sign    | +x        | Returns positive (unchanged) value of x            |
+| -      |          | Negative sign    | -x        | Returns the negating value of x                    |
+| \|()\| |          | Absolue value    | \|x\|     | Returns the absolute value of x                    |
+| ⌈()⌉   |           | Absolue value    | ⌈x⌉        | Returns the smallest integer value not less than x |
+| ⌊()⌋   |           | Absolue value    | ⌊x⌋        | Returns the largest integer value not greater than x |
+| ²      |          | Squared          | x²        | Returns x\*x                                       |
+| ³      |          | Cubed            | x³        | Returns x\*x\*x                                    |
+| √      |          | Square Root      | √x        | Returns square root of x                           |
+| ∛      |          | Cube Root        | ∛x        | Returns cube root of x                             |
+
+More special purpose math functions are provided in the [math class](Math.md).
 
 ## Other Numeric Classes
 
