@@ -158,3 +158,33 @@ weekdays := all_days - Day(SUNDAY, SATURDAY);
 all_days_expect_for_sunday := all_days - Day::SUNDAY;
 ```
 Here the function `-` requires an input of `enumset of Day`. The expression `all_days - Day::SUNDAY` is actually converted to `all_days - Day(SUNDAY)`.
+
+## Iteration through Enumeration Set
+
+A value of an enumeration set is [iterable](TypeIterable.md). It can be used in a foreach loop. For example,
+```altro
+enum Day(SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY);
+weekdays := Day(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
+foreach (day in weekdays)
+{
+    // do somthing for each weekday
+}
+```
+To iterate all enumeration values, you can do: 
+```altro
+foreach (day in Day(...))
+{
+    // do somthing for each day
+}
+```
+If you can also use other loop statement to manually iterate through an enumeration set value, but you have to check if the enumeration value is actually contained in the set:
+```altro
+somedays := Day(MONDAY, WEDNESDAY, FRIDAY);
+for (day:=Day.first(); day.is_valid(); ++day)
+{
+    if (somedays ⊃ day)
+    {
+       // do somthing for the day 
+    }
+}
+```
