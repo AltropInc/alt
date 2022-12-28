@@ -4,25 +4,27 @@ In mathematics, some constants and functions are important enough to deserve the
 ```altro
 value class float is real
 {
-    meta float e =  2.718282f;
+    meta const float e =  2.718282f;
     func + (other: ownerclass): ownerclass; 
 }
 value class double is real
 {
-    meta float e =  2.71828182845904523536;
+    meta const double e =  2.71828182845904523536;
     func + (other: ownerclass): ownerclass; 
 }
 value class ldouble is real
 {
-    meta float e =  2.71828182845904523536028747135266ld;
+    meta const ldouble e =  2.71828182845904523536028747135266ld;
     func + (other: ownerclass): ownerclass; 
 }
 ```
-And some other constants and functions are defined in the `math `class`:
+See [Numeric Types](TypeNumeric.md) for the list of all constants and member functions provided in numeric types.
+
+Some other constants and functions are defined in the `math class`, for example:
 ```altro
 data class math
 {
-    meta double e =  2.71828182845904523536;
+    meta const double e =  2.71828182845904523536;
     func sin (x: float): float;
     func sin (x: double): double;
     func sin (x: ldouble): ldouble;
@@ -39,88 +41,75 @@ value class double is real
     prefix func sin();
 }
 ```
-Then you can use prefix expression `sin x` or `sin(x)` to call the `sin` function. However, the prefix expression has a limitation to accept convertable types. For instance, the expression `sin 3` will ill-formed because the class `int` does not have a member funcion `sin`. But if we put the function `sin` in the `math` class, we will find an overloaded input interface provided for the `sin` function to accept an integer, which is convertable to a floating-point number, and in this case, the interface `(x: double): double` will be selected.
+With the definition of the prefix member function, you can use prefix expression `sin x` or `sin(x)` to call the `sin` member function. However, the prefix expression has a limitation to accept convertable types. For instance, the expression `sin 3` will ill-formed because the class `int` (the type of `3`) does not have a member funcion `sin`. But if we put the function `sin` in the `math` class, we will find an overloaded input interface provided for the `sin` function to accept an integer, which is convertable to a floating-point number, and in this case, the interface `(x: double): double` will be selected for calling `sin`.
 
-## Constants in Floating-Number Types (hfloat, float, double, and ldouble)
+## Math Constants
 
-The following (meta) constants are defined in floating-number types to represent the information about floating-point types (hfloat, float, double, or ldouble):
-| name      | type      |description                                                                               |
-|:--------- |:--------- |:---------------------------------------------------------------------------------------- |
-| max_val   | selfclass | the largest positive finite value of the given type |
-| min_val   | selfclass | the lowest negative finite value of the given type  |
-| smallest  | selfclass | the smallest positive nonzero value of the given type |
-| epsilon   | selfclass | the difference between 1.0 and the next representable value of the given floating-point type |
-| max_exp   | int       | the largest positive number n such that 2ⁿ⁻¹ is a representable value of the given floating-point type |
-| min_exp   | int       | the lowest negative number n such that 2ⁿ⁻¹ is a representable value of the given floating-point type |
-| max_exp10 | int       | the largest positive number n such that 10ⁿ is a representable value of the given floating-point type |
-| min_exp10 | int       | the lowest negative number n such that 10ⁿ is a representable value of the given floating-point type |
-| dig       | int       | the number of digits in base-2 that can be represented by the given floating-point type without change |
-| dig10     | int       | number of decimal digits that can represent a value of the given floating-point type |
-| infinity  | selfclass | positive [infinity](https://en.wikipedia.org/wiki/Infinity), ∞ can also be used. Use -infinity for negative infinity |
-| nan       | selfclass | a value representing “not a number” of the given floating-point type |
+The `math` class provides the following meta constants:
 
-The following (meta) constants are defined in floating-number types to represent special values in different precision according to the given floating-point type (hfloat, float, double, or ldouble):
-| name      | type      | description                                                                               |
-|:--------- |:--------- |:----------------------------------------------------------------------------------------- |
-| pi        | selfclass | [π](https://en.wikipedia.org/wiki/Pi) approximately equal to 3.14159... |
-| tau       | selfclass | 2 * π approximately equal to 6.28319... |
-| e         | selfclass | [euler's number](https://en.wikipedia.org/wiki/E_(mathematical_constant)) approximately equal to 2.71828... |
-| phi       | selfclass | [golden ratio](https://en.wikipedia.org/wiki/Golden_ratio) approximately equal to 1.61803... |
-| sqrt2     | selfclass | √2 approximately equal to 1.41421... |
-| sqrt_e    | selfclass | √e approximately equal to 1.64872... |
-| sqrt_pi   | selfclass | √π approximately equal to 1.77245... |
-| ln2       | selfclass | [natural logarithm](https://en.wikipedia.org/wiki/Natural_logarithm) of 2 approximately equal to 0.69315... |
-| ln10      | selfclass | [natural Logarithm](https://en.wikipedia.org/wiki/Natural_logarithm) of 10 approximately equal to 2.30259... |
+| name    | type   | description                                                                               |
+|:------- |:------ |:----------------------------------------------------------------------------------------- |
+| π       | double | [π](https://en.wikipedia.org/wiki/Pi) approximately equal to 3.14159... |
+| pi      | double | same as π |
+| τ       | double | 2 * π approximately equal to 6.28319... |
+| tau     | double | same as τ |
+| e       | double | [euler's number](https://en.wikipedia.org/wiki/E_(mathematical_constant)) approximately equal to 2.71828... |
+| phi     | double | [golden ratio](https://en.wikipedia.org/wiki/Golden_ratio) approximately equal to 1.61803... |
+| sqrt2   | double | √2 approximately equal to 1.41421... |
+| sqrt_e  | double | √e approximately equal to 1.64872... |
+| sqrt_pi | double | √π approximately equal to 1.77245... |
+| ln2     | double | [natural logarithm](https://en.wikipedia.org/wiki/Natural_logarithm) of 2 approximately equal to 0.69315... |
+| ln10    | double | [natural Logarithm](https://en.wikipedia.org/wiki/Natural_logarithm) of 10 approximately equal to 2.30259... |
 
-## Functions in Floating-Number Types (hfloat, float, double, and ldouble)
+These contants are in double precision. If you want any contant in a specific precision, use the one defined the the concrete floating point type, for exmaple, use `ldouble.pi` to get the π value in long double precision.
 
-```altro
-func + (other: ownerclass): ownerclass;   // addable
-func - (other: ownerclass): ownerclass;   // addable
-func * (other: ownerclass): ownerclass;   // scalable
-func / (other: ownerclass): ownerclass;   // scalable
-func ÷ (other: ownerclass): ownerclass;   // scalable
-func % (other: ownerclass): ownerclass;   // scalable
-func ^ (other: ownerclass): ownerclass;   // scalable
-func += (other: ownerclass): ownerclass;  // addable
-func -= (other: ownerclass): ownerclass;  // addable
-func *= (other: ownerclass): ownerclass;  // scalable
-func /= (other: ownerclass): ownerclass;  // scalable
-func ÷= (other: ownerclass): ownerclass;  // scalable
-func %= (other: ownerclass): ownerclass;  // scalable
-func ^= (other: ownerclass): ownerclass;  // scalable
-prefix func +(): ownerclass;              // negatable
-prefix func -(): ownerclass;              // negatable
-prefix func |()|: ownerclass;             // negatable
-prefix func ⌈()⌉: ownerclass;
-prefix func ⌊()⌋: ownerclass;
-func ²() : ownerclass;
-func ³() : ownerclass;
-func √() : ownerclass;
-func ∛() : ownerclass;
-```
-| func   | Alias    | Common Name      | Example   |   Description                                       |
-|:------ |:-------- |:---------------- |:--------- |:--------------------------------------------------- |
-| +      |          | Addition         | x + y     | Returns the sum of x and y                          |
-| -      |          | Subtraction      | x - y     | Returns the difference by subtracting y from x      |
-| *      |          | Multiplication   | x * y     | Returns the multiplies of x by the factor y         |
-| /      |          | Division         | x / y     | Returns the quotient of dividing x by the divisor y |
-| ÷      | /#       | Integer Division | x ÷ y     | Returns the integral part of the quotient from x/y  |
-| %      |          | Modulus          | x % y     | Returns the integral division remainder             |
-| ^      |          | Power            | x ^ y     | Returns the value of x raised to the power of y     |
-| +=     |          | Add Assign       | x += y    | Adds y to x and x gets the sum                      |
-| -=     |          | Sub Assignn      | x -= y    | Substrcts y from x and x gets the difference        |
-| \*=    |          | Mul Assign       | x \*= y   | Multiplies x by y and x gets the product            |
-| /=     |          | Div Assign       | x /= y    | Divides x by y and x gets the quotient              |
-| ÷=     | /#=      | Int Div Assign   | x ÷= y    | Divides x by y and x gets the integral part of the quotient    |
-| %=     |          | Mod Assign       | x %= y    | Divides x by y and x gets the remainder             |
-| ^=     |          | Power Assign     | x ^= y    | Raised the value of x to the power of y             |
-| +      |          | Positive sign    | +x        | Returns positive (unchanged) value of x            |
-| -      |          | Negative sign    | -x        | Returns the negating value of x                    |
-| \|()\| |          | Absolue value    | \|x\|     | Returns the absolute value of x                    |
-| ⌈()⌉   |           | Absolue value    | ⌈x⌉        | Returns the smallest integer value not less than x |
-| ⌊()⌋   |           | Absolue value    | ⌊x⌋        | Returns the largest integer value not greater than x |
-| ²      |          | Squared          | x²        | Returns x\*x                                       |
-| ³      |          | Cubed            | x³        | Returns x\*x\*x                                    |
-| √      |          | Square Root      | √x        | Returns square root of x                           |
-| ∛      |          | Cube Root        | ∛x        | Returns cube root of x                             |
+## Math Functions
+
+The following functions provided in the 'math` class has four overloading interfaces:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;func *name* (hfloat): hfloat;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;func *name* (float): float;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;func *name* (double): double;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;func *name* (ldouble): ldouble;<br>
+
+| name    | example   | description                                                                               |
+|:------- |:---------- |:----------------------------------------------------------------------------------------- |
+| floor   | floor(x)   | Rounds x downward, returning the largest integral value that is not greater than x |
+| ceil    | ceil(x)    | Rounds x upward, returning the smallest integral value that is not less than x |
+| trunc   | trunc(x)   | Rounds x toward zero, returning the nearest integral value that is not larger in magnitude than x. |
+| round   | round(x)   | Returns the integral value that is nearest to x, with halfway cases rounded away from zero. |
+    ADD_MATH_FUNC(lround)
+    ADD_MATH_FUNC(llround)
+    ADD_MATH_FUNC(nearbyint)
+    ADD_MATH_FUNC(rint)
+    ADD_MATH_FUNC(lrint)
+    ADD_MATH_FUNC(llrint)
+    
+| sqrt    | sqrt(x)   | Returns the square root of x. |
+| cbrt    | cbrt(x)   | Returns the cubic root of x. |
+| exp     | exp(x)    | Returns the base-e exponential function of x, which is e raised to the power x: e<sup>x</sup>. |
+| log     | log(x)    | Returns the natural logarithm of x. |
+| log10   | log10(x)  | Returns the common (base-10) logarithm of x. |
+| erf     | erf(x)    | Returns the error function of x (2/√π)⎰<sub>0~x</sub>e<sup>-t<sup>2</sup></sup>dt). |
+| erfc    | erfc(x)   | Returns the complementary error function of x (1-2/√π)⎰<sub>0~x</sub>e<sup>-t<sup>2</sup></sup>dt). |
+| tgamma  | tgamma(x) | Returns the gamma function of x. |
+| lgamma  | lgamma(x) | Returns the natural logarithm of the absolute value of the gamma function of x. |
+    ADD_MATH_FUNC_2(pow)
+    ADD_MATH_HYPOT()
+
+| sin    | sin(x)   | Returns the sine of an angle of x radians. |
+| cos    | cos(x)   | Returns the cosine  of an angle of x radians. |
+| tan    | tan(x)   | Returns the tangent  of an angle of x radians. |
+| asin   | asin(x)  | Returns the principal value of the arc sine of x, expressed in radians. |
+| acos   | acos(x)  | Returns the principal value of the arc cosine of x, expressed in radians. |
+
+
+ ADD_MATH_FUNC(abs)
+
+
+    ADD_MATH_ATAN()
+    ADD_MATH_FUNC(cosh)
+    ADD_MATH_FUNC(sinh)
+    ADD_MATH_FUNC(tanh)
+    ADD_MATH_FUNC(acosh)
+    ADD_MATH_FUNC(asinh)
+    ADD_MATH_FUNC(atanh)
