@@ -167,14 +167,14 @@ enum Day(SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY);
 weekdays := Day(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
 foreach (day in weekdays)
 {
-    // do somthing for each weekday
+    // do something for each weekday
 }
 ```
 To iterate all enumeration values, you can do: 
 ```altro
 foreach (day in Day(...))
 {
-    // do somthing for each day
+    // do something for each day
 }
 ```
 If you can also use other loop statement to manually iterate through an enumeration set value, but you have to check if the enumeration value is actually contained in the set:
@@ -184,7 +184,7 @@ for (day:=Day.first(); day.is_valid(); ++day)
 {
     if (somedays ⊃ day)
     {
-       // do somthing for the day 
+       // do something for the day 
     }
 }
 ```
