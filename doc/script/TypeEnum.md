@@ -7,7 +7,7 @@ An *enumeration type* is a data type consisting of a set of named values called 
 interface class enumerable is comparable, incrementable
 {
 }
-value class enum is enumerable
+value abstract class enum is enumerable
 {
     const func <=> (other: ownerclass): int;  // implements comparable interface
     func ++ (): ownerclass;                   // implements incrementable interface
@@ -107,7 +107,7 @@ weekend_days: DaySet = DaySet(Sunday, Saturday);
 
 All concrete enumeration set type are derived from the enumeration set class `enumset`, which is a value class that implements the *comparable* interface with a support of all built-in operators in [clusivity group](Operators.md):
 ```altro
-value class enumset is comparable
+value abstract class enumset is comparable
 {
     const func <=> (other: ownerclass): int;  // implements comparable interface
     const func \ (other: ownerclass): ownerclass;  // clusivity operator 'exclusive or'
