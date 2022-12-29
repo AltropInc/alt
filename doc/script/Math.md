@@ -101,7 +101,7 @@ The following functions are provided in the 'math` class:
 * **func asin(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the principal value of the arc sine of x, expressed in radians.
 * **func acos(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the principal value of the arc cosine of x, expressed in radians.
 * **func atan(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the principal value of the arc tangent of x, expressed in radians.
-* **func atan(y:T)over(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the principal value of the arc tangent of y/x, expressed in radians.
+* **func atan(y:T)over(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the principal value of the arc tangent of y/x, expressed in radians. For example, `atan 5.0 over 10.0` returns `1.1071487177940904'.
 
 **Hyperbolic functions**
 * **func sinh(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the hyperbolic sine of x.
