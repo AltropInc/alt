@@ -68,7 +68,14 @@ These constants are in double precision. If you want any constant in a specific 
 The following functions are provided in the 'math` class:
 
 **Common arithmetic functions**
-* **func abs(x:T):T;** where T can be `int`, `long`, `llong`, `float`, `double`, or `ldouble`. It Returns the absolute value of x, i.e. |x|. For example, `abs(-2.8)` returns `2.8`, and `abs(-8)` returns `8`
+* **func abs(x:T):T;** where T can be `int`, `long`, `llong`, `float`, `double`, or `ldouble`. It returns the absolute value of x, i.e. |x|. For example, `abs(-2.8)` returns `2.8`, and `abs(-8)` returns `8`
+* **func copysign(x,y:T):T;** where T can be `int`, `long`, `llong`, `float`, `double`, or `ldouble`. It returns a value with the magnitude of x and the sign of y. For example, `copysign(2.8, -3)` returns `-2.8`, and `copysign(-8, 4)` returns `8`
+* **func max(x,y:T):T;** where T can be `int`, `long`, `llong`, `float`, `double`, or `ldouble`. It returns the larger of its arguments: either x or y. For example, `max(2.8, 2)` returns `2.8`, and `max(-3.0, -3.2)` returns `-3.0`. Note that the second parameter `y` must be convertable to the type of the first paramter `x`. Therefore, `max(2, 2.2)` is considered an error because a double type cannot be implicitly converted to a integer.
+* **func min(x,y:T):T;** where T can be `int`, `long`, `llong`, `float`, `double`, or `ldouble`. It returns the smaller of its arguments: either x or y. For example, `min(2.8, 2)` returns `2.0`, and min(-3.0, -3.2)` returns `-3.2`. See comments about `max`.
+* * **func mid(x,y:T):T;** where T can be `float`, `double`, or `ldouble`. It returns  the midpoint between x and y. For example, `mid(2, 4)` returns `3`, and min(-2, -3)` returns `-2.5`.
+* **func fma(x,y,z:T):T;** where T can be `int`, `long`, `llong`, `float`, `double`, or `ldouble`. It returns the value of x\*y+z. For example, `fma(3,10,5)` returns `35`.
+* **func lerp(x,y,t:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the linear interpolation between x and y: `x+t*(y-x)`. For example, `lerp(5, 10, 0.5)` returns `7.5`.
+* **func nextafter(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the  the next representable value after x in the direction of y. For example, `nextafter(0.0,1.0))` returns first representable double value greater than zero (4.940656e-324).
 * **func floor(x:T):T;** where T can be `float`, `double`, or `ldouble`. It rounds x downward, returning the largest integral value that is not greater than x. For example, `floor(2.8)` returns `2.0`, and `floor(-2.8)` returns `-3.0`
 * **func ceil(x:T):T;** where T can be `float`, `double`, or `ldouble`. It rounds x upward, returning the smallest integral value that is not less than x. For example, `ceil(2.8)` returns `3.0`, and `ceil(-2.8)` returns `-2.0`
 * **func trunc(x:T):T;** where T can be `float`, `double`, or `ldouble`. It rounds x toward zero, returning the nearest integral value that is not larger in magnitude than x. For example, `trunc(2.8)` returns `2.0`, and `trunc(-2.8)` returns `-2.0`
@@ -78,6 +85,9 @@ The following functions are provided in the 'math` class:
 * **func remainder(x,y:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the floating-point remainder of x/y, which is rounded to nearest. For example, `remainder(5.3, 2)** returns `-0.7`, and `remainder(18.5, 4.2)` returns `1.7`.
 * **func fmod(x,y:T):T;** where T can be `float`, `double`, or `ldouble`. It is a similar function to `remainder` and returns the same but with the quotient rounded to the nearest integer, instead of being truncated.  For example, `fmod(5.3, 2)` returns `1.3`, and `fmod(18.5, 4.2)` returns `1.7`.
 * **func div(x,y:T): (quot, rem:T);** where T can be `int`, `long`, or `llong`. It computes both the quotient and the remainder of the division of the numerator x by the denominator y.
+* **func gcd(x,y:T): T;** where T can be `int`, `long`, or `llong`. It returns the greatest common divisor of the integers x and y.
+* **func lcm(x,y:T): T;** where T can be `int`, `long`, or `llong`. It returns least common multiple of the integers x and y.
+* **func random(x,y:T): T;** where T can be any integral type. It generates a random integer in the closed range \[x, y].
 
 **Exponential and logarithmic functions**
 * **func sqrt(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the square root of x.
@@ -87,6 +97,9 @@ The following functions are provided in the 'math` class:
 * **func hypot(x, y:T):T;** where T can be `float`, `double`, or `ldouble`. It returns  the hypotenuse of a right-angled triangle whose legs are `x` and `y`, i.e. the square root of (x<sup>2</sup>+y<sup>2</sup>).
 * **func log(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the natural logarithm of x.
 * **func log10(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the common (base-10) logarithm of x.
+* **func frexp(x:T): (significand:T; exp:int);** where T can be `float`, `double`, or `ldouble`. It breaks the floating point number x into its binary significand (a floating point with an absolute value between 0.5(included) and 1.0(excluded)) and an integral exponent for 2, such that: x = significand * 2<sup>exp</sup>.
+* **func ldexp(x:T; exp:int):T;** where T can be `float`, `double`, or `ldouble`. It returns the result of multiplying x (the significand) by 2 raised to the power of exp (the exponent), such that: ldexp(x) = x * 2<sup>exp</sup>.
+* **func mod(x:T): (i, f:int);** where T can be `float`, `double`, or `ldouble`. It breaks x into an integral (i) and a fractional part (f).
 
 **Error functions**
 * **func erf(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the error function of x: 2/√π)⎰<sub><sub>0</sub></sub><sup><sup>x</sup></sup>e<sup>-t<sup>2</sup></sup>dt.
@@ -102,6 +115,8 @@ The following functions are provided in the 'math` class:
 * **func acos(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the principal value of the arc cosine of x, expressed in radians.
 * **func atan(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the principal value of the arc tangent of x, expressed in radians.
 * **func atan(y,x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the angle in radians in the plane between the positive x-axis and the ray from (0, 0) to the point (x, y).
+* **func to_radians(x:T):T;** where T can be `float`, `double`, or `ldouble`. It converts the angle in radians to degrees.
+* **func to_degrees(x:T):T;** where T can be `float`, `double`, or `ldouble`. It converts the angle in degrees to radians.
 
 **Hyperbolic functions**
 * **func sinh(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the hyperbolic sine of x.
