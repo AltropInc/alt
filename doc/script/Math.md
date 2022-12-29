@@ -68,43 +68,46 @@ These constants are in double precision. If you want any constant in a specific 
 The following functions are provided in the 'math` class:
 
 **Common arithmetic functions**
-* `func abs(x:T):T;` where T can be `int`, `long`, `llong`, `float`, `double`, or `ldouble`. It Returns the absolute value of x, i.e. |x|. For example, `abs(-2.8)` returns `2.8`, and `abs(-8)` returns `8`
-* `func floor(x:T):T;` where T can be `float`, `double`, or `ldouble`. It rounds x downward, returning the largest integral value that is not greater than x. For example, `floor(2.8)` returns `2.0`, and `floor(-2.8)` returns `-3.0`
-* `func ceil(x:T):T;` where T can be `float`, `double`, or `ldouble`. It rounds x upward, returning the smallest integral value that is not less than x. For example, `ceil(2.8)` returns `3.0`, and `ceil(-2.8)` returns `-2.0`
-* `func trunc(x:T):T;` where T can be `float`, `double`, or `ldouble`. It rounds x toward zero, returning the nearest integral value that is not larger in magnitude than x. For example, `trunc(2.8)` returns `2.0`, and `trunc(-2.8)` returns `-2.0`
-* `func round(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the integral value that is nearest to x, with halfway cases rounded away from zero. For example, `round(2.8)` returns `3.0`, `round(2.3)` returns `2.0`, `round(-2.8)` returns `-3.0`, `round(-2.3)` returns `-2.0`.
-* `func lround(x:T):long;` where T can be `float`, `double`, or `ldouble`. It is a similar function to `round` except for the return type is a 64-bit integer.
-* `func llround(x:T):llong;` where T can be `float`, `double`, or `ldouble`. It is a similar function to `round` except for the return type is a 128-bit integer.
-* `func remainder(x,y:T):llong;` where T can be `float`, `double`, or `ldouble`. It returns the floating-point remainder of x/y, which is rounded to nearest. For example, `remainder(5.3, 2)` returns `-0.7`, and `remainder(18.5, 4.2)` returns `1.7`.
-* `func fmod(x,y:T):llong;` where T can be `float`, `double`, or `ldouble`. It is a similar function to `remainder` and returns the same but with the quotient rounded to the nearest integer, instead of being truncated.  For example, `fmod(5.3, 2)` returns `1.3`, and `fmod(18.5, 4.2)` returns `1.7`.
-* `func div(x,y:T): (quot, rem:T);` where T can be `int`, `long`, or `llong`. It computes both the quotient and the remainder of the division of the numerator x by the denominator y.
-* `func sqrt(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the square root of x.
-* `func cbrt(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the cubic root of x.
-* `func exp(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the base-e exponential function of x, which is e raised to the power x: e<sup>x</sup>.
-* `func pow(x, y:T):T;` where T can be `float`, `double`, or `ldouble`. It returns base `x` raised to the power exponent `y`: x<sup>y</sup>.
-* `func hypot(x, y:T):T;` where T can be `float`, `double`, or `ldouble`. It returns  the hypotenuse of a right-angled triangle whose legs are `x` and `y`, i.e. the square root of (x<sup>2</sup>+y<sup>2</sup>).
-* `func log(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the natural logarithm of x.
-* `func log10(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the common (base-10) logarithm of x.
-* `func erf(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the error function of x (2/√π)⎰<sub><sub>0</sub></sub><sup><sup>x</sup></sup>e<sup>-t<sup>2</sup></sup>dt)..
-* `func erfc(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the complementary error function of x (1 - 2/√π)⎰<sub><sub>0</sub></sub><sup><sup>x</sup></sup>e<sup>-t<sup>2</sup></sup>dt).
-* `func tgamma(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the gamma function of x.
-* `func lgamma(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the natural logarithm of the absolute value of the gamma function of x.
-* `func log(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns .
+* **func abs(x:T):T;** where T can be `int`, `long`, `llong`, `float`, `double`, or `ldouble`. It Returns the absolute value of x, i.e. |x|. For example, `abs(-2.8)` returns `2.8`, and `abs(-8)` returns `8`
+* **func floor(x:T):T;** where T can be `float`, `double`, or `ldouble`. It rounds x downward, returning the largest integral value that is not greater than x. For example, `floor(2.8)` returns `2.0`, and `floor(-2.8)` returns `-3.0`
+* **func ceil(x:T):T;** where T can be `float`, `double`, or `ldouble`. It rounds x upward, returning the smallest integral value that is not less than x. For example, `ceil(2.8)` returns `3.0`, and `ceil(-2.8)` returns `-2.0`
+* **func trunc(x:T):T;** where T can be `float`, `double`, or `ldouble`. It rounds x toward zero, returning the nearest integral value that is not larger in magnitude than x. For example, `trunc(2.8)` returns `2.0`, and `trunc(-2.8)` returns `-2.0`
+* **func round(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the integral value that is nearest to x, with halfway cases rounded away from zero. For example, `round(2.8)` returns `3.0`, `round(2.3)` returns `2.0`, `round(-2.8)` returns `-3.0`, `round(-2.3)` returns `-2.0`.
+* **func lround(x:T):long;** where T can be `float`, `double`, or `ldouble`. It is a similar function to `round` except for the return type is a 64-bit integer.
+* **func llround(x:T):llong;** where T can be `float`, `double`, or `ldouble`. It is a similar function to `round` except for the return type is a 128-bit integer.
+* **func remainder(x,y:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the floating-point remainder of x/y, which is rounded to nearest. For example, `remainder(5.3, 2)** returns `-0.7`, and `remainder(18.5, 4.2)` returns `1.7`.
+* **func fmod(x,y:T):T;** where T can be `float`, `double`, or `ldouble`. It is a similar function to `remainder` and returns the same but with the quotient rounded to the nearest integer, instead of being truncated.  For example, `fmod(5.3, 2)` returns `1.3`, and `fmod(18.5, 4.2)` returns `1.7`.
+* **func div(x,y:T): (quot, rem:T);** where T can be `int`, `long`, or `llong`. It computes both the quotient and the remainder of the division of the numerator x by the denominator y.
+
+**Exponential and logarithmic functions**
+* **func sqrt(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the square root of x.
+* **func cbrt(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the cubic root of x.
+* **func exp(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the base-e exponential function of x, which is e raised to the power x: e<sup>x</sup>.
+* **func pow(x, y:T):T;** where T can be `float`, `double`, or `ldouble`. It returns base `x` raised to the power exponent `y`: x<sup>y</sup>.
+* **func hypot(x, y:T):T;** where T can be `float`, `double`, or `ldouble`. It returns  the hypotenuse of a right-angled triangle whose legs are `x` and `y`, i.e. the square root of (x<sup>2</sup>+y<sup>2</sup>).
+* **func log(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the natural logarithm of x.
+* **func log10(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the common (base-10) logarithm of x.
+
+**Error functions**
+* **func erf(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the error function of x: 2/√π)⎰<sub><sub>0</sub></sub><sup><sup>x</sup></sup>e<sup>-t<sup>2</sup></sup>dt.
+* **func erfc(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the complementary error function of x: 1 - 2/√π)⎰<sub><sub>0</sub></sub><sup><sup>x</sup></sup>e<sup>-t<sup>2</sup></sup>dt.
+* **func tgamma(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the gamma function of x.
+* **func lgamma(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the natural logarithm of the absolute value of the gamma function of x.
 
 **Trigonometric functions**
-* `func sin(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the sine of an angle of x radians.
-* `func cos(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the cosine of an angle of x radians.
-* `func tan(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the tangent of an angle of x radians.
-* `func asin(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the principal value of the arc sine of x, expressed in radians.
-* `func acos(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the principal value of the arc cosine of x, expressed in radians.
-* `func atan(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the principal value of the arc tangent of x, expressed in radians.
-* `func atan(y:T)over(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the principal value of the arc tangent of y/x, expressed in radians.
+* **func sin(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the sine of an angle of x radians.
+* **func cos(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the cosine of an angle of x radians.
+* **func tan(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the tangent of an angle of x radians.
+* **func asin(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the principal value of the arc sine of x, expressed in radians.
+* **func acos(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the principal value of the arc cosine of x, expressed in radians.
+* **func atan(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the principal value of the arc tangent of x, expressed in radians.
+* **func atan(y:T)over(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the principal value of the arc tangent of y/x, expressed in radians.
 
 **Hyperbolic functions**
-* `func sinh(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the hyperbolic sine of x.
-* `func cosh(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the hyperbolic cpsine of x.
-* `func tanh(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the hyperbolic tangent of x.
-* `func asinh(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the nonnegative area hyperbolic sine of x.
-* `func acosh(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the nonnegative area hyperbolic cosine of x.
-* `func atanh(x:T):T;` where T can be `float`, `double`, or `ldouble`. It returns the nonnegative area hyperbolic tangent of x.
+* **func sinh(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the hyperbolic sine of x.
+* **func cosh(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the hyperbolic cpsine of x.
+* **func tanh(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the hyperbolic tangent of x.
+* **func asinh(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the nonnegative area hyperbolic sine of x.
+* **func acosh(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the nonnegative area hyperbolic cosine of x.
+* **func atanh(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the nonnegative area hyperbolic tangent of x.
 
