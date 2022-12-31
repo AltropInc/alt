@@ -53,8 +53,10 @@ The member function `<=>` defined in the `comparable` interface is a [three-way 
 * x > y	  ―― returns true if x is greater than y, false otherwise.
 * x <= y  ―― returns true if x is less than or equal to y, false otherwise.
 * x >= y  ―― returns true if x is greater than or equal to y, false otherwise.
-* x == y  ―― returns if x is equal to y, false otherwise.
-* x != y  ―― returns if x is not equal to y, false otherwise.
+* x == y  ―― returns true if x is equal to y, false otherwise.
+* x != y  ―― returns true if x is not equal to y, false otherwise.
+* x <+> y  ―― returns x if x is greater than to y, otherwise returns y.
+* x <-> y  ―― returns x if x is smaller than to y, otherwise returns y.
 
 In any class derived from the `comparable` interface, you do not need to provide a member function for any two-way comparison. Whenever a two-way comparison operator is used, it is automatically translated to the following three-way comparison:
 * x < y	  ⟶  x<=>y < 0
@@ -63,6 +65,8 @@ In any class derived from the `comparable` interface, you do not need to provide
 * x >= y  ⟶  x<=>y >= 0
 * x == y  ⟶  x<=>y == 0
 * x != y  ⟶  x<=>y != 0
+* x <+> y  ⟶  x<=>y > 0 ? x : y
+* x <-> y  ⟶  x<=>y < 0 ? x : y
 
 Here is the example  of using two-way comparisons:
 ```altro
@@ -76,6 +80,7 @@ class Person is comparable
 s1 := Person("John", 18);
 s2 := Person("Mary", 17);
 b := s1 > s2;      // this is translated to s1<=>s2 > 0
+s := s1 <+> s2;    // this is translated to s1<=>s2 > 0 ? s1 : s2
 ```
 Certainly，you can provide a member function for two-way comparison to prevent from converting it to a three-way comparison:
 ```altro
@@ -105,13 +110,19 @@ Note that member functions used for comparisons using `ownerclass` for the type 
 ```altro
 4 > 4.2
 ```
-The owner (integer 4) will be promoted to `double` before the expression is executed. And the result of the execution is `false`. Consider another eample:
+The owner (integer 4) will be promoted to `double` before the expression is executed. And the result of the execution is `false`. In the following eample:
 ```altro
 x: int = -4;
 y: uint = 150;
 y_is_greater_than_y := y > x;
 ```
-Here in the expression `x+y`, both `x` and `y` are promoted to int, and the result will be true. If we do not do the type promotion and compare the value bits of y and x directly, the result would be false.
+In the expression `y > x`, both `x` and `y` are promoted to int, and the result will be true. If we do not do the type promotion and compare the value bits of y and x directly, the result would be false. Consider another eample:
+```altro
+x: int = 4;
+y: double = 4.5;
+max_of_xy := x <+> y;
+```
+In the expression `x <+> y`, both `x` and `y` are promoted to double, and the `max_of_xy` gets the value `4.5`.
 
 Here are the numeric type promotion rules for comparison operation:
 
