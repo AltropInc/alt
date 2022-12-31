@@ -21,6 +21,7 @@ class Person is comparable
     name: string;
     age: int;
     final func <=> (other: Person): int { age<=>other.age }
+    ctor(n:string; a: int) { name=n; age=a }
 }
 ```
 Here `int` is a builtin type that implements the comparable interface so that you can use `age<=>other.age` for ordering people based on their ages. Note that the overridden function `<=>` is final. That means the method of ordering people is final, no different ordering method can be provided further in any derived class from `Person`. If you do not want to fix the ordering method in the class `Person`, you can implement a comparing method without overriding the one defined in the `comparable` class interface:
@@ -29,19 +30,20 @@ class Person is comparable
 {
     name: string;
     age: int;
-    func <=> (other: Person): int { age<=>other.age }
+    func <=> (other: Person): int { age<=>other.age }   // func <=> is not final and can be overriden in a derived class
+    ctor(n:string; a: int) { name=n; age=a }
 }
 ```
-This one does not override the deferred function in the `comparable` interface because the signature `(other: Person)` does not match the signature `(other: ownerclass)` if the class `Person` is not sealed or the member function itself is not final (For more discussion, see [ownerclass](SelfAndOwner.md). You can provide the final version in a derived class of `Person`:
+When the class `Person` is not sealed or the member function itself is not final, the function `<=>` defined here does not override the deferred function `<=>` defined in the `comparable` interface because the signature `(other: Person)` cannot not match the signature `(other: ownerclass)` (For more discussion, see [ownerclass](SelfAndOwner.md). You can provide the final version in a derived class of `Person`:
 ```altro
 class Student is Person
 {
     grade: int;
     final func <=> (other: Student): int
     {
-        if (grade==other.grade) return owner.Person::<=>(other);  // call the function defined in Person
-                                                                  // if they are in the same grade
-        return grade<=>other.grade;                               // otherwise the grade dominates the ordering
+        if (grade==other.grade) return owner.Person::<=>(other);  // Call the function defined in Person
+                                                                  // if they are in the same grade.
+        return grade<=>other.grade;                               // Otherwise the grade dominates the ordering
     }
 }
 ```
@@ -55,6 +57,8 @@ The member function `<=>` defined in the `comparable` interface is a [three-way 
 * x >= y  ―― returns true if x is greater than or equal to y, false otherwise.
 * x == y  ―― returns true if x is equal to y, false otherwise.
 * x != y  ―― returns true if x is not equal to y, false otherwise.
+
+Or we use the following two-way comparisons to get the maximum or minimum value from the two:
 * x <+> y  ―― returns x if x is greater than to y, otherwise returns y.
 * x <-> y  ―― returns x if x is smaller than to y, otherwise returns y.
 
