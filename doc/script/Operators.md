@@ -200,7 +200,7 @@ Operator precedence, also referred as [order of operations](https://en.wikipedia
 | Assignment           | 12     |
 | Sequencing           | 13     |
 
-All user defined non-prefix operators has the precedence number 12.
+All user defined non-prefix operators has the precedence number 11.
 
 ## Operator Associativity
 
