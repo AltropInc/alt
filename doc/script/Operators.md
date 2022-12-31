@@ -115,9 +115,7 @@ Because `..` is a separator, `>..<` contains three operator sequences: `>', '..'
 
 ## Built-in Operators
 
-Altro provides a complete collection of built-in operators across all of its primitive types in numeric, enum, enumset, character, etc.
-
-The following builtin operators are provided with certain properties regarding to precedence and associativity:
+Altro provides a complete collection of built-in operators across all of its primitive types in numeric, enum, enumset, character, etc. Built-in operators have its predefined input/output interface, precedence and associativity. Builtin operators are listed as below:
 
 | Op     | unicode  | Name             | category      | precedence    | associativity    | is lvaue operator | returns lvalue  |
 |:------ |:-------- |:---------------- |:------------- |:------------- |:--------------   | ----------------- | --------------|
@@ -129,6 +127,9 @@ The following builtin operators are provided with certain properties regarding t
 | <      |          | less             | comparible    | Relation   | left             | false             | false         |
 | >=     | ≥        | greater or equal | comparible    | Relation   | left             | false             | false         |
 | <=     | ≤        | less or equal    | comparible    | Relation   | left             | false             | false         |
+| <+>    |          | max              | comparible    | shift      | left             | false             | false         |
+| <->    |          | min              | comparible    | shift      | left             | false             | false         |
+| <=>    |          | threeway compare | comparible    | Relation   | left             | false             | false         |
 | ..     | ‥        | between          | comparible    | Addition   | left             | false             | false         |
 | +      |          | add              | addable       | Addition   | left             | false             | false         |
 | -      |          | substract        | addable       | Addition   | left             | false             | false         |
@@ -178,10 +179,9 @@ The following builtin operators are provided with certain properties regarding t
 | >>=    |          | L-hift assign    | shiftable     | Assignment  | right            | true             | true         |
 | <<=    |          | R-hift assign    | shiftable     | Assignment  | right            | true             | true         |
 
-Note that `.` has special meaning and cannot be used as an operator character in a function name. They are listed here just for lexcial processing purpose on [expressions](Expressions.md).
+Note that `.` has special meaning and cannot be used as an operator character in a function name. They are listed here just for lexcial processing purpose in [expressions](Expressions.md).
 
 ## Operator Precedence
-==, !=, <, >, >=, <=, , !,
 Operator precedence, also referred as [order of operations](https://en.wikipedia.org/wiki/Order_of_operations), determines which operations to perform first in order to evaluate a given expression. Operators with higher precedence become the operands of operators with lower precedence. For example, multiplication is granted a higher precedence than addition. Thus, the expression 3 + 4 * 2 is interpreted as 3 + (4 × 2), not (3 + 4) * 2. Each built-in operator is assigned with a precedence number. The smaller number indicates the higher precedence.
 
 | Precedence Group     | Order  |
