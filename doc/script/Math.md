@@ -68,14 +68,10 @@ These constants are in double precision. If you want any constant in a specific 
 The following functions are provided in the 'math` class:
 
 **Common arithmetic functions**
-* **func abs(x:T):T;** where T can be `int`, `long`, `llong`, `float`, `double`, or `ldouble`. It returns the absolute value of x, i.e. |x|. For example, `abs(-2.8)` returns `2.8`, and `abs(-8)` returns `8`
-* **func copysign(x,y:T):T;** where T can be `int`, `long`, `llong`, `float`, `double`, or `ldouble`. It returns a value with the magnitude of x and the sign of y. For example, `copysign(2.8, -3)` returns `-2.8`, and `copysign(-8, 4)` returns `8`
-* **func max(x,y:T):T;** where T can be `int`, `long`, `llong`, `float`, `double`, or `ldouble`. It returns the larger of its arguments: either x or y. For example, `max(2.8, 2)` returns `2.8`, and `max(-3.0, -3.2)` returns `-3.0`. Note that the second parameter `y` must be convertable to the type of the first paramter `x`. Therefore, `max(2, 2.2)` is considered an error because a double type cannot be implicitly converted to a integer.
-* **func min(x,y:T):T;** where T can be `int`, `long`, `llong`, `float`, `double`, or `ldouble`. It returns the smaller of its arguments: either x or y. For example, `min(2.8, 2)` returns `2.0`, and min(-3.0, -3.2)` returns `-3.2`. See comments about `max`.
-* * **func mid(x,y:T):T;** where T can be `float`, `double`, or `ldouble`. It returns  the midpoint between x and y. For example, `mid(2, 4)` returns `3`, and min(-2, -3)` returns `-2.5`.
+* **func abs(x:T):T;** where T can be `tiny`, `short`, `int`, `long`, `llong`, `float`, `double`, or `ldouble`. It returns the absolute value of x, i.e. |x|. For example, `abs(-2.8)` returns `2.8`, and `abs(-8s)` returns `8s`
+* **func copysign(x,y:T):T;** where T can be `float`, `double`, or `ldouble`. It returns a value with the magnitude of x and the sign of y. For example, `copysign(2.8, -3)` returns `-2.8`, and `copysign(-8, 4)` returns `8.0`
 * **func fma(x,y,z:T):T;** where T can be `int`, `long`, `llong`, `float`, `double`, or `ldouble`. It returns the value of x\*y+z. For example, `fma(3,10,5)` returns `35`.
-* **func lerp(x,y,t:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the linear interpolation between x and y: `x+t*(y-x)`. For example, `lerp(5, 10, 0.5)` returns `7.5`.
-* **func nextafter(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the  the next representable value after x in the direction of y. For example, `nextafter(0.0,1.0))` returns first representable double value greater than zero (4.940656e-324).
+* **func nextafter(x, y:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the  the next representable value after x in the direction of y. For example, `nextafter(0.0,1.0))` returns first representable double value greater than zero (4.940656e-324).
 * **func floor(x:T):T;** where T can be `float`, `double`, or `ldouble`. It rounds x downward, returning the largest integral value that is not greater than x. For example, `floor(2.8)` returns `2.0`, and `floor(-2.8)` returns `-3.0`
 * **func ceil(x:T):T;** where T can be `float`, `double`, or `ldouble`. It rounds x upward, returning the smallest integral value that is not less than x. For example, `ceil(2.8)` returns `3.0`, and `ceil(-2.8)` returns `-2.0`
 * **func trunc(x:T):T;** where T can be `float`, `double`, or `ldouble`. It rounds x toward zero, returning the nearest integral value that is not larger in magnitude than x. For example, `trunc(2.8)` returns `2.0`, and `trunc(-2.8)` returns `-2.0`
@@ -94,7 +90,8 @@ The following functions are provided in the 'math` class:
 * **func cbrt(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the cubic root of x.
 * **func exp(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the base-e exponential function of x, which is e raised to the power x: e<sup>x</sup>.
 * **func pow(x, y:T):T;** where T can be `float`, `double`, or `ldouble`. It returns base `x` raised to the power exponent `y`: x<sup>y</sup>.
-* **func hypot(x, y:T):T;** where T can be `float`, `double`, or `ldouble`. It returns  the hypotenuse of a right-angled triangle whose legs are `x` and `y`, i.e. the square root of (x<sup>2</sup>+y<sup>2</sup>).
+* **func hypot(x, y:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the hypotenuse of a right-angled triangle whose legs are `x` and `y`, i.e. the square root of (x<sup>2</sup>+y<sup>2</sup>).
+* **func hypot(x, y, z:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the space diagonal of a cuboid whose edges are `x`, `y` and `z`, i.e. the square root of (x<sup>2</sup>+y<sup>2</sup>+z<sup>2</sup>).
 * **func log(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the natural logarithm of x.
 * **func log10(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the common (base-10) logarithm of x.
 * **func frexp(x:T): (significand:T; exp:int);** where T can be `float`, `double`, or `ldouble`. It breaks the floating point number x into its binary significand (a floating point with an absolute value between 0.5(included) and 1.0(excluded)) and an integral exponent for 2, such that: x = significand * 2<sup>exp</sup>.
