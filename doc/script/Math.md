@@ -80,9 +80,9 @@ The following functions are provided in the 'math` class:
 * **func llround(x:T):llong;** where T can be `float`, `double`, or `ldouble`. It is a similar function to `round` except for the return type is a 128-bit integer.
 * **func remainder(x,y:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the floating-point remainder of x/y, which is rounded to nearest. For example, `remainder(5.3, 2)** returns `-0.7`, and `remainder(18.5, 4.2)` returns `1.7`.
 * **func fmod(x,y:T):T;** where T can be `float`, `double`, or `ldouble`. It is a similar function to `remainder` and returns the same but with the quotient rounded to the nearest integer, instead of being truncated.  For example, `fmod(5.3, 2)` returns `1.3`, and `fmod(18.5, 4.2)` returns `1.7`.
-* **func div(x,y:T): (quot, rem:T);** where T can be `int`, `long`, or `llong`. It computes both the quotient and the remainder of the division of the numerator x by the denominator y.
-* **func gcd(x,y:T): T;** where T can be `int`, `long`, or `llong`. It returns the greatest common divisor of the integers x and y.
-* **func lcm(x,y:T): T;** where T can be `int`, `long`, or `llong`. It returns least common multiple of the integers x and y.
+* **func div(x,y:T): (quot, rem:T);** where T can be `int`, `long`, or `llong`. It computes both the quotient and the remainder of the division of the numerator x by the denominator y. For example, in declaration `quot,rem:=div(9, 5)`, the expression `div(9, 5)` returns `(1,4)`, `quot` and `rem` get `1` and `4` respectively.
+* **func gcd(x,y:T): T;** where T can be `uint` or `ulong`. It returns the greatest common divisor of the integers x and y. Note that any input value of a signed integer  or an integer type with size smaller than 32-bit is converted to either `uint` or `ulong`. Therefore, the output type of `gcd` will be either `uint` or `ulong`. For example, the output of `gcd(4t, 5l)` is `20ul`, an integer value of the type `ulong`. `gcd` for 128-bit integers is currently not supported.
+* **func lcm(x,y:T): T;** where T can be `uint` or `ulong`. It returns least common multiple of the integers x and y. See notes on `gcd`.
 * **func random(x,y:T): T;** where T can be any integral type. It generates a random integer in the closed range \[x, y].
 
 **Exponential and logarithmic functions**
