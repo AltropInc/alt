@@ -80,7 +80,7 @@ The following functions are provided in the 'math` class:
 * **func llround(x:T):llong;** where T can be `float`, `double`, or `ldouble`. It is a similar function to `round` except for the return type is a 128-bit integer.
 * **func remainder(x,y:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the floating-point remainder of x/y, which is rounded to nearest. For example, `remainder(5.3, 2)** returns `-0.7`, and `remainder(18.5, 4.2)` returns `1.7`.
 * **func fmod(x,y:T):T;** where T can be `float`, `double`, or `ldouble`. It is a similar function to `remainder` and returns the same but with the quotient rounded to the nearest integer, instead of being truncated.  For example, `fmod(5.3, 2)` returns `1.3`, and `fmod(18.5, 4.2)` returns `1.7`.
-* **func div(x,y:T): (quot, rem:T);** where T can be `int`, `long`, or `llong`. It computes both the quotient and the remainder of the division of the numerator x by the denominator y. For example, in declaration `quot,rem:=div(9, 5)`, the expression `div(9, 5)` returns `(1,4)`, `quot` and `rem` get `1` and `4` respectively.
+* **func div(x,y:T): (T;T);** where T can be `int`, `long`, or `llong`. It computes both the quotient and the remainder of the division of the numerator x by the denominator y. For example, in declaration `quot,rem:=div(9, 5)`, the expression `div(9, 5)` returns `(1,4)`, `quot` and `rem` get `1` and `4` respectively.
 * **func gcd(x,y:T): T;** where T can be `uint` or `ulong`. It returns the greatest common divisor of the integers x and y. Note that any input value of a signed integer  or an integer type with size smaller than 32-bit is converted to either `uint` or `ulong`. Therefore, the output type of `gcd` will be either `uint` or `ulong`. For example, the output of `gcd(4t, 5l)` is `20ul`, an integer value of the type `ulong`. `gcd` for 128-bit integers is currently not supported.
 * **func lcm(x,y:T): T;** where T can be `uint` or `ulong`. It returns least common multiple of the integers x and y. See notes on `gcd`.
 * **func random(x,y:T): T;** where T can be any integral type. It generates a random integer in the closed range \[x, y].
@@ -94,9 +94,9 @@ The following functions are provided in the 'math` class:
 * **func hypot(x, y, z:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the space diagonal of a cuboid whose edges are `x`, `y` and `z`, i.e. the square root of (x<sup>2</sup>+y<sup>2</sup>+z<sup>2</sup>).
 * **func log(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the natural logarithm of x.
 * **func log10(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the common (base-10) logarithm of x.
-* **func frexp(x:T): (significand:T; exp:int);** where T can be `float`, `double`, or `ldouble`. It breaks the floating point number x into its binary significand (a floating point with an absolute value between 0.5(included) and 1.0(excluded)) and an integral exponent for 2, such that: x = significand * 2<sup>exp</sup>.
+* **func frexp(x:T):(T;int);** where T can be `float`, `double`, or `ldouble`. It breaks the floating point number x into its binary significand (a floating point with an absolute value between 0.5(included) and 1.0(excluded)) and an integral exponent for 2, such that: x = significand * 2<sup>exp</sup>.
 * **func ldexp(x:T; exp:int):T;** where T can be `float`, `double`, or `ldouble`. It returns the result of multiplying x (the significand) by 2 raised to the power of exp (the exponent), such that: ldexp(x) = x * 2<sup>exp</sup>.
-* **func mod(x:T): (i, f:int);** where T can be `float`, `double`, or `ldouble`. It breaks x into an integral (i) and a fractional part (f).
+* **func modf(x:T): (T;T);** where T can be `float`, `double`, or `ldouble`. It breaks x into (integral part, fractional part). For example, `mod(3.14)` returns (3.0, 0.14).
 
 **Error functions**
 * **func erf(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the error function of x: 2/√π)⎰<sub><sub>0</sub></sub><sup><sup>x</sup></sup>e<sup>-t<sup>2</sup></sup>dt.
@@ -112,8 +112,6 @@ The following functions are provided in the 'math` class:
 * **func acos(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the principal value of the arc cosine of x, expressed in radians.
 * **func atan(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the principal value of the arc tangent of x, expressed in radians.
 * **func atan(y,x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the angle in radians in the plane between the positive x-axis and the ray from (0, 0) to the point (x, y).
-* **func to_radians(x:T):T;** where T can be `float`, `double`, or `ldouble`. It converts the angle in radians to degrees.
-* **func to_degrees(x:T):T;** where T can be `float`, `double`, or `ldouble`. It converts the angle in degrees to radians.
 
 **Hyperbolic functions**
 * **func sinh(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the hyperbolic sine of x.
