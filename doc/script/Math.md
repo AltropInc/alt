@@ -83,7 +83,9 @@ The following functions are provided in the 'math` class:
 * **func div(x,y:T): (T;T);** where T can be `int`, `long`, or `llong`. It computes both the quotient and the remainder of the division of the numerator x by the denominator y. For example, in declaration `quot,rem:=div(9, 5)`, the expression `div(9, 5)` returns `(1,4)`, `quot` and `rem` get `1` and `4` respectively.
 * **func gcd(x,y:T): T;** where T can be `uint` or `ulong`. It returns the greatest common divisor of the integers x and y. Note that any input value of a signed integer  or an integer type with size smaller than 32-bit is converted to either `uint` or `ulong`. Therefore, the output type of `gcd` will be either `uint` or `ulong`. For example, the output of `gcd(4t, 5l)` is `20ul`, an integer value of the type `ulong`. `gcd` for 128-bit integers is currently not supported.
 * **func lcm(x,y:T): T;** where T can be `uint` or `ulong`. It returns least common multiple of the integers x and y. See notes on `gcd`.
-* **func random(x,y:T): T;** where T can be any integral type. It generates a random integer in the closed range \[x, y].
+* **func random_T(): T;** where T can be `utiny`, `tiny`, `ushort`, `short`, `uint`, or `int`. It generates an uniformaly-distributed random integer in the closed range \[T.min_val, T.max_val]. For example, expression `random_utiny()` returns a random integer between \[0, 255], and `random_tiny()` returns a random integer between \[-128, 127].
+* **func random(x,y:T): T;** where T can be `int`, `float`, or `double`. It generates an uniformaly-distributed random number in the closed range \[x, y].
+* **func random_normal(μ,σ:T): T;** where T can be `int`, `float`, or `double`. It generates a random number in a [normal-distribution](https://en.wikipedia.org/wiki/Normal_distribution) at the [mean](https://en.wikipedia.org/wiki/Mean) given by `μ` with a [standard deviation](https://en.wikipedia.org/wiki/Standard_deviation) given by `σ`.
 
 **Exponential and logarithmic functions**
 * **func sqrt(x:T):T;** where T can be `float`, `double`, or `ldouble`. It returns the square root of x.
