@@ -18,10 +18,23 @@ A facet provides a common place for a set of aspects (punctuations, date format,
 ## Set Application Locale
 
 The function `set_app_locale` provided in the locale class is typically called during the application start to set the appropriate locale for the entire application:
-```alreto
+```altro
 func set_app_locale(language: string; region: string=null);
 ```
 This function will not only affect all locale-sensitive operations to be called in future, but will also affect the existing locale-sensitive objects such as text in shown buttons and menus, locale-sensitive images and icons in the graphic user interface.
+
+Here are some examples to call set_app_locale:
+```altro
+set_app_locale("de");
+set_app_locale("de", "DE");
+set_app_locale("German", "Deutschland");
+set_app_locale("Deutsch", "Österreich");
+set_app_locale("en:English:English:LTR", "LC:Saint Lucia:Saint Lucia:001");
+```
+The last call is used only when you want to add a new locale that is not provided in the existing system. For the language string, you can have:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*language-code*:*language-name*:*language-native-name*:*language-orientation*<sub>opt</sub><br>
+And for the region string, you can have:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*region-code*:*region-name*:*region-native-name*:*facet-name*<sub>opt</sub><br>
 
 Altro will perform localization for the following locale-sensitive operations:
 * string compare, hash, and transform
@@ -92,21 +105,20 @@ To provide language specific punctuations and more specific time and date format
 ```
 To provide graphic text item translations, add a translation dictionary file in the application's "locale" folder. For example, to add text translation for the ("zh", "Hans") facet, put the "zh_Hans_dic.txt" file under the application's "locale/zh_Hans/" folder:
 ```
-MenuNew:			"新建";
-MenuOpen:		  "打开";
-MenuReload:		"恢复";
-MenuClose:		"关闭";
-MenuCloseAll:	"全部关闭";
-MenuSave:		  "保存";
-MenuSaveAs:		"另存为";
-MenuSaveCopy: "保存副本";
-MenuSaveAll:  "全部保存";
+MenuNew:        "新建";
+MenuOpen:       "打开";
+MenuReload:     "恢复";
+MenuClose:      "关闭";
+MenuCloseAll:   "关闭所有";
+MenuSave:       "保存";
+MenuSaveAs:     "另存为";
+MenuSaveCopy:   "保存副本";
+MenuSaveAll:    "保存所有";
 ...
 ```
-This translation will be used by all regions for Simplified Chinese. If there is any difference between two regions that shares the same facet, an override facet can be placed in the region subfolder, for example, a translation dictionary "zh_SG_dic.txt" can be put in "locale/zh_SG/" folder for only items that need to be translated in a different way.
+The above translation will be used by all regions for Simplified Chinese. If there is any difference between two regions that shares the same facet, an override facet can be placed in the region subfolder, for example, a translation dictionary "zh_SG_dic.txt" can be put in "locale/zh_SG/" folder for only items that need to be translated in a different way for Singapore reagion.
 
 All locale-sensitive sound, images, and icons should also be placed in the appropriate subfolders in the application "locale' folder. A locale package is typically distributed separately with the application itself.
-
 
 
 
