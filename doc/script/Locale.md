@@ -27,7 +27,7 @@ Here are some examples to call set_app_locale:
 ```altro
 set_app_locale("de");
 set_app_locale("de", "DE");
-set_app_locale("German", "Deutschland");
+set_app_locale("German", "Germany");
 set_app_locale("Deutsch", "Österreich");
 set_app_locale("en:English:English:LTR", "LC:Saint Lucia:Saint Lucia:001");
 ```
