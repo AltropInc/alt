@@ -47,7 +47,7 @@ Application developer can provide localization by providing facet files in the a
 * more specific time and date formats
 * graphic item translations
 
-To provide language specific punctuations and more specific time and date formats, add a facet jason file in the application's "locale" folder. For example, to add a ("zh", "Hans") facet, put the following "zh_Hans.json" file under the application's "locale/zh_Hans/" folder:
+To provide language specific punctuations and more specific time and date formats, add a facet jason file in the application's "locale" folder. For example, to add a ("zh", "Hans") facet, put the following "facet.json" file under the "altro_system_path/locale/zh_Hans/" folder:
 ```json
 {
     "id": "zh_Hans",
@@ -103,7 +103,7 @@ To provide language specific punctuations and more specific time and date format
     }
 }
 ```
-To provide graphic text item translations, add a translation dictionary file in the application's "locale" folder. For example, to add text translation for the ("zh", "Hans") facet, put the "zh_Hans_dic.txt" file under the application's "locale/zh_Hans/" folder:
+Locale-sensitive text translations is typically application specific, and the translation dictionary file are added in the application's "locale" folder. For example, to add text translation for the ("zh", "Hans") facet, put the "dic.txt" file under the "altro_application_path/locale/zh_Hans/" folder:
 ```
 MenuNew:        "新建";
 MenuOpen:       "打开";
@@ -116,7 +116,7 @@ MenuSaveCopy:   "保存副本";
 MenuSaveAll:    "保存所有";
 ...
 ```
-The above translation will be used by all regions for Simplified Chinese. If there is any difference between two regions that shares the same facet, an override facet can be placed in the region subfolder, for example, a translation dictionary "zh_SG_dic.txt" can be put in "locale/zh_SG/" folder for only items that need to be translated in a different way for Singapore reagion.
+The above translation will be used by all regions for Simplified Chinese. If there is any difference between two regions that shares the same facet, an override facet can be placed in the region subfolder, for example, a translation dictionary "zh_SG_dic.txt" can be put in "locale/zh_SG/" folder for only items that need to be translated in a different way for Singapore region. The translation looks up the region dictionary first, then the facet dictionary, and finally the language dictionary.
 
 All locale-sensitive sound, images, and icons should also be placed in the appropriate subfolders in the application "locale' folder. A locale package is typically distributed separately with the application itself.
 
