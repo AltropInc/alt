@@ -120,7 +120,25 @@ The above translation will be used by all regions for Simplified Chinese. If the
 
 All locale-sensitive sound, images, and icons should also be placed in the appropriate subfolders in the application "locale' folder. A locale package is typically distributed separately with the application itself.
 
+## Set Category Locale
 
+You can set locale for some special purpose in certain categories without affect the application locale setting. The locale change in a specific category only affects operations in that category. Locale are divided into five standard categories:
+| category     | operations affected                      |
+|:------------ |:-----------------------------------------|
+| numeric      |  numeric number format                   |
+| time         |  time and date format                    |
+| character    |  character attributes such as lower and upper cases, puctuations   |
+| monetary     |  currency symbol and price format        |
+| collate      |  string comparison, hash and transform   |
+
+Here are some example of numeric number format affected by category locale settings with different decimals and thousands separators:
+| locale                       |  numeric number       |
+|:---------------------------- |:----------------------|
+| default (without any locale) |  4294967295.34        |
+| en, US (English, US)         |  4,294,967,295.34     |
+| en, CA (English, Canadian)   |  4 294 967 295,340    |
+| de, DE (German, Germany)     |  4 294 967.295,340    |
+| it, IT (Italian, Itally)     |  4.294.967.295,340    |
 
 
 
