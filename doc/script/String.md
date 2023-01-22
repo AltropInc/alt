@@ -219,14 +219,24 @@ greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
 "Hello, World!".is_basic();    // returns true
 "Hello, 世界!".is_basic();     // returns false
 ```
-* `func n_chars (): int` --
+* `func count (): int` --
     returns number of characters contained in the string
-* `func n_chars (start: int; end: int =-1): int` --
+* `func count (start: int; end: int =-1): int` --
     returns number of characters between the start and the end indices. If end is not given, the defualt is -1, meaning to the end of the string
 ```altscript
-"Hello, 世界!".n_chars();     // returns 10
-"Hello, 世界!".n_chars(7);    // returns 3 for 3 characters "世界!"
+"Hello, 世界!".count();     // returns 10
+"Hello, 世界!".count(7);    // returns 3 for 3 characters "世界!", counts from the 7th character
 ```
+
+* `func width (): int` --
+    returns number of colum positions required to display the string in a fixed width font
+* `func width (start: int; end: int =-1): int` --
+    returns number of colum positions required to display the string between the start and the end indices in a fixed width font . If end is not given, the defualt is -1, meaning to the end of the string
+```altscript
+"Hello, 世界!".count();     // returns 12, one Chinese character requires two colum positions
+"Hello, 世界!".count(7);    // returns 5 for 3 characters "世界!"
+```
+
 * `func begin (): iterator` --
     returns the iterator points to the first character of the string. If the string is empty, it returns an invalid iterator.
 ```altscript
