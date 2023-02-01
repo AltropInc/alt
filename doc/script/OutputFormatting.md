@@ -75,8 +75,8 @@ The above expression specifies a formatter for print right-aligned contents in r
 ```alreo
 print([width=40, align=1, fill='─', color=1], 0.23456)
 ```
-The output on screen is
-<span style="color:red">─────────────────────────────────0.23456</span>
+The output on screen is<br>
+<span style="color:red">─────────────────────────────────0.23456</span><br>
 
 In addition to the typical form of `fromat_name=fromat_value`, a number of shorthands and aliases are also provided for readability and convenience. For instance, instead of using integer for color code, you can also use color name such as `red`, and `green`. Format values can be packed a specific string like Python output format. The following expressions give the same set of formatter values:
 ```altro
@@ -85,6 +85,105 @@ In addition to the typical form of `fromat_name=fromat_value`, a number of short
 [width=40, right, fill='.', red]
 [:.>40, red]
 ```
+### Format Shorthands
+
+**shorthands for colors**
+
+The following common color names can be used. The first occurence of the color name stands for the text color, and the second occurence of the color name stands for the background color. For example:
+```altro
+[red, white]
+```
+stands for red text with white background. Using shorthands `/color` or `/bcolor` to reset text color or background color to the default color used by the printing media. Here are the of common color names:
+| shorthand  | equivalents                                                        |
+|:---------- |:------------------------------------------------------------------ |
+| /color     | cancel text color, using default text color   |
+| /bcolor    | cancel background color, using default background color   |
+| black      | color=0 or bcolor=0    |
+| blue       | color=4 or bcolor=4 (blue)   |
+| bblue      | color=12 or bcolor=12 (birght blue)   |
+| bcyan      | color=14 or bcolor=14 (birght cyan)   |
+| bgreen     | color=10 or bcolor=10 (birght green)   |
+| bmagenta   | color=13 or bcolor=13 (birght magenta)   |
+| bred       | color=9 or bcolor=9 (birght red)   |
+| bwhite     | color=15 or bcolor=15 (birght white)   |
+| byellow    | color=11 or bcolor=11 (birght yellow)   |
+| cyan       | color=6 or bcolor=6 (cyan)   |
+| gray       | color=8 or bcolor=8 (gray)   |
+| green      | color=2 or bcolor=2 (green)   |
+| magenta    | color=5 or bcolor=5 (magenta)   |
+| red        | color=1 or bcolor=1 (red)   |
+| white      | color=7 or bcolor=7 (white)   |
+| yellow     | color=3 or bcolor=3 (yellow)   |
+
+**shorthands for text style**
+
+| shorthand  | equivalents                                                        |
+|:---------- |:------------------------------------------------------------------ |
+| b          | intense=1   |
+| /b         | intense=0   |
+| blink      | blink=1    |
+| /blink     | blink=0    |
+| bold       | intense=1   |
+| /bold      | intense=0   |
+| i          | italic=1  |
+| /i         | italic=0  |
+| italic     | italic=1  |
+| /italic    | italic=0  |
+| u          | underline=1  |
+| /u         | underline=0  |
+| underline  | underline=1  |
+| /underline | underline=0  |
+| uu         | underline=2 (double underline)  |
+| strike     | strike=1  |
+| /strike    | strike=0  |
+| overline   | overline=1  |
+| /overline  | overline=0  |
+| conceal    | conceal=1  |
+| /conceal   | conceal=0  |
+| reverse    | reverse=1  |
+| /reverse   | reverse=0  |
+
+**shorthands for fill and align**
+
+The following shorthands are provided for text alignment:
+
+| shorthand  | equivalents                                                        |
+|:---------- |:------------------------------------------------------------------ |
+| left       | align=0 (left)   |
+| right      | align=1 (right)   |
+| center     | align=2 (center)   |
+| internal   | align=3 (internal)   |
+
+You can also use the following format to specift a fill-and-align format:<br>
+\[\[\[*start*]*fill*]*align*]\[*width*]\[*end*]
+
+The *start* is an optional character put at the very beginning of the aligned and filled text, and the *end* is another optional character put at the end.
+
+The *width* is an integer for the minimum number of column width required for the output in this format. If the content exceeds the width, nothing is trimmed. Note that the width is not necessarily the number of characters because some characters may occupy two column spaces.
+
+The *fill* is an optional character to fill the space required for the minimum width. If the fill character is not given, space is assumed. If the fill character occupies two column spaces and the number of column spaces is an odd number, a space will be used between the filling and the text.
+
+The *align* is a single character that gives the alignment to use. It can have any of the values <, >, ^, or =. The meaning of these is as follows:
+* < – The text is left-justified in the field width. This is the default alignment.
+* > – The text is right-justified in the field width.
+* ^ – The text is centered in the field width. Any filling will be distributed evenly on the left and right sides of the value. If an odd number of padding characters is needed, the extra one will always be on the right.
+
+If the first character is immediately followed by one of the alignment characters, that first character is treated as the fill character to use. The fill and align values only make sense if you also specify a width value, although it is not an error to specify them without width.
+
+Here are example of using different fill-and-align format to print a number 1.23:
+```
+format     output
+─────────────────────────────────
+:*<10      1.23******
+:*>10      ******1.23
+:*^10      ***1.23***
+:|<10|     |1.23      |
+:|>10|     |      1.23|
+:|^10|     |   1.23   |
+```
+The start and the end characters are not counted in width.
+
+**shorthands for numeric values**
 
 
 
