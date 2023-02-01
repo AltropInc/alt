@@ -76,7 +76,7 @@ The above expression specifies a formatter for print right-aligned contents in r
 print([width=40, align=1, fill='─', color=1], 0.23456)
 ```
 The output on screen is
-<p style="color:red";>─────────────────────────────────0.23456</p>
+<span style="color:red">─────────────────────────────────0.23456</span>
 
 In addition to the typical form of `fromat_name=fromat_value`, a number of shorthands and aliases are also provided for readability and convenience. For instance, instead of using integer for color code, you can also use color name such as `red`, and `green`. Format values can be packed a specific string like Python output format. The following expressions give the same set of formatter values:
 ```altro
