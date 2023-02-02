@@ -39,7 +39,7 @@ A **formatter** is the specification of a printing format. It provides support f
 | name      | values  | Description                                                         |
 |:--------- |:------- |:-------------------------------------------------------------- |
 | base      |  0~3    | integer base: decimal(0), hexadecimal(1), octal(2), binay(3)             |
-| fbase     |  0~4    | floating number base: decimal(0), decimal(1), scientific(2), percentage(3), hexadecimal(4)             |
+| fbase     |  0~4    | floating number base: optimized(0), fixed point(1), scientific(2), percentage(3), hexadecimal(4)             |
 | precision |  int    | precision for printing floating number   |
 | sign      |  0~2    | show negative sign only(0)  show positive and negative sign(1), show positive sign as a space(2)|
 | locale    |  0~1    | no locale awareness(0)  locale awareness (1)                    |
@@ -78,12 +78,12 @@ print([width=40, align=1, fill='─', color=1], 0.23456)
 The output on screen is<br>
 <span style="color:red">─────────────────────────────────0.23456</span><br>
 
-In addition to the typical form of `fromat_name=fromat_value`, a number of shorthands and aliases are also provided for readability and convenience. For instance, instead of using integer for color code, you can also use color name such as `red`, and `green`. Format values can be packed a specific string like Python output format. The following expressions give the same set of formatter values:
+In addition to the typical form of `fromat_name=fromat_value`, a number of shorthands and aliases are also provided for readability and convenience. For instance, instead of using integer for color code, you can also use color name such as `red`, and `green`. Format values can be packed in a specific string like Python output format. The following expressions give the same set of formatter values:
 ```altro
-[width=40, align=1, fill='.', color=1]
-[width=40, align=right, fill='.', color=red]
-[width=40, right, fill='.', red]
-[:.>40, red]
+[width=40, align=1, fill='─', color=1]
+[width=40, align=right, fill='─', color=red]
+[width=40, right, fill='─', red]
+[:─>40, red]
 ```
 ### Format Shorthands
 
@@ -155,7 +155,7 @@ The following shorthands are provided for text alignment:
 | internal   | align=3 (internal)   |
 
 You can also use the following format to specift a fill-and-align format:<br>
-\[\[\[*start*]*fill*]*align*]\[*width*]\[*end*]
+:\[\[\[*start*]*fill*]*align*]\[*width*]\[*end*]
 
 The *start* is an optional character put at the very beginning of the aligned and filled text, and the *end* is another optional character put at the end.
 
@@ -164,8 +164,8 @@ The *width* is an integer for the minimum number of column width required for th
 The *fill* is an optional character to fill the space required for the minimum width. If the fill character is not given, space is assumed. If the fill character occupies two column spaces and the number of column spaces is an odd number, a space will be used between the filling and the text.
 
 The *align* is a single character that gives the alignment to use. It can have any of the values <, >, ^, or =. The meaning of these is as follows:
-* < – The text is left-justified in the field width. This is the default alignment.
-* > – The text is right-justified in the field width.
+* \< – The text is left-justified in the field width. This is the default alignment.
+* \> – The text is right-justified in the field width.
 * ^ – The text is centered in the field width. Any filling will be distributed evenly on the left and right sides of the value. If an odd number of padding characters is needed, the extra one will always be on the right.
 
 If the first character is immediately followed by one of the alignment characters, that first character is treated as the fill character to use. The fill and align values only make sense if you also specify a width value, although it is not an error to specify them without width.
@@ -185,5 +185,39 @@ The start and the end characters are not counted in width.
 
 **shorthands for numeric values**
 
+The following shorthands are provided for text numeric values:
 
+| shorthand  | equivalents                                                        |
+|:---------- |:------------------------------------------------------------------ |
+| dec        | base=0 (decimal)      |
+| hex        | base=1 (hexadecimal)  |
+| oct        | base=2 (octal)        |
+| bin        | base=3 (binay)        |
+| fopt       | fbase=0 (optimized format for floating point number)      |
+| fixed      | fbase=1 (fixed point format)  |
+| sci        | fbase=2 (scientific)        |
+| %          | fbase=3 (percentage)        |
 
+You can also use the following format to specift a fill-and-align format:<br>
+:\[*sign*]*#*]\[*0*]\[*width*]\[*prec*]\[*L*]\[*type*]
+
+The sign value specifies how the sign for an numeric value is to be printed. It can take the following options:
+
+* + – A sign should always be printed for both negative and non-negative values.
+* - – A sign should only be printed for negative values. This is the default.
+* (space) – A sign should be printed for negative values, and a space for non-negative values.
+
+The # character, if used, causes a decimal point character to always be printed, even if there is no fractional part. This does not apply to infinity and NaN values.
+
+The 0 character is only valid when also specifying a width value. If present it pads the field with 0 characters after any sign character and/or base indicator. The width value is used to give the minimum width for a numeric value. If the output value needs more characters than the specified width, it will be displayed in full, not truncated to the width.
+
+The *prec* value is formed by a decimal point followed by an integer to indicate the precision. The precision value is only valid for floating-point. It is used to determine how many digits after decimals should be printed.
+
+The L character, when present, indicates that the value should be printed in a locale-aware format, for instance, using comma as decimal point of German locale. 
+
+The *type* character gives differnt floating-point presentation as given below.
+
+* e – Prints the value in scientific notation. If no prec value is given, it defaults to 6.
+* f – Prints the value in fixed-point notation. If no prec value is given, it defaults to 6.
+* g – Prints the value in optimized way, which picks between e and f form depending on which ofrm is the shortest.
+* a – Prints the value using scientific notation, but with the number represented in hexadecimal. Because e is a valid hex digit, the exponent is indicated with a p character.
