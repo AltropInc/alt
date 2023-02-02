@@ -197,27 +197,28 @@ The following shorthands are provided for text numeric values:
 | fixed      | fbase=1 (fixed point format)  |
 | sci        | fbase=2 (scientific)        |
 | %          | fbase=3 (percentage)        |
+| hsci       | fbase=4 (hexadecimal scientific)        |
 
 You can also use the following format to specift a fill-and-align format:<br>
 :\[*sign*]*#*]\[*0*]\[*width*]\[*prec*]\[*L*]\[*type*]
 
 The sign value specifies how the sign for an numeric value is to be printed. It can take the following options:
 
-* + – A sign should always be printed for both negative and non-negative values.
-* - – A sign should only be printed for negative values. This is the default.
+* `+` – A sign should always be printed for both negative and non-negative values.
+* `-` – A sign should only be printed for negative values. This is the default.
 * (space) – A sign should be printed for negative values, and a space for non-negative values.
 
-The # character, if used, causes a decimal point character to always be printed, even if there is no fractional part. This does not apply to infinity and NaN values.
+The `#` character, if used, causes a decimal point character to always be printed, even if there is no fractional part. This does not apply to infinity and NaN values.
 
-The 0 character is only valid when also specifying a width value. If present it pads the field with 0 characters after any sign character and/or base indicator. The width value is used to give the minimum width for a numeric value. If the output value needs more characters than the specified width, it will be displayed in full, not truncated to the width.
+The `0` character is only valid when also specifying a width value. If present it pads the field with 0 characters after any *sign* character and/or base indicator. The *width* value is used to give the minimum width for a numeric value. If the value needs more characters than the specified width, it will be displayed in full, not truncated to the width.
 
 The *prec* value is formed by a decimal point followed by an integer to indicate the precision. The precision value is only valid for floating-point. It is used to determine how many digits after decimals should be printed.
 
-The L character, when present, indicates that the value should be printed in a locale-aware format, for instance, using comma as decimal point of German locale. 
+The 'L' character, when present, indicates that the value should be printed in a locale-aware format, for instance, using comma as decimal point and using space for thousand separator in German locale. See [Locale](Locale.md) for more information.
 
 The *type* character gives differnt floating-point presentation as given below.
 
-* e – Prints the value in scientific notation. If no prec value is given, it defaults to 6.
-* f – Prints the value in fixed-point notation. If no prec value is given, it defaults to 6.
-* g – Prints the value in optimized way, which picks between e and f form depending on which ofrm is the shortest.
-* a – Prints the value using scientific notation, but with the number represented in hexadecimal. Because e is a valid hex digit, the exponent is indicated with a p character.
+* `e` – Prints the value in scientific notation. If no *prec* value is given, it defaults to 6.
+* `f` – Prints the value in fixed-point notation. If no *prec* value is given, it defaults to 6.
+* `g` – Prints the value in an optimized way, which picks between `e` and `f` form depending on which form is the shortest.
+* `a` – Prints the value using scientific notation, but with the number represented in hexadecimal. Because `e` is a valid hex digit, the exponent is indicated with a `p` character.
