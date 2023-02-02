@@ -100,13 +100,13 @@ stands for red text with white background. Using shorthands `/color` or `/bcolor
 | /bcolor    | cancel background color, using default background color   |
 | black      | color=0 or bcolor=0    |
 | blue       | color=4 or bcolor=4 (blue)   |
-| bblue      | color=12 or bcolor=12 (birght blue)   |
-| bcyan      | color=14 or bcolor=14 (birght cyan)   |
-| bgreen     | color=10 or bcolor=10 (birght green)   |
-| bmagenta   | color=13 or bcolor=13 (birght magenta)   |
-| bred       | color=9 or bcolor=9 (birght red)   |
-| bwhite     | color=15 or bcolor=15 (birght white)   |
-| byellow    | color=11 or bcolor=11 (birght yellow)   |
+| bblue      | color=12 or bcolor=12 (bright blue)   |
+| bcyan      | color=14 or bcolor=14 (bright cyan)   |
+| bgreen     | color=10 or bcolor=10 (bright green)   |
+| bmagenta   | color=13 or bcolor=13 (bright magenta)   |
+| bred       | color=9 or bcolor=9 (bright red)   |
+| bwhite     | color=15 or bcolor=15 (bright white)   |
+| byellow    | color=11 or bcolor=11 (bright yellow)   |
 | cyan       | color=6 or bcolor=6 (cyan)   |
 | gray       | color=8 or bcolor=8 (gray)   |
 | green      | color=2 or bcolor=2 (green)   |
@@ -199,7 +199,7 @@ The following shorthands are provided for text numeric values:
 | %          | fbase=3 (percentage)        |
 | hsci       | fbase=4 (hexadecimal scientific)        |
 
-You can also use the following format to specift a fill-and-align format:<br>
+You can also use the following format to specift a numeric format:<br>
 :\[*sign*]*#*]\[*0*]\[*width*]\[*prec*]\[*L*]\[*type*]
 
 The sign value specifies how the sign for an numeric value is to be printed. It can take the following options:
