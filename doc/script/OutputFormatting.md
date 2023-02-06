@@ -118,7 +118,7 @@ The start and the end characters are not counted in width, and are not affected 
 print (underline, [:A【^10】], 1.23)
 ```
 In the output:<br>
-【<u>&nbsp;&nbsp;&nbsp;1.23&nbsp;&nbsp;&nbsp;</u>】<br>
+【<ins>&nbsp;&nbsp;&nbsp;1.23&nbsp;&nbsp;&nbsp;</ins>】<br>
 the underline effect is not applied to the starting and the ending characters.
 
 #### Apperance Formatter
@@ -226,9 +226,9 @@ The 'isep' value, when present, determines if the value needs to be printed with
 * 1 – Locale-aware thousand separator. This takes effect only for decimal format. See [Locale](Locale.md) for more information.
 * 2 – Using comma as a thousand separator for decimal format, and use a space as a separator for other base formats.
 
-The 'iwidth' value, when present, gives minmum characters (excluding the sign and base characters) for the output. If the number of digits is smaller than the required width, leading zeros will be padded if the `ipadding` value is 0, or leading spaces will be padded if the `ipadding` value is 1.
+The `iwidth` value, when present, gives minmum characters (excluding the sign and base characters) for the output. If the number of digits is smaller than the required width, leading zeros will be padded if the `ipadding` value is 0, or leading spaces will be padded if the `ipadding` value is 1. If the value needs more characters than the specified width, it will be displayed in full, not truncated to the width.
 
-The 'showbase' value determines if the base will be shown in the output for non-decimal format. It this value is 1, the number output will be prefixed by `0X' or `0x` for hecadecimal format, `0B' or `0b` for binary format, and `0` for none-zero numbers in octal format. The case used in the prefix is determined by the value of `uppercase`
+The `showbase` value determines if the base will be shown in the output for non-decimal format. It this value is 1, the number output will be prefixed by `0X` or `0x` for hecadecimal format, `0B` or `0b` for binary format, and `0` for none-zero numbers in octal format. The case used in the prefix is determined by the value of `uppercase`
 
 The following shorthands are provided for integer formats:
 | shorthand  | equivalents                                                        |
@@ -257,13 +257,23 @@ The *sign* can be one of the following characters:
 | +          | ibase=1 (show sign always)    |
 | space      | ibase=2 (show positive sign as a space)    |
 
-or inin a locale-aware format, for instance, using comma as decimal point and using space for thousand separator in German locale. See [Locale](Locale.md) for more information.
+The `#` character, if used, is eqivalent to `showbase=1`, cases base to be printed for non-decimal formats.
 
-The `#` character, if used, causes a decimal point character to always be printed, even if there is no fractional part. This does not apply to infinity and NaN values.
+The `0` character is only valid when also specifying a width value. If present it pads the field with 0 characters after any *sign* character and/or base indicator. 
 
-The `0` character is only valid when also specifying a width value. If present it pads the field with 0 characters after any *sign* character and/or base indicator. The *width* value is used to give the minimum width for a numeric value. If the value needs more characters than the specified width, it will be displayed in full, not truncated to the width.
+The `width` field is an integer, which is eqivalent to `iwdith=<the filed value>`, and used to give the minimum width for a numeric value. 
 
-The *prec* value is formed by a decimal point followed by an integer to indicate the precision. The precision value is only valid for floating-point. It is used to determine how many digits after decimals should be printed.
+The *sep* can be one of the following characters:
+| shorthand  | equivalents |
+|:---------- |:------------|
+| L          | isep=1 (locale awareness separator)    |
+| '          | ibase=2 (comma separator for decimals and space for other formats)    |
+
+Integer formatter examples:
+```altro
+print("Default: ", -10, 0, 10);  // Default: -10 0 10
+```
+
 
 
 
