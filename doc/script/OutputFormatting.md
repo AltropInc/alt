@@ -214,19 +214,36 @@ The `ibase` value indicates the integer base used to print the number. It can ha
 * 2 – Octal format (base 8). For alternate form, the value is prefixed with 0 as long as it is non-zero. For example, 7 outputs as 07, but 0 outputs as 0.
 * 3 – Binary format (base 2). For alternate form, the value is prefixed with 0b for b, and 0B for B.
 
+Here are examples of integer being printed in different base:
+```altro
+print("Base 10: ", 10, ' ', -1);               // Base 10: 10 -1
+print("Base 16: ", [ibase=1], 10, ' ', -1);    // Base 16: a ffffffff
+print("Base 8:  ", [ibase=2], 10, ' ', -1);    // Base 8 : 12 37777777777
+print("Base 2:  ", [ibase=3], 10, ' ', -1);    // Base 2 : 1010 11111111111111111111111111111111
+```
+When using base other than decimal, the integer is always treated as unsigned in order to reflect the values of the underlying bits of the integer.
+
 The `isign` value specifies how the sign for an integer value is to be printed. It can take the following options:
 
-* 0 – A sign should always be printed for both negative and non-negative values.
-* 1 – A sign should only be printed for negative values. This is the default.
+* 0 – A sign should only be printed for negative values. This is the default.
+* 1 – A sign should always be printed for both negative and non-negative values.
 * 2 – A sign should be printed for negative values, and a space for non-negative values.
+
+Because non-decimal format ignores signs, and the *sign* option has no effect on non-decimal format. Here are examples of using different *sign* options
+```altro
+print("isign=0: ", -10, ' ', 0, ' ', 10);             // isign=0: -10 0 10
+print("isign=1: ", [isign=1], -10, ' ', 0, ' ', 10);  // isign=1: -10 +0 +10
+print("isign=2: ", [isign=2], -10, ' ', 0, ' ', 10);  // isign=2: -10  0  10
+```
+The `iwidth` value, when present, gives minmum characters for the output of an integer in decimal (base 10). If the number of digits is smaller than the required width, leading zeros will be padded if the `ipad` value is 0, or leading spaces will be padded if the `ipad` value is 1. If the value needs more characters than the specified width, it will be displayed in full, not truncated to the width. Here are examples of using `iwidth` and `ipad` to print integers in decimal:
+
+(excluding characters for the base indicator, if any)
 
 The 'isep' value, when present, determines if the value needs to be printed with separators. In a decimal format, digits are separated by thousands (every 3 digits); in a hecadecimal format, digits are separated every two digits; ; and in an octal format, digits are separated every three digits; and in a binary format, digits are separated every eight digits. The 'isep' value can take the following options:
 
 * 0 – No thousand separator. This is the default.
 * 1 – Locale-aware thousand separator. This takes effect only for decimal format. See [Locale](Locale.md) for more information.
 * 2 – Using comma as a thousand separator for decimal format, and use a space as a separator for other base formats.
-
-The `iwidth` value, when present, gives minmum characters (excluding the sign and base characters) for the output. If the number of digits is smaller than the required width, leading zeros will be padded if the `ipadding` value is 0, or leading spaces will be padded if the `ipadding` value is 1. If the value needs more characters than the specified width, it will be displayed in full, not truncated to the width.
 
 The `showbase` value determines if the base will be shown in the output for non-decimal format. It this value is 1, the number output will be prefixed by `0X` or `0x` for hecadecimal format, `0B` or `0b` for binary format, and `0` for none-zero numbers in octal format. The case used in the prefix is determined by the value of `uppercase`
 
@@ -238,12 +255,12 @@ The following shorthands are provided for integer formats:
 | oct        | ibase=2 (octal)        |
 | bin        | ibase=3 (binay)        |
 
-The following packed string can also be used for string alignment:
+The following packed string can also be used for integer output format:
 
 :*base*\[*sign*]*#*]\[*0*]\[*width*]\[*sep*]
 
 The *base* can be one of the following characters:
-| shorthand  | equivalents                                                        |
+| base       | equivalents                                                        |
 |:---------- |:------------------------------------------------------------------ |
 | d          | ibase=0 (decimal)      |
 | x          | ibase=1 (hexadecimal)  |
@@ -251,11 +268,14 @@ The *base* can be one of the following characters:
 | b          | ibase=3 (binary)       |
 
 The *sign* can be one of the following characters:
-| shorthand  | equivalents |
+| sign       | equivalents |
 |:---------- |:------------|
-| -          | isign=0 (show negative sign onl)    |
+| -          | isign=0 (show negative sign only)    |
 | +          | ibase=1 (show sign always)    |
 | space      | ibase=2 (show positive sign as a space)    |
+
+
+
 
 The `#` character, if used, is eqivalent to `showbase=1`, cases base to be printed for non-decimal formats.
 
@@ -269,10 +289,7 @@ The *sep* can be one of the following characters:
 | L          | isep=1 (locale awareness separator)    |
 | '          | ibase=2 (comma separator for decimals and space for other formats)    |
 
-Integer formatter examples:
-```altro
-print("Default: ", -10, 0, 10);  // Default: -10 0 10
-```
+
 
 
 
