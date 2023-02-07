@@ -216,10 +216,16 @@ The `ibase` value indicates the integer base used to print the number. It can ha
 
 Here are examples of integer being printed in different base:
 ```altro
-print("Base 10: ", 10, ' ', -1);               // Base 10: 10 -1
-print("Base 16: ", [ibase=1], 10, ' ', -1);    // Base 16: a ffffffff
-print("Base 8:  ", [ibase=2], 10, ' ', -1);    // Base 8 : 12 37777777777
-print("Base 2:  ", [ibase=3], 10, ' ', -1);    // Base 2 : 1010 11111111111111111111111111111111
+print(10, ' ', -1, '\n');              // Decimal, this is default
+print([ibase=1], 10, ' ', -1, '\n');   // Hecadecimal format
+print([ibase=2], 10, ' ', -1, '\n');   // Octal format
+print([ibase=3], 10, ' ', -1, '\n');   // Binary format
+_______________________________________________________
+output:
+10 -1
+a ffffffff
+12 37777777777
+1010 11111111111111111111111111111111
 ```
 When using base other than decimal, the integer is always treated as unsigned in order to reflect the values of the underlying bits of the integer.
 
@@ -231,15 +237,46 @@ The `isign` value specifies how the sign for an integer value is to be printed. 
 
 Because non-decimal format ignores signs, and the *sign* option has no effect on non-decimal format. Here are examples of using different *sign* options
 ```altro
-print("isign=0: ", -10, ' ', 0, ' ', 10);             // isign=0: -10 0 10
-print("isign=1: ", [isign=1], -10, ' ', 0, ' ', 10);  // isign=1: -10 +0 +10
-print("isign=2: ", [isign=2], -10, ' ', 0, ' ', 10);  // isign=2: -10  0  10
+print(-10, ' ', 0, ' ', 10, '\n');               // This is default
+print([isign=1], -10, ' ', 0, ' ', 10, '\n');
+print([isign=2], -10, ' ', 0, ' ', 10, '\n');
+_______________________________________________________
+output:
+-10 0 10
+-10 +0 +10
+-10  0  10
 ```
-The `iwidth` value, when present, gives minmum characters for the output of an integer in decimal (base 10). If the number of digits is smaller than the required width, leading zeros will be padded if the `ipad` value is 0, or leading spaces will be padded if the `ipad` value is 1. If the value needs more characters than the specified width, it will be displayed in full, not truncated to the width. Here are examples of using `iwidth` and `ipad` to print integers in decimal:
-
-(excluding characters for the base indicator, if any)
-
-The 'isep' value, when present, determines if the value needs to be printed with separators. In a decimal format, digits are separated by thousands (every 3 digits); in a hecadecimal format, digits are separated every two digits; ; and in an octal format, digits are separated every three digits; and in a binary format, digits are separated every eight digits. The 'isep' value can take the following options:
+The `iwidth` value, when present, gives minmum characters for the output of an integer in decimal (base 10). If the number of digits is smaller than the required width, leading zeros will be padded if the `ipad` value is 1, or leading spaces will be padded if the `ipad` value is 0 or is not given. If the value needs more characters than the specified width, it will be displayed in full, not truncated to the width. Here are examples of using `iwidth` and `ipad` to print integers in decimal:
+```altro
+print([iwidth=8]], 10, ' ', 0, ' ', -10, '\n');                    // width 8, pad with leading spaces
+print([iwidth=8, ipad=1]", 10, ' ', 0, ' ', -10, '\n');            // width 8, pad with leading zeros
+print([iwidth=8, ipad=1, isign=1]", 10, ' ', 0, ' ', -10, '\n');   // width 8, pad with leading zeros, show positive sign
+print([iwidth=8, ipad=1, isign=1]", 1000000000, '\n');             // digits are not truncated to the width
+_______________________________________________________
+output:
+      10        0      -10
+00000010 00000000 -0000010
++0000010 +0000000 -0000010
++1000000000
+```
+For non-decimal integer formats, if `iwidth` is not given or is zero, and `ipad` value is 1, leading zeros will be padded to show all bits of the given integer value. For instance, if the integer value is a 32-bit integer and hecadecimal format is used, leading zeros will be padded to generate a sequence of 8 hecadecimal digits to show all bytes of the value; and if binary format is used, leading zeros will be padded to generate a sequence of 32 binary digits to show all bits of the value. If  `iwidth` is not given, leading zeros (when `ipad` value is 1) or spaces (when otherwise) will be padded to the given width (the base indicator characters, if any, are not counted in the given width). 
+```altro
+print([ibase=1], 192, '\n');          // default
+print([ibase=1, ipad=1], 192, '\n');  // padding with leading 0s to show all bytes of a 32-bit int (8 hecadecimal digits)
+print([ibase=2, ipad=1], 192, '\n');  // padding with leading 0s to show all bits of a 32-bit int (32 binary digits)
+print([ibase=1, iwidth=4, ipad=1], 192, '\n');  // padding with leading 0s to the given width
+print([ibase=1, iwidth=4], 192, '\n');          // padding with leading spaces to the given width
+print([ibase=1, iwidth=4, ipad=1, showbase=1], 192, '\n');  // The base indicator `0x` is not counted in the width
+_______________________________________________________
+output:
+c0
+000000c0
+00000000000000000000000011000000
+00c0
+  c0
+0x00c0
+```
+The 'isep' value, when present, determines if the value needs to be printed with separators. In a decimal format, digits are separated by thousands (every 3 digits); in a hecadecimal format, digits are separated every two digits; in an octal format, digits are separated every three digits; and in a binary format, digits are separated every eight digits. The 'isep' value can take the following options:
 
 * 0 – No thousand separator. This is the default.
 * 1 – Locale-aware thousand separator. This takes effect only for decimal format. See [Locale](Locale.md) for more information.
