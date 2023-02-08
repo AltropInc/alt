@@ -202,8 +202,8 @@ The following members are used for integers:
 | ibase     |  0~3    | integer base: decimal(0), hexadecimal(1), octal(2), binay(3)             |
 | isign     |  0~2    | show negative sign only(0)  show positive and negative sign(1), show positive sign as a space(2)|
 | isep      |  0~2    | no thousand separator (0)  locale awareness separator (1) comma as a separator (2)  |
-| iwidth    |  int    | trim leading zeros: no trim(0), replacing leading zeros with spaces (1)            |
-| ipadding  |  0~1    | using zeros for padding (0), using spaces for padding(1)            |
+| iwidth    |  int    | minimum number of characters for the output, excluding base indicator           |
+| ipad      |  0~1    | using zeros for padding (0), using spaces for padding(1)            |
 | showbase  |  0~1    | hide number base(0), show number base (1)            |
 | iupper    |  0~1    | using lowercase(0)  using uppercase(1)                 |
 
@@ -354,51 +354,119 @@ The *sep* can be one of the following characters:
 
 Examples of using packed string for integer formats:
 ```altro
-print([:dL], 1000000000, " ⭠ ibase=dec, isep=1\n");
-print([:d+L], 1000000000, " ⭠ ibase=dec, isign=1, isep=1\n");
-print([:d+8L], 10, " ⭠ ibase=dec, iwidth=8, isign=1, isep=1\n");
-print([:d+08L], 10, " ⭠ ibase=dec, iwidth=8, ipad=1, isign=1, isep=1\n");
-print([:X08'], 1000000000, " ⭠ ibase=hex, iwidth=8, isep=2, iupper=1\n");
+print("Using ", setlocale(LC_NUMERIC, "de_DE"), " for numeric output:\n");
+print([:dL], 1000000000, " ⭠ ibase=dec, isep=1(German)\n");
+print([:d+L], 1000000000, " ⭠ ibase=dec, isign=1, isep=1(German)\n");
+print([:d+24'], 1000000000, " ⭠ ibase=dec, iwidth=24, isign=1, isep=2(comma)\n");
+print([:d+024L], 1000000000, " ⭠ ibase=dec, iwidth=24, isign=1, isep=1(German), ipad=1\n");
+print([:X08'], 1000000000, " ⭠ ibase=hex, iwidth=8, isep=2(space), iupper=1\n");
 print([:x#08], 1000000000, " ⭠ ibase=hex, iwidth=8, showbase=1\n");
 _______________________________________________________
 output:
-1,000,000,000 ⭠ ibase=dec, isep=1
-+1,000,000,000 ⭠ ibase=dec, isign=1, isep=1
-+     10 ⭠ ibase=dec, iwidth=8, isign=1, isep=1
-+0000010 ⭠ ibase=dec, iwidth=8, ipad=1, isign=1, isep=1
-3B 9A CA 00 ⭠ ibase=hex, iwidth=8, isep=2, iupper=1
+Using de_DE for numeric output:
+1.000.000.000 ⭠ ibase=dec, isep=1
++1.000.000.000 ⭠ ibase=dec, isign=1, isep=1(German)
++          1.000.000.000 ⭠ ibase=dec, iwidth=24, isign=1, isep=2(comma)
++00000000001.000.000.000 ⭠ ibase=dec, iwidth=24, isign=1, isep=1(German), ipad=1
+3B 9A CA 00 ⭠ ibase=hex, iwidth=8, isep=2(space), iupper=1
 0x3b9aca00 ⭠ ibase=hex, iwidth=8, showbase=1
 ```
 
+### Formatters for Floating-Point Numbers
 
+The following members are used for floating-point numbers:
+| name       | values  | Description                                                         |
+|:---------- |:------- |:-------------------------------------------------------------- |
+| fbase      |  0~4    | floating number base: optimized(0), fixed point(1), scientific(2), percentage(3), hexadecimal(4)             |
+| fsign      |  0~2    | show negative sign only(0)  show positive and negative sign(1), show positive sign as a space(2)|
+| fsep       |  0~1    | no thousand separator (0)  locale awareness separator and decimal point (1) comma as a separator (2)                    |
+| fpad       |  0~1    | using zeros for padding (0), using spaces for padding(1)             |
+| fwidth     |  int    | minimum number of characters for the output              |
+| fupper     |  0~1    | no using uppercase(0)  using uppercase(1)                 |
+| showpoint  |  0~1    | show decimal point only as needed(0)  show decimal point always(1)                 |
+| prec       |  int    | precision                 |
 
+The `fbase` value indicates the format used to print the number. It can have one of the following values:
 
+* 0 – Prints the value in an optimized way, which picks between scientific and fixed format depending on which one is the best to fit.
+* 1 – Prints the value in fixed-point notation with a fixed number of digits after decimal point (default 6, trailing zeros may be padded). 
+* 2 – Prints the value in scientific notation, the default precision after decimal point is 6.
+* 3 – Prints the value in percentage format with a number of digits after decimal point up tp the precision (by default 6)
+* 4 – Prints the value using scientific notation, but with the number represented in hexadecimal. Because `e` is a valid hex digit, the exponent is indicated with a `p` character.
 
-The *type* character gives differnt floating-point presentation as given below.
-
-* `e` – Prints the value in scientific notation. If no *prec* value is given, it defaults to 6.
-* `f` – Prints the value in fixed-point notation. If no *prec* value is given, it defaults to 6.
-* `g` – Prints the value in an optimized way, which picks between `e` and `f` form depending on which form is the shortest.
-* `a` – Prints the value using scientific notation, but with the number represented in hexadecimal. Because `e` is a valid hex digit, the exponent is indicated with a `p` character.
-
+The following shorthands can be for the `fbase` in the floating-point number format:
+| shorthand  | equivalents                                                        |
+|:---------- |:------------------------------------------------------------------ |
 | fopt       | fbase=0 (optimized format for floating point number)      |
 | fixed      | fbase=1 (fixed point format)  |
 | sci        | fbase=2 (scientific)        |
 | %          | fbase=3 (percentage)        |
 | hsci       | fbase=4 (hexadecimal scientific)  
 
+Here are examples of integer being printed in different base:
+```altro
+small, integer, large, huge := 0.1234567, 34., 1e10+12.345, 1e20;
+print(0.0, ' ', small, ' ', integer, ' ', large, ' ', huge, " ⭠ fbase=0(default)\n");
+print([fixed], 0.0, ' ', small, ' ', integer, ' ', large, ' ', huge, " ⭠ fbase=1(fixed)\n");
+print([sci], 0.0, ' ', small, ' ', integer, ' ', large, ' ', huge, " ⭠ fbase=2(scientific)\n");
+print([%], 0.0, ' ', small, ' ', integer, ' ', large, ' ', huge, " ⭠ fbase=3(percentage)\n");
+print([hsci], 0.0, ' ', small, ' ', integer, ' ', large, ' ', huge, " ⭠ fbase=4(hexadecimal scientific)\n");
+_______________________________________________________
+output:
+0 0.123457 34 1e+10 1e+20 ⭠ fbase=0(default)
+0.000000 0.123457 34.000000 10000000012.344999 100000000000000000000.000000 ⭠ fbase=1(fixed)
+0.000000e+00 1.234567e-01 3.400000e+01 1.000000e+10 1.000000e+20 ⭠ fbase=2(scientific)
+0% 12.34567% 3400% 1000000001234.499878% 10000000000000000000000% ⭠ fbase=3(percentage)
+0x0p+0 0x1.f9adbb8f8da72p-4 0x1.1p+5 0x1.2a05f2062c28fp+33 0x1.5af1d78b58c4p+66 ⭠ fbase=4(hexadecimal scientific)
+```
+The `fsign` value specifies how the sign for a value is to be printed. It can take the following options:
 
-### Formatters for Floating-Point Numbers
+* 0 – A sign should only be printed for negative values. This is the default.
+* 1 – A sign should always be printed for both negative and non-negative values.
+* 2 – A sign should be printed for negative values, and a space for non-negative values.
 
-|:--------- |:------- |:-------------------------------------------------------------- |
-| base      |  0~3    | integer base: decimal(0), hexadecimal(1), octal(2), binay(3)             |
-| fbase     |  0~4    | floating number base: optimized(0), fixed point(1), scientific(2), percentage(3), hexadecimal(4)             |
-| precision |  int    | precision for printing floating number   |
-| sign      |  0~2    | show negative sign only(0)  show positive and negative sign(1), show positive sign as a space(2)|
-| locale    |  0~1    | no locale awareness(0)  locale awareness (1)                    |
-| trim      |  0~1    | trim leading and trailing zeros: no trim(0)  trim(1)            |
-| intbase   |  0~3    | decimal(0), hexadecimal(1), octal(2), binay(3)             |
-| uppercase |  0~1    | no using uppercase(0)  using uppercase(1)                 |
+```altro
+print(10.12, ' ', 0.0, ' ', -10.12, "   ⭠ fsign=0(show negative sign only)\n");
+print([fsign=1], 10.12, ' ', 0.0, ' ', -10.12, " ⭠ fsign=1(show positive sign)\n");
+print([fsign=2], 10.12, ' ', 0.0, ' ', -10.12, " ⭠ fsign=2(show positive sign as a space)\n");
+_______________________________________________________
+output:
+10.12 0 -10.12   ⭠ fsign=0(show negative sign only)
++10.12 +0 -10.12 ⭠ fsign=1(show positive sign)
+ 10.12  0 -10.12 ⭠ fsign=2(show positive sign as a space)
+```
+If the `showpoint` value is 1, it causes a decimal point character to always be output, even if there are no digits after it. This does not apply to infinity and NaN values.
+```altro
+small, integer, large, huge := 0.1234567, 34., 1e10+12.345, 1e20;
+print(0.0, ' ', small, ' ', integer, ' ', large, ' ', huge, "     ⭠ show decimal point as needed (default)\n");
+print(showpoint=1], 0.0, ' ', small, ' ', integer, ' ', large, ' ', huge, " ⭠ show decimal point always\n");
+_______________________________________________________
+output:
+0 0.123457 34 1e+10 1e+20     ⭠ show decimal point as needed (default)
+0. 0.123457 34. 1.e+10 1.e+20 ⭠ show decimal point always
+```
+If the `fupper` value is 1, uppercase will be used for `e` and `p` in scientific notion, and uppercase hexadecimal digits will be used.
+```altro
+print([fupper=1], 1e10, " ⭠ using uppercase for `e`\n");
+print([hsci, fupper=1], 1e10, " ⭠ using uppercase for `p` and hex digits\n");
+_______________________________________________________
+output:
+1E+10 ⭠ using uppercase for `e`
+0X1.2A05F2P+33  ⭠ using uppercase for `p` and hex digits
+```
+If `prec` is present, the output will have the precision as specified. If prec is not present, the default precision is 6. In fixed format, the precision determines the number of digits after the decimal point:
+```altro
+print([fixed], 0.123456789, "       ⭠ default precision in fixed\n");
+print([fixed, prec=12], 0.123456789, " ⭠ precision 12 in fixed\n");
+_______________________________________________________
+output:
+0.123457       ⭠ default precision in fixed
+0.123456789000 ⭠ precision 12 in fixed
+```
+
+
+the output is in either fixed-point or scientific notation, depending on which gives the shortest output that still guarantees that reading the value in again will give the same value as was written out.
+
 
 
 
