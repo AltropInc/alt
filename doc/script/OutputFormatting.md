@@ -115,7 +115,7 @@ format     output
 ```
 The start and the end characters are not counted in width, and are not affected by other formats. For instance,
 ```altro
-print (underline, [:A【^10】], 1.23)
+print (underline, [:s【^10】], 1.23)
 ```
 In the output:<br>
 【<ins>&nbsp;&nbsp;&nbsp;1.23&nbsp;&nbsp;&nbsp;</ins>】<br>
@@ -141,7 +141,7 @@ The following members are used for text apperance:
 
 The following shorthands are provided for text apperance:
 
-**Common color names:**
+* **Shorthands for common color names:**
 | shorthand  | equivalents                                                        |
 |:---------- |:------------------------------------------------------------------ |
 | /color     | cancel text color, using default text color   |
@@ -163,7 +163,7 @@ The following shorthands are provided for text apperance:
 | white      | color=7 or bcolor=7 (white)   |
 | yellow     | color=3 or bcolor=3 (yellow)   |
 
-**Common text attributes:**
+* **Shorthands for common text attributes:**
 | shorthand  | equivalents                                                        |
 |:---------- |:------------------------------------------------------------------ |
 | b          | intense=1   |
@@ -205,27 +205,35 @@ The following members are used for integers:
 | iwidth    |  int    | trim leading zeros: no trim(0), replacing leading zeros with spaces (1)            |
 | ipadding  |  0~1    | using zeros for padding (0), using spaces for padding(1)            |
 | showbase  |  0~1    | hide number base(0), show number base (1)            |
-| uppercase |  0~1    | no using uppercase(0)  using uppercase(1)                 |
+| iupper    |  0~1    | using lowercase(0)  using uppercase(1)                 |
 
 The `ibase` value indicates the integer base used to print the number. It can have one of the following values:
 
 * 0 – Decimal format (base 10). This is the default if no presentation of `ibase`.
-* 1 – Hecadecimal format (base 16). The digits above 9 are printed as A, B, C, D, E, F, or a, b, c, d, e, f, and the case is determined by the value of `uppercase`
+* 1 – Hexadecimal format (base 16). The digits above 9 are printed as A, B, C, D, E, F, or a, b, c, d, e, f, and the case is determined by the value of `uppercase`
 * 2 – Octal format (base 8). For alternate form, the value is prefixed with 0 as long as it is non-zero. For example, 7 outputs as 07, but 0 outputs as 0.
 * 3 – Binary format (base 2). For alternate form, the value is prefixed with 0b for b, and 0B for B.
 
+The following shorthands can be for the `ibase` in theinteger format:
+| shorthand  | equivalents                                                        |
+|:---------- |:------------------------------------------------------------------ |
+| dec        | ibase=0 (decimal)      |
+| hex        | ibase=1 (hexadecimal)  |
+| oct        | ibase=2 (octal)        |
+| bin        | ibase=3 (binay)        |
+
 Here are examples of integer being printed in different base:
 ```altro
-print(10, ' ', -1, '\n');              // Decimal, this is default
-print([ibase=1], 10, ' ', -1, '\n');   // Hecadecimal format
-print([ibase=2], 10, ' ', -1, '\n');   // Octal format
-print([ibase=3], 10, ' ', -1, '\n');   // Binary format
+print(10, ' ', -1, " ⭠ Decimal, this is default\n");
+print([hex], 10, ' ', -1, " ⭠ Hexadecimal format\n");
+print([oct], 10, ' ', -1, " ⭠ Octal format\n");
+print([bin], 10, ' ', -1, " ⭠ Binary format\n");
 _______________________________________________________
 output:
-10 -1
-a ffffffff
-12 37777777777
-1010 11111111111111111111111111111111
+10 -1 ⭠ Decimal, this is default
+a ffffffff ⭠ Hexadecimal format
+12 37777777777 ⭠ Octal format
+0b1010 0b11111111111111111111111111111111 ⭠ Binary format
 ```
 When using base other than decimal, the integer is always treated as unsigned in order to reflect the values of the underlying bits of the integer.
 
@@ -246,7 +254,7 @@ output:
 -10 +0 +10
 -10  0  10
 ```
-The `iwidth` value, when present, gives minmum characters for the output of an integer in decimal (base 10). If the number of digits is smaller than the required width, leading zeros will be padded if the `ipad` value is 1, or leading spaces will be padded if the `ipad` value is 0 or is not given. If the value needs more characters than the specified width, it will be displayed in full, not truncated to the width. Here are examples of using `iwidth` and `ipad` to print integers in decimal:
+For non-decimal integer format, the `iwidth` value, when present, gives minmum characters for the output. If the number of digits is smaller than the required width, leading zeros will be padded if the `ipad` value is 1, or leading spaces will be padded if the `ipad` value is 0 or is not given. If the value needs more characters than the specified width, it will be displayed in full, not truncated to the width. Here are examples of using `iwidth` and `ipad` to print integers in decimal:
 ```altro
 print([iwidth=8]], 10, ' ', 0, ' ', -10, '\n');                    // width 8, pad with leading spaces
 print([iwidth=8, ipad=1]", 10, ' ', 0, ' ', -10, '\n');            // width 8, pad with leading zeros
@@ -261,39 +269,59 @@ output:
 ```
 For non-decimal integer formats, if `iwidth` is not given or is zero, and `ipad` value is 1, leading zeros will be padded to show all bits of the given integer value. For instance, if the integer value is a 32-bit integer and hecadecimal format is used, leading zeros will be padded to generate a sequence of 8 hecadecimal digits to show all bytes of the value; and if binary format is used, leading zeros will be padded to generate a sequence of 32 binary digits to show all bits of the value. If  `iwidth` is not given, leading zeros (when `ipad` value is 1) or spaces (when otherwise) will be padded to the given width (the base indicator characters, if any, are not counted in the given width). 
 ```altro
-print([ibase=1], 192, '\n');          // default
-print([ibase=1, ipad=1], 192, '\n');  // padding with leading 0s to show all bytes of a 32-bit int (8 hecadecimal digits)
-print([ibase=2, ipad=1], 192, '\n');  // padding with leading 0s to show all bits of a 32-bit int (32 binary digits)
-print([ibase=1, iwidth=4, ipad=1], 192, '\n');  // padding with leading 0s to the given width
-print([ibase=1, iwidth=4], 192, '\n');          // padding with leading spaces to the given width
-print([ibase=1, iwidth=4, ipad=1, showbase=1], 192, '\n');  // The base indicator `0x` is not counted in the width
+print([ibase=hex], 192, "        ⭠ default hexadecimal format\n");
+print([hex, ipad=1], 192, " ⭠ padding with leading 0s to show all bytes of a 32-bit int (8 hexadecimal digits)\n");
+print([bin, ipad=1], 192, " ⭠ padding with leading 0s to show all bits of a 32-bit int (32 binary digits)\n");
+print([hex, iwidth=4, ipad=1], 192, "     ⭠ padding with leading 0s to the given width\n");
+print([hex, iwidth=4], 192, "     ⭠ padding with leading spaces to the given width\n");
+print([hex, iwidth=4, ipad=1, showbase=1], 192, "   ⭠ The base indicator `0x` is not counted in the width\n");
 _______________________________________________________
 output:
-c0
-000000c0
-00000000000000000000000011000000
-00c0
-  c0
-0x00c0
+c0       ⭠ default hexadecimal format
+000000c0 ⭠ padding with leading 0s to show all bytes of a 32-bit int (8 hexadecimal digits)
+0b00000000000000000000000011000000 ⭠ padding with leading 0s to show all bits of a 32-bit int (32 binary digits)
+00c0     ⭠ padding with leading 0s to the given width
+  c0     ⭠ padding with leading spaces to the given width
+0x00c0   ⭠ The base indicator `0x` is not counted in the width
 ```
 The 'isep' value, when present, determines if the value needs to be printed with separators. In a decimal format, digits are separated by thousands (every 3 digits); in a hecadecimal format, digits are separated every two digits; in an octal format, digits are separated every three digits; and in a binary format, digits are separated every eight digits. The 'isep' value can take the following options:
 
 * 0 – No thousand separator. This is the default.
 * 1 – Locale-aware thousand separator. This takes effect only for decimal format. See [Locale](Locale.md) for more information.
 * 2 – Using comma as a thousand separator for decimal format, and use a space as a separator for other base formats.
+```altro
+print(1000000000, "    ⭠ This is default\n");
+print("Now using ", setlocale(LC_NUMERIC, "German", "Germany"), " for numeric output\n");
+print([isep=1], 1000000000, " ⭠ Thounsand separator using de_DE locale\n");
+print([isep=2], 1000000000, " ⭠ Thounsand separator using comma\n");
+print([ibase=1, isep=2, ipad=1], 1000000000, "   ⭠ Using space as separator in hexadecimal format\n");
+_______________________________________________________
+output:
+1000000000    ⭠ This is default
+Now using de_DE for numeric output
+1.000.000.000 ⭠ Thounsand separator using de_DE locale
+1,000,000,000 ⭠ Thounsand separator using comma
+3b 9a ca 00   ⭠ Using space as separator in hexadecimal format
+```
+The `showbase` value determines if the base will be shown in the output for non-decimal format. It this value is 1, the number output will be prefixed by `0X` or `0x` for hecadecimal format, `0B` or `0b` for binary format, and `0` for none-zero numbers in octal format. The case used in the prefix is determined by the value of `iupper`.
+```altro
+print([ibase=1, showbase=1], 1000000000, "  ⭠ show base in hexadecimal format\n");
+print([ibase=1, showbase=1, iupper=1], 1000000000, "  ⭠ show base using uppercase in hexadecimal format\n");
+print([ibase=2], 1000000000,  "  ⭠ octal format without showing base\n");
+print([ibase=2, showbase=1], 1000000000, " ⭠ octal format with base shown\n");
+print([ibase=3, showbase=1], 1000000000, " ⭠ binary format with base shown\n");
+_______________________________________________________
+output:
+0x3b9aca00  ⭠ show base in hexadecimal format
+0X3B9ACA00  ⭠ show base using uppercase in hexadecimal format
+7346545000  ⭠ octal format without showing base
+07346545000 ⭠ octal format with base shown
+0b111011100110101100101000000000 ⭠ binary format with base shown
+```
 
-The `showbase` value determines if the base will be shown in the output for non-decimal format. It this value is 1, the number output will be prefixed by `0X` or `0x` for hecadecimal format, `0B` or `0b` for binary format, and `0` for none-zero numbers in octal format. The case used in the prefix is determined by the value of `uppercase`
+**Integer Format with Packed Format String**
 
-The following shorthands are provided for integer formats:
-| shorthand  | equivalents                                                        |
-|:---------- |:------------------------------------------------------------------ |
-| dec        | ibase=0 (decimal)      |
-| hex        | ibase=1 (hexadecimal)  |
-| oct        | ibase=2 (octal)        |
-| bin        | ibase=3 (binay)        |
-
-The following packed string can also be used for integer output format:
-
+The following packed string can also be used for integer output format:<br>
 :*base*\[*sign*]*#*]\[*0*]\[*width*]\[*sep*]
 
 The *base* can be one of the following characters:
@@ -301,8 +329,11 @@ The *base* can be one of the following characters:
 |:---------- |:------------------------------------------------------------------ |
 | d          | ibase=0 (decimal)      |
 | x          | ibase=1 (hexadecimal)  |
+| X          | ibase=1, iupper=1 (hexadecimal)  |
 | o          | ibase=2 (octal)        |
 | b          | ibase=3 (binary)       |
+| B          | ibase=3, iupper=1 (binary)       |
+The base character is mandatory.
 
 The *sign* can be one of the following characters:
 | sign       | equivalents |
@@ -311,14 +342,9 @@ The *sign* can be one of the following characters:
 | +          | ibase=1 (show sign always)    |
 | space      | ibase=2 (show positive sign as a space)    |
 
+The `#` character, if present, is eqivalent to `showbase=1`, and causes base to be printed for non-decimal formats.
 
-
-
-The `#` character, if used, is eqivalent to `showbase=1`, cases base to be printed for non-decimal formats.
-
-The `0` character is only valid when also specifying a width value. If present it pads the field with 0 characters after any *sign* character and/or base indicator. 
-
-The `width` field is an integer, which is eqivalent to `iwdith=<the filed value>`, and used to give the minimum width for a numeric value. 
+The `0` character, if present, is eqivalent to `ipad=1`.  The `width` field is an integer, which is eqivalent to `iwdith=<the filed value>`, and used to give the minimum width for a numeric value.  In decimal format, if both `0` and `width` present, leading zeros will be padded after any *sign* character and/or base indicator to meet the specified width. If only `width` present, leading spaces will be padded. In non-decimal formats, the `iwidth` value, leading zeros will be padded if the `0` presents, otherwise leading spaces will be padded.
 
 The *sep* can be one of the following characters:
 | shorthand  | equivalents |
@@ -326,6 +352,9 @@ The *sep* can be one of the following characters:
 | L          | isep=1 (locale awareness separator)    |
 | '          | ibase=2 (comma separator for decimals and space for other formats)    |
 
+Examples of using packed string for integer formats:
+```altro
+```
 
 
 
