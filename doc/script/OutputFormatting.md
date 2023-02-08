@@ -350,10 +350,24 @@ The *sep* can be one of the following characters:
 | shorthand  | equivalents |
 |:---------- |:------------|
 | L          | isep=1 (locale awareness separator)    |
-| '          | ibase=2 (comma separator for decimals and space for other formats)    |
+| '          | isep=2 (comma separator for decimals and space for other formats)    |
 
 Examples of using packed string for integer formats:
 ```altro
+print([:dL], 1000000000, " ⭠ ibase=dec, isep=1\n");
+print([:d+L], 1000000000, " ⭠ ibase=dec, isign=1, isep=1\n");
+print([:d+8L], 10, " ⭠ ibase=dec, iwidth=8, isign=1, isep=1\n");
+print([:d+08L], 10, " ⭠ ibase=dec, iwidth=8, ipad=1, isign=1, isep=1\n");
+print([:X08'], 1000000000, " ⭠ ibase=hex, iwidth=8, isep=2, iupper=1\n");
+print([:x#08], 1000000000, " ⭠ ibase=hex, iwidth=8, showbase=1\n");
+_______________________________________________________
+output:
+1,000,000,000 ⭠ ibase=dec, isep=1
++1,000,000,000 ⭠ ibase=dec, isign=1, isep=1
++     10 ⭠ ibase=dec, iwidth=8, isign=1, isep=1
++0000010 ⭠ ibase=dec, iwidth=8, ipad=1, isign=1, isep=1
+3B 9A CA 00 ⭠ ibase=hex, iwidth=8, isep=2, iupper=1
+0x3b9aca00 ⭠ ibase=hex, iwidth=8, showbase=1
 ```
 
 
