@@ -377,7 +377,7 @@ Using de_DE for numeric output:
 The following members are used for floating-point numbers:
 | name       | values  | Description                                                         |
 |:---------- |:------- |:-------------------------------------------------------------- |
-| fbase      |  0~4    | floating number base: optimized(0), fixed point(1), scientific(2), percentage(3), hexadecimal(4)             |
+| fbase      |  0~4    | floating number base: general(0), fixed point(1), scientific(2), percentage(3), hexadecimal(4)             |
 | fsign      |  0~2    | show negative sign only(0)  show positive and negative sign(1), show positive sign as a space(2)|
 | fsep       |  0~1    | no thousand separator (0)  locale awareness separator and decimal point (1) comma as a separator (2)                    |
 | fpad       |  0~1    | using zeros for padding (0), using spaces for padding(1)             |
@@ -388,8 +388,8 @@ The following members are used for floating-point numbers:
 
 The `fbase` value indicates the format used to print the number. It can have one of the following values:
 
-* 0 – Prints the value in an optimized way, which picks between scientific and fixed format depending on which one is the best to fit.
-* 1 – Prints the value in fixed-point notation with a fixed number of digits after decimal point (default 6, trailing zeros may be padded). 
+* 0 – Prints the value in a general way. It uses an optimized fixed format that has no trailing zeros and shows decimal points only as needed. However, if the number is too large or too small based on the given precision (default 6), the scientific format will be used. 
+* 1 – Prints the value in fixed-point notation with a fixed number of digits after decimal point (default 6). If digits after decimal point are fewer than the number, trailing zeros are added. 
 * 2 – Prints the value in scientific notation, the default precision after decimal point is 6.
 * 3 – Prints the value in percentage format with a number of digits after decimal point up tp the precision (by default 6)
 * 4 – Prints the value using scientific notation, but with the number represented in hexadecimal. Because `e` is a valid hex digit, the exponent is indicated with a `p` character.
@@ -397,7 +397,7 @@ The `fbase` value indicates the format used to print the number. It can have one
 The following shorthands can be for the `fbase` in the floating-point number format:
 | shorthand  | equivalents                                                        |
 |:---------- |:------------------------------------------------------------------ |
-| fopt       | fbase=0 (optimized format for floating point number)      |
+| fgen       | fbase=0 (general format for floating point number)      |
 | fixed      | fbase=1 (fixed point format)  |
 | sci        | fbase=2 (scientific)        |
 | %          | fbase=3 (percentage)        |
@@ -454,7 +454,7 @@ output:
 1E+10 ⭠ using uppercase for `e`
 0X1.2A05F2P+33  ⭠ using uppercase for `p` and hex digits
 ```
-If `prec` is present, the output will have the precision as specified. If prec is not present, the default precision is 6. In fixed format, the precision determines the number of digits after the decimal point:
+If `prec` is present, the output will have the precision as specified. If `prec` is not present, the default precision is 6. The precision has different meanings in different formats. In fixed format, the precision determines the number of digits after the decimal point:
 ```altro
 print([fixed], 0.123456789, "       ⭠ default precision in fixed\n");
 print([fixed, prec=12], 0.123456789, " ⭠ precision 12 in fixed\n");
@@ -463,16 +463,41 @@ output:
 0.123457       ⭠ default precision in fixed
 0.123456789000 ⭠ precision 12 in fixed
 ```
+In the general (default) format, the precision determines how large the number can be before the fixed format is switched to the scientific format. This is the same as the `g` or `G` format used in other programming languages such as C++ and Python. The detail description of the rule that governs choice between scientific format and the fixed format with a given precision can be found in [Python G format](https://python-reference.readthedocs.io/en/latest/docs/functions/format.html#type). Here is the example how precision affect the choice of the optimized fixed format and the scientific format when the general format is used:
+```altro
+print(1234567.0, " ⭠ using default precision 6 and the scientific format is used\n");
+print([prec=8], 1234567.0, "     ⭠ using customized precision 8, and the optimized fixed format is used\n");
+_______________________________________________________
+output:
+1.23457e+06 ⭠ using default precision 6 and the scientific format is chosen
+1234567     ⭠ using customized precision 8, and the optimized fixed format is chosen
+```
+The 'fsep' value, when present, determines if the value needs to be printed with separators in fixed format, and how the decimal point is printed. The 'fsep' value can take the following options:
+
+* 0 – No thousand separator. This is the default.
+* 1 – Locale-aware thousand separator and decimal point. Thousand separator takes effect only for fixed format.
+* 2 – Using comma as a thousand separator in fixed format.
+
+```altro
+print(1000000000, "    ⭠ This is default\n");
+print("Now using ", setlocale(LC_NUMERIC, "German", "Germany"), " for numeric output\n");
+print([isep=1], 1000000000, " ⭠ Thounsand separator using de_DE locale\n");
+print([isep=2], 1000000000, " ⭠ Thounsand separator using comma\n");
+print([ibase=1, isep=2, ipad=1], 1000000000, "   ⭠ Using space as separator in hexadecimal format\n");
+_______________________________________________________
+output:
+1000000000    ⭠ This is default
+Now using de_DE for numeric output
+1.000.000.000 ⭠ Thounsand separator using de_DE locale
+1,000,000,000 ⭠ Thounsand separator using comma
+3b 9a ca 00   ⭠ Using space as separator in hexadecimal format
+```
 
 
-the output is in either fixed-point or scientific notation, depending on which gives the shortest output that still guarantees that reading the value in again will give the same value as was written out.
 
 
 
 
-**Shorthands for Integer Values**
-
-The following shorthands are provided for text numeric values:
 
 
 
@@ -497,11 +522,11 @@ The *type* character gives differnt floating-point presentation as given below.
 
 * `e` – Prints the value in scientific notation. If no *prec* value is given, it defaults to 6.
 * `f` – Prints the value in fixed-point notation. If no *prec* value is given, it defaults to 6.
-* `g` – Prints the value in an optimized way, which picks between `e` and `f` form depending on which form is the shortest.
+* `g` – Prints the value in a general way, which picks between `e` and `f` form depending on which form is the shortest.
 * `a` – Prints the value using scientific notation, but with the number represented in hexadecimal. Because `e` is a valid hex digit, the exponent is indicated with a `p` character.
 
 **Shorthands for Integer Values**
-| fopt       | fbase=0 (optimized format for floating point number)      |
+| fgen       | fbase=0 (general format for floating point number)      |
 | fixed      | fbase=1 (fixed point format)  |
 | sci        | fbase=2 (scientific)        |
 | %          | fbase=3 (percentage)        |
