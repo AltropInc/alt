@@ -575,7 +575,7 @@ print([:g/'], 1000000000.25, " ⭠ [:g/'] general, remove trailing zeros, comma 
 print([:g24'], 1000000000.25, " ⭠ [:g24'] general, commas separated, leading spaces to make up width of 24\n");
 print("Using ", setlocale(LC_NUMERIC, "de_DE"), " for numeric output:\n");
 print([:gL], 1000000000.25, " ⭠ [:gL] general, separated by locale-aware separators\n");
-print([:E24L], 1000000000.25, " ⭠ [:E+24L] scientific, fwidth=24, fsign=2(comma), fupper=1\n");
+print([:E24L.12], 1000000000.25, " ⭠ [:E24L.12] scientific, fupper=1, fwidth=24, fsep=1(German), prec=12\n");
 print([:g024L], 1000000000.25, " ⭠ [:g+024L] general, fwidth=24, fsep=1(German), fpad=1\n");
 _______________________________________________________
 output:
@@ -591,9 +591,37 @@ output:
     1,000,000,000.250000 ⭠ [:g24'] general, commas separated, leading spaces to make up width of 24
 Using de_DE for numeric output:
 1.000.000.000,250000 ⭠ [:gL] general, separated by locale-aware separators
-            1,000000E+09 ⭠ [:E+24L] scientific, fwidth=24, fsign=2(comma), fupper=1
+      1,000000000250E+09 ⭠ [:E24L.12] scientific, fupper=1, fwidth=24, fsep=1(German), prec=12
 00001.000.000.000,250000 ⭠ [:g+024L] general, fwidth=24, fsep=1(German), fpad=1
 ```
+
+## Using Formatter in Print
+
+A formatter can be inserted in any position in the input list of the `print` function. The formatter takes effect on all inputs that follows the formatter until the end of the input list or a new formatter of the same type which overrides the previous formatter.
+
+Here is an example of calling the `print` with multiple formatters:
+```altro
+for (x := 1; x<10; ++x)
+    print( [bold], x,   // print x in bold
+           [/bold],     // cancel bold atrribute
+           ": ",        // print string ": " in normal
+           [:s<10],  x, "² = ", x²,  // print x, string "² = ", and x² together in specified alignment
+           [:s<10], x, "³ = ", x³,   // print x, string "³ = ", and x³ together in specified alignment
+           "\n"         // print a new line
+         );
+```
+The output:<br>
+**1**: 1² = 1&nbsp;&nbsp;&nbsp;1³ = 1<br>
+**2**: 2² = 4&nbsp;&nbsp;&nbsp;2³ = 8<br>
+**3**: 3² = 9&nbsp;&nbsp;&nbsp;3³ = 27<br>
+**4**: 4² = 16&nbsp;&nbsp;&nbsp;4³ = 64<br>
+**5**: 5² = 25&nbsp;&nbsp;5³ = 125<br>
+**6**: 6² = 36&nbsp;&nbsp;6³ = 216<br>
+**7**: 7² = 49&nbsp;&nbsp;7³ = 343<br>
+**8**: 8² = 64&nbsp;&nbsp;8³ = 512<br>
+**9**: 9² = 81&nbsp;&nbsp;9³ = 729<br>
+
+
 
 
 
