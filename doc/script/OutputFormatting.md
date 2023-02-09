@@ -254,7 +254,7 @@ output:
 -10 +0 +10
 -10  0  10
 ```
-For non-decimal integer format, the `iwidth` value, when present, gives minmum characters for the output. If the number of digits is smaller than the required width, leading zeros will be padded if the `ipad` value is 1, or leading spaces will be padded if the `ipad` value is 0 or is not given. If the value needs more characters than the specified width, it will be displayed in full, not truncated to the width. Here are examples of using `iwidth` and `ipad` to print integers in decimal:
+The `iwidth` value, when present, gives minmum characters for the output. If the number of digits is smaller than the required width, leading zeros will be padded if the `ipad` value is 1, or leading spaces will be padded if the `ipad` value is 0 or is not given. If the value needs more characters than the specified width, it will be displayed in full, not truncated to the width. Here are examples of using `iwidth` and `ipad` to print integers in decimal:
 ```altro
 print([iwidth=8]], 10, ' ', 0, ' ', -10, '\n');                    // width 8, pad with leading spaces
 print([iwidth=8, ipad=1]", 10, ' ', 0, ' ', -10, '\n');            // width 8, pad with leading zeros
@@ -339,8 +339,8 @@ The *sign* can be one of the following characters:
 | sign       | equivalents |
 |:---------- |:------------|
 | -          | isign=0 (show negative sign only)    |
-| +          | ibase=1 (show sign always)    |
-| space      | ibase=2 (show positive sign as a space)    |
+| +          | isign=1 (show sign always)    |
+| space      | isign=2 (show positive sign as a space)    |
 
 The `#` character, if present, is eqivalent to `showbase=1`, and causes base to be printed for non-decimal formats.
 
@@ -379,7 +379,7 @@ The following members are used for floating-point numbers:
 |:---------- |:------- |:-------------------------------------------------------------- |
 | fbase      |  0~4    | floating number base: general(0), fixed point(1), scientific(2), percentage(3), hexadecimal(4)             |
 | fsign      |  0~2    | show negative sign only(0)  show positive and negative sign(1), show positive sign as a space(2)|
-| fsep       |  0~1    | no thousand separator (0)  locale awareness separator and decimal point (1) comma as a separator (2)                    |
+| fsep       |  0~1    | no thousand separator (0)  locale awareness separator(1) comma as a separator (2)                    |
 | fpad       |  0~1    | using zeros for padding (0), using spaces for padding(1)             |
 | fwidth     |  int    | minimum number of characters for the output              |
 | fupper     |  0~1    | no using uppercase(0)  using uppercase(1)                 |
@@ -472,37 +472,117 @@ output:
 1.23457e+06 ⭠ using default precision 6 and the scientific format is chosen
 1234567     ⭠ using customized precision 8, and the optimized fixed format is chosen
 ```
-The 'fsep' value, when present, determines if the value needs to be printed with separators in fixed format, and how the decimal point is printed. The 'fsep' value can take the following options:
+The 'fsep' value, when present, determines if the value needs to be printed with thousand separators in general or fixed format. If the thousand separato is used, the general format will never use scientic format, and use the optimized fixed format in stead. The 'fsep' value can take the following options:
 
 * 0 – No thousand separator. This is the default.
-* 1 – Locale-aware thousand separator and decimal point. Thousand separator takes effect only for fixed format.
+* 1 – Locale-aware thousand separator. Thousand separator takes effect only for general and fixed format.
 * 2 – Using comma as a thousand separator in fixed format.
 
+Some numeric locale use comma as a decimal point, and this causes conflict when choose commas as thousand separators. In this case, the decimal point will be switch back to the default form `.`.  
 ```altro
-print(1000000000, "    ⭠ This is default\n");
-print("Now using ", setlocale(LC_NUMERIC, "German", "Germany"), " for numeric output\n");
-print([isep=1], 1000000000, " ⭠ Thounsand separator using de_DE locale\n");
-print([isep=2], 1000000000, " ⭠ Thounsand separator using comma\n");
-print([ibase=1, isep=2, ipad=1], 1000000000, "   ⭠ Using space as separator in hexadecimal format\n");
+print("Now using ", setlocale(LC_NUMERIC, "de_DE"), " for numeric output\n");
+print([fsep=1], 2000000000.25, "     ⭠ general format, locale-aware separators\n");
+print([fsep=2], 2000000000.25, "     ⭠ general format, commas as separators\n");
+print([fixed, fsep=1], 2000000000.25, " ⭠ fixed format, locale-aware separators\n");
+print([fixed, fsep=2], 2000000000.25, " ⭠ fixed format, commas as separators\n");
 _______________________________________________________
 output:
-1000000000    ⭠ This is default
 Now using de_DE for numeric output
-1.000.000.000 ⭠ Thounsand separator using de_DE locale
-1,000,000,000 ⭠ Thounsand separator using comma
-3b 9a ca 00   ⭠ Using space as separator in hexadecimal format
+2.000.000.000,25     ⭠ general format, locale-aware separators
+2,000,000,000.25     ⭠ general format, commas as separators
+2.000.000.000,250000 ⭠ fixed format, locale-aware separators
+2,000,000,000.250000 ⭠ fixed format, commas as separators
+```
+The `fwidth` value, when present in positive value, gives minmum characters for the output. If the number of output characters is smaller than the required width, leading zeros will be padded if the `fpad` value is 1, or leading spaces will be padded if the `fpad` value is 0 or is not given. Leading zeros or spaces will be padded after any *sign* character. If only `width` present, leading spaces will be padded.. If the value needs more characters than the specified width, it will be displayed in full, not truncated to the width. Here are examples of using `fwidth` and `fpad` to print floating numbers in decimal.
+```altro
+print([fsep=2, fwidth=20, fpad=1], 2000000.25, " ⭠ padding with zeros\n");
+print([fwidth=20], 2000000.25, " ⭠ padding with spaces\n");
+print([sci, fwidth=20], -2000000.25, " ⭠ padding with spaces after sign\n");
+_______________________________________________________
+output:
+000000002,000,000.25 ⭠ padding with zeros 
+          2000000.25 ⭠ padding with spaces
+-       2.000000e+06 ⭠ padding with spaces after sign
+```
+Note that thousand separators do not count for leading zeros.
+
+The `ftrim` value, when present with value equal to one, will trim trailing zeros, if any. If `showpoint` value is not given to one, the decimal point will also be trimed.
+```altro
+print([showpoint=1], 12.5, "      ⭠ general format with options that always shows fractional part\n");
+print([fixed], 12.5, "    ⭠ fixed format which shows fractional part \n");
+print([sci], 10., " ⭠ scientific format which shows fractional part \n");
+print([showpoint=1, ftrim=1], 2.25, "        ⭠ trailing zero trimmed in general format\n");
+print([fixed, ftrim=1], 2.25, "         ⭠ trailing zero trimmed in scientific format\n");
+print([sci, ftrim=1], 1e+01, "        ⭠ trailing zero trimmed in scientific format\n");
+_______________________________________________________
+output:
+12.5000      ⭠ general format with options that always shows fractional part
+12.500000    ⭠ fixed format which shows fractional part
+1.000000e+01 ⭠ scientific format which shows fractional part
+2.25         ⭠ trailing zero trimmed in general format
+2.25         ⭠ trailing zero trimmed in scientific format
+1e+01        ⭠ trailing zero trimmed in scientific format
+```
+
+**Float-Point Number Format with Packed Format String**
+
+You can use the following format string to define a format of rpringting a float-point number:<br>
+:*base*\[*sign*]*#*]\[*0*]\[*width*]\[*sep*]\[*prec*]
+
+The *base* can be one of the following characters:
+| base       | equivalents                                                        |
+|:---------- |:------------------------------------------------------------------ |
+| g          | fbase=0 (general)      |
+| G          | fbase=0 (general), fupper=1      |
+| f          | fbase=1 (fixed)  |
+| F          | fbase=1 (fixed), fupper=1  |
+| e          | fbase=2 (scientific)        |
+| E          | fbase=2 (scientific), fupper=1       |
+| a          | fbase=3 (hexadecimal scientific)       |
+| a          | fbase=3 (hexadecimal scientific), fupper=1      |
+The base character is mandatory.
+
+The *sign* can be one of the following characters:
+| sign       | equivalents |
+|:---------- |:------------|
+| -          | fsign=0 (show negative sign only)    |
+| +          | fsign=1 (show sign always)    |
+| space      | fsign=2 (show positive sign as a space)    |
+
+The `#` character, if present, is eqivalent to `showpoint=1`, and causes the fractional part to be aways printed even with the value has no fractional part.
+
+The `0` character, if present, is eqivalent to `fpad=1`.  The `width` field is an integer, which is eqivalent to `fwdith=<the filed value>`, and used to give the minimum width for a numeric value.  If both `0` and `width` present, leading zeros will be padded after any *sign* character to meet the specified width. If only `width` present, leading spaces will be padded.
+
+The *sep* can be one of the following characters:
+| shorthand  | equivalents |
+|:---------- |:------------|
+| L          | fsep=1 (locale awareness separator)    |
+| '          | fsep=2 (comma separator for decimals and space for other formats)    |
+
+The *prec* filed value is formed of a decimal point followed by the precision integer, and is eqivalent to `prec=<the filed value>`. 
+
+Examples of using packed string for integer formats:
+```altro
+print("Using ", setlocale(LC_NUMERIC, "de_DE"), " for numeric output:\n");
+print([:dL], 1000000000, " ⭠ ibase=dec, isep=1(German)\n");
+print([:d+L], 1000000000, " ⭠ ibase=dec, isign=1, isep=1(German)\n");
+print([:d+24'], 1000000000, " ⭠ ibase=dec, iwidth=24, isign=1, isep=2(comma)\n");
+print([:d+024L], 1000000000, " ⭠ ibase=dec, iwidth=24, isign=1, isep=1(German), ipad=1\n");
+print([:X08'], 1000000000, " ⭠ ibase=hex, iwidth=8, isep=2(space), iupper=1\n");
+print([:x#08], 1000000000, " ⭠ ibase=hex, iwidth=8, showbase=1\n");
+_______________________________________________________
+output:
+Using de_DE for numeric output:
+1.000.000.000 ⭠ ibase=dec, isep=1
++1.000.000.000 ⭠ ibase=dec, isign=1, isep=1(German)
++          1.000.000.000 ⭠ ibase=dec, iwidth=24, isign=1, isep=2(comma)
++00000000001.000.000.000 ⭠ ibase=dec, iwidth=24, isign=1, isep=1(German), ipad=1
+3B 9A CA 00 ⭠ ibase=hex, iwidth=8, isep=2(space), iupper=1
+0x3b9aca00 ⭠ ibase=hex, iwidth=8, showbase=1
 ```
 
 
 
-
-
-
-
-
-
-You can also use the following format to specift a numeric format:<br>
-:\[*sign*]*#*]\[*0*]\[*width*]\[*prec*]\[*L*]\[*type*]
 
 The sign value specifies how the sign for an numeric value is to be printed. It can take the following options:
 
