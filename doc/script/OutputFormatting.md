@@ -12,7 +12,7 @@ The output on the printed target is a text of one or multiple characters:
 π
 the ratio of circumference to diameter
 ```
-You can provide any nummber of input values to a print function. For example,
+You can provide any number of input values to a print function. For example,
 ```altro
 print("π = ", 3.14); // print a string and a real number
 ```
@@ -30,19 +30,19 @@ A **formatter** is the specification of a printing format. It provides support f
 * Formatters for integers
 * Formatters for floating-point numbers
 
-A formatter can be expressed by a formatter expression with a set of formatter values listed in a pair of bracket `[]`. Each format value is typically given by the format member name defined by the `fmt` type and followed by an equal sign with a format value.  For instance,
+A formatter can be expressed by a formatter expression with a set of formatter values listed in a pair of brackets `[]`. Each format value is typically given by the format member name defined by the `fmt` type and followed by an equal sign with a format value.  For instance,
 ```altro
 [width=40, align=1, fill='─', bold=1]
 ```
 The above expression specifies a formatter for printing right-aligned contents in bold font with minimum column width 40 and dash filled spaces. Using this format to print a string:
-```alreo
+```altro
 print([width=40, align=1, fill='─', bold=1], "this is bold text")
 ```
 generates the following screen output:
 
 **───────────────────────this is bold text**
 
-In addition to the typical form of `fromat_name=fromat_value`, a number of shorthands are also provided for readability and convenience. For instance, instead of using integer for color code in the form `color=1`, you can also use color name such as `red`, and `green`. Format values can also be packed in a specific string similar to Python output format. The following expressions give the same set of formatter values:
+In addition to the typical form of `fromat_name=fromat_value`, a number of shorthands are also provided for readability and convenience. For instance, instead of using integers for color code in the form `color=1`, you can also use color names such as `red`, and `green`. Format values can also be packed in a specific string similar to Python output format. The following expressions give the same set of formatter values:
 ```altro
 [width=40, align=1, fill='─', color=1, bold=1]
 [width=40, align=right, fill='─', red, bold]
@@ -53,7 +53,7 @@ Formatter shorthands will be discussed in the following sections.
 
 ### Formatters for Strings
 
-Formatters for strings provides specifications of text layout arrangement, alignment and appearance. They are applied to strings converted from all types of values. For example,
+Formatters for strings provide specifications of text layout arrangement, alignment and appearance. They are applied to strings converted from all types of values. For example,
 ```altro
 print([italic=1], "pi = ", 3.14);
 ```
@@ -61,11 +61,11 @@ The formatter `[italic=1]` are applied to all arguments following this formatter
 
 *pi = 3.14*
 
-Formatters for strings include **Alignment Formatter** and **Apperance Formatter**:
+Formatters for strings include **Alignment Formatter** and **Appearance Formatter**:
 
 #### Alignment Formatter
 
-The following members are used for string aligments:
+The following members are used for string alignments:
 | name      | values  | Description                                                         |
 |:--------- |:------- |:-------------------------------------------------------------- |
 | start     |  char   | starting character in alignment            |
@@ -80,7 +80,7 @@ The *width* is an integer for the minimum number of column width required for th
 
 The *fill* is an optional character to fill the space required for the minimum width. If the fill character is not given, space is assumed. If the fill character occupies two column spaces and the number of column spaces is an odd number, a space will be used between the filling and the text.
 
-The *align* value gives the alignment to use. It can be value from 0 to 2. The meaning of these is as follows:
+The *align* value gives the alignment to use. It can be a value from 0 to 2. The meaning of these is as follows:
 * 0 – The text is left-justified in the field width. This is the default alignment.
 * 1 – The text is right-justified in the field width.
 * 2 – The text is centered in the field width. Any filling will be distributed evenly on the left and right sides of the value. If an odd number of padding characters is needed, the extra one will always be on the right.
@@ -96,7 +96,7 @@ The following packed string, started with `:s`, can also be used for string alig
 
 :s\[\[\[*start*]*fill*]*align*]\[*width*]\[*end*]
 
-`:s` intruduces a packed string for string alignment formats. If the first character following `:s` is immediately followed by one of the alignment characters, that first character is treated as the fill character to use. The fill and align values only make sense if you also specify a width value, although it is not an error to specify them without width, but without width, the alignment will not take effect. The `align` character can have any of the values <, >, or ^. The meaning of these is as follows:
+`:s` introduces a packed string for string alignment formats. If the first character following `:s` is immediately followed by one of the alignment characters, that first character is treated as the fill character to use. The fill and align values only make sense if you also specify a width value, although it is not an error to specify them without width, but without width, the alignment will not take effect. The `align` character can have any of the values <, >, or ^. The meaning of these is as follows:
 
 * \< – left-justified, which is equivalent to `align=0`, and this is the default.
 * \> – right-justified, which is equivalent to `align=1`.
@@ -121,9 +121,9 @@ In the output:<br>
 【<ins>&nbsp;&nbsp;&nbsp;1.23&nbsp;&nbsp;&nbsp;</ins>】<br>
 the underline effect is not applied to the starting and the ending characters.
 
-#### Apperance Formatter
+#### Appearance  Formatter
 
-The following members are used for text apperance:
+The following members are used for text appearance:
 
 | name      | values  | Description                                                         |
 |:--------- |:------- |:-------------------------------------------------------------- |
@@ -139,7 +139,7 @@ The following members are used for text apperance:
 | conceal   |  0~1    | hidden text: no conceal(0)  conceal(1)      |
 | blink     |  0~2    | no blink(0)  blink(1), fast blink(2)             |
 
-The following shorthands are provided for text apperance:
+The following shorthands are provided for text appearance:
 
 * **Shorthands for common color names:**
 | shorthand  | equivalents                                                        |
@@ -190,7 +190,7 @@ The following shorthands are provided for text apperance:
 | reverse    | reverse=1  |
 | /reverse   | reverse=0  |
 
-If you use a common color name as a shorthand to specify the text color or the background color, the first occurence of the color name stands for the text color, and the second occurence of the color name stands for the background color. For example: `[red, white]` stands for red text with white background, which is eqvalent to `[color=red, bcolor=white]`
+If you use a common color name as a shorthand to specify the text color or the background color, the first occurance of the color name stands for the text color, and the second occurance of the color name stands for the background color. For example: `[red, white]` stands for red text with white background, which is equivalent to `[color=red, bcolor=white]`.
 
 Using shorthands `/color` or `/bcolor` to reset text color or background color to the default color used by the printing media.
 
@@ -214,7 +214,7 @@ The `ibase` value indicates the integer base used to print the number. It can ha
 * 2 – Octal format (base 8). For alternate form, the value is prefixed with 0 as long as it is non-zero. For example, 7 outputs as 07, but 0 outputs as 0.
 * 3 – Binary format (base 2). For alternate form, the value is prefixed with 0b for b, and 0B for B.
 
-The following shorthands can be for the `ibase` in theinteger format:
+The following shorthands can be for the `ibase` in the integer format:
 | shorthand  | equivalents                                                        |
 |:---------- |:------------------------------------------------------------------ |
 | dec        | ibase=0 (decimal)      |
@@ -235,7 +235,7 @@ a ffffffff ⭠ Hexadecimal format
 12 37777777777 ⭠ Octal format
 0b1010 0b11111111111111111111111111111111 ⭠ Binary format
 ```
-When using base other than decimal, the integer is always treated as unsigned in order to reflect the values of the underlying bits of the integer.
+When using a base other than decimal, the integer is always treated as unsigned in order to reflect the values of the underlying bits of the integer.
 
 The `isign` value specifies how the sign for an integer value is to be printed. It can take the following options:
 
@@ -254,7 +254,7 @@ output:
 -10 +0 +10
 -10  0  10
 ```
-The `iwidth` value, when present, gives minmum characters for the output. If the number of digits is smaller than the required width, leading zeros will be padded if the `ipad` value is 1, or leading spaces will be padded if the `ipad` value is 0 or is not given. If the value needs more characters than the specified width, it will be displayed in full, not truncated to the width. Here are examples of using `iwidth` and `ipad` to print integers in decimal:
+The `iwidth` value, when present, gives minimum characters for the output. If the number of digits is smaller than the required width, leading zeros will be padded if the `ipad` value is 1, or leading spaces will be padded if the `ipad` value is 0 or is not given. If the value needs more characters than the specified width, it will be displayed in full, not truncated to the width. Here are examples of using `iwidth` and `ipad` to print integers in decimal:
 ```altro
 print([iwidth=8]], 10, ' ', 0, ' ', -10, '\n');                    // width 8, pad with leading spaces
 print([iwidth=8, ipad=1]", 10, ' ', 0, ' ', -10, '\n');            // width 8, pad with leading zeros
@@ -267,7 +267,7 @@ output:
 +0000010 +0000000 -0000010
 +1000000000
 ```
-For non-decimal integer formats, if `iwidth` is not given or is zero, and `ipad` value is 1, leading zeros will be padded to show all bits of the given integer value. For instance, if the integer value is a 32-bit integer and hecadecimal format is used, leading zeros will be padded to generate a sequence of 8 hecadecimal digits to show all bytes of the value; and if binary format is used, leading zeros will be padded to generate a sequence of 32 binary digits to show all bits of the value. If  `iwidth` is not given, leading zeros (when `ipad` value is 1) or spaces (when otherwise) will be padded to the given width (the base indicator characters, if any, are not counted in the given width). 
+For non-decimal integer formats, if `iwidth` is not given or is zero, and `ipad` value is 1, leading zeros will be padded to show all bits of the given integer value. For instance, if the integer value is a 32-bit integer and hexadecimal format is used, leading zeros will be padded to generate a sequence of 8 hexadecimal digits to show all bytes of the value; and if binary format is used, leading zeros will be padded to generate a sequence of 32 binary digits to show all bits of the value. If  `iwidth` is not given, leading zeros (when `ipad` value is 1) or spaces (when otherwise) will be padded to the given width (the base indicator characters, if any, are not counted in the given width).
 ```altro
 print([ibase=hex], 192, "        ⭠ default hexadecimal format\n");
 print([hex, ipad=1], 192, " ⭠ padding with leading 0s to show all bytes of a 32-bit int (8 hexadecimal digits)\n");
@@ -284,26 +284,26 @@ c0       ⭠ default hexadecimal format
   c0     ⭠ padding with leading spaces to the given width
 0x00c0   ⭠ The base indicator `0x` is not counted in the width
 ```
-The 'isep' value, when present, determines if the value needs to be printed with separators. In a decimal format, digits are separated by thousands (every 3 digits); in a hecadecimal format, digits are separated every two digits; in an octal format, digits are separated every three digits; and in a binary format, digits are separated every eight digits. The 'isep' value can take the following options:
+The 'isep' value, when present, determines if the value needs to be printed with separators. In a decimal format, digits are separated by thousands (every 3 digits); in a hexadecimal format, digits are separated every two digits; in an octal format, digits are separated every three digits; and in a binary format, digits are separated every eight digits. The 'isep' value can take the following options:
 
-* 0 – No thousand separator. This is the default.
-* 1 – Locale-aware thousand separator. This takes effect only for decimal format. See [Locale](Locale.md) for more information.
+* 0 – No thousand separators. This is the default.
+* 1 – Locale-aware thousand separators. This takes effect only for decimal format. See [Locale](Locale.md) for more information.
 * 2 – Using comma as a thousand separator for decimal format, and use a space as a separator for other base formats.
 ```altro
 print(1000000000, "    ⭠ This is default\n");
 print("Now using ", setlocale(LC_NUMERIC, "German", "Germany"), " for numeric output\n");
-print([isep=1], 1000000000, " ⭠ Thounsand separator using de_DE locale\n");
-print([isep=2], 1000000000, " ⭠ Thounsand separator using comma\n");
+print([isep=1], 1000000000, " ⭠ Thousand separator using de_DE locale\n");
+print([isep=2], 1000000000, " ⭠ Thousand separator using comma\n");
 print([ibase=1, isep=2, ipad=1], 1000000000, "   ⭠ Using space as separator in hexadecimal format\n");
 _______________________________________________________
 output:
 1000000000    ⭠ This is default
 Now using de_DE for numeric output
-1.000.000.000 ⭠ Thounsand separator using de_DE locale
-1,000,000,000 ⭠ Thounsand separator using comma
+1.000.000.000 ⭠ Thousand separator using de_DE locale
+1,000,000,000 ⭠ Thousand separator using comma
 3b 9a ca 00   ⭠ Using space as separator in hexadecimal format
 ```
-The `showbase` value determines if the base will be shown in the output for non-decimal format. It this value is 1, the number output will be prefixed by `0X` or `0x` for hecadecimal format, `0B` or `0b` for binary format, and `0` for none-zero numbers in octal format. The case used in the prefix is determined by the value of `iupper`.
+The `showbase` value determines if the base will be shown in the output for non-decimal format. It this value is 1, the number output will be prefixed by `0X` or `0x` for hexadecimal format, `0B` or `0b` for binary format, and `0` for non-zero numbers in octal format. The case used in the prefix is determined by the value of `iupper`.
 ```altro
 print([ibase=1, showbase=1], 1000000000, "  ⭠ show base in hexadecimal format\n");
 print([ibase=1, showbase=1, iupper=1], 1000000000, "  ⭠ show base using uppercase in hexadecimal format\n");
@@ -342,9 +342,9 @@ The *sign* can be one of the following characters:
 | +          | isign=1 (show sign always)    |
 | space      | isign=2 (show positive sign as a space)    |
 
-The `#` character, if present, is eqivalent to `showbase=1`, and causes base to be printed for non-decimal formats.
+The `#` character, if present, is equivalent  to `showbase=1`, and causes base to be printed for non-decimal formats.
 
-The `0` character, if present, is eqivalent to `ipad=1`.  The `width` field is an integer, which is eqivalent to `iwdith=<the filed value>`, and used to give the minimum width for a numeric value.  In decimal format, if both `0` and `width` present, leading zeros will be padded after any *sign* character and/or base indicator to meet the specified width. If only `width` present, leading spaces will be padded. In non-decimal formats, the `iwidth` value, leading zeros will be padded if the `0` presents, otherwise leading spaces will be padded.
+The `0` character, if present, is equivalent to `ipad=1`.  The `width` field is an integer, which is equivalent to `iwdith=<the filed value>`, and used to give the minimum width for a numeric value.  In decimal format, if both `0` and `width` present, leading zeros will be padded after any *sign* character and/or base indicator to meet the specified width. If only `width` present, leading spaces will be padded. In non-decimal formats, the `iwidth` value, leading zeros will be padded if the `0` presents, otherwise leading spaces will be padded.
 
 The *sep* can be one of the following characters:
 | shorthand  | equivalents |
@@ -472,13 +472,13 @@ output:
 1.23457e+06 ⭠ using default precision 6 and the scientific format is chosen
 1234567     ⭠ using customized precision 8, and the optimized fixed format is chosen
 ```
-The 'fsep' value, when present, determines if the value needs to be printed with thousand separators in general or fixed format. If the thousand separato is used, the general format will never use scientic format, and use the optimized fixed format in stead. The 'fsep' value can take the following options:
+The 'fsep' value, when present, determines if the value needs to be printed with thousand separators in general or fixed format. If the thousand separator is used, the general format will never use scientific format, and use the optimized fixed format instead. The 'fsep' value can take the following options:
 
 * 0 – No thousand separator. This is the default.
 * 1 – Locale-aware thousand separator. Thousand separator takes effect only for general and fixed format.
-* 2 – Using comma as a thousand separator in fixed format.
+* 2 – Using commas as a thousand separator in fixed format.
 
-Some numeric locale use comma as a decimal point, and this causes conflict when choose commas as thousand separators. In this case, the decimal point will be switch back to the default form `.`.  
+Some numeric locales use commas as a decimal point, and this causes conflict when choosing commas as thousand separators. In this case, the decimal point will be switched back to the default form `.`.  
 ```altro
 print("Now using ", setlocale(LC_NUMERIC, "de_DE"), " for numeric output\n");
 print([fsep=1], 2000000000.25, "     ⭠ general format, locale-aware separators\n");
@@ -493,7 +493,7 @@ Now using de_DE for numeric output
 2.000.000.000,250000 ⭠ fixed format, locale-aware separators
 2,000,000,000.250000 ⭠ fixed format, commas as separators
 ```
-The `fwidth` value, when present in positive value, gives minmum characters for the output. If the number of output characters is smaller than the required width, leading zeros will be padded if the `fpad` value is 1, or leading spaces will be padded if the `fpad` value is 0 or is not given. Leading zeros or spaces will be padded after any *sign* character. If only `width` present, leading spaces will be padded.. If the value needs more characters than the specified width, it will be displayed in full, not truncated to the width. Here are examples of using `fwidth` and `fpad` to print floating numbers in decimal.
+The `fwidth` value, when present in positive value, gives minimum characters for the output. If the number of output characters is smaller than the required width, leading zeros will be padded if the `fpad` value is 1, or leading spaces will be padded if the `fpad` value is 0 or is not given. Leading zeros or spaces will be padded after any *sign* character. If only `width` is present, leading spaces will be padded.. If the value needs more characters than the specified width, it will be displayed in full, not truncated to the width. Here are examples of using `fwidth` and `fpad` to print floating numbers in decimal.
 ```altro
 print([fsep=2, fwidth=20, fpad=1], 2000000.25, " ⭠ padding with zeros\n");
 print([fwidth=20], 2000000.25, " ⭠ padding with spaces\n");
@@ -526,7 +526,7 @@ output:
 
 **Float-Point Number Format with Packed Format String**
 
-You can use the following format string to define a format of rpringting a float-point number:<br>
+You can use the following format string to define a format to print a float-point number:<br>
 :*base*\[*sign*]*#*]\[*0*]\[*width*]\[*sep*]\[*prec*]
 
 The *base* can be one of the following characters:
@@ -549,9 +549,9 @@ The *sign* can be one of the following characters:
 | +          | fsign=1 (show sign always)    |
 | space      | fsign=2 (show positive sign as a space)    |
 
-The `#` character, if present, is eqivalent to `showpoint=1`, and causes the fractional part to be aways printed even with the value has no fractional part.
+The `#` character, if present, is equivalent to `showpoint=1`, and causes the fractional part to be aways printed even if the value has no fractional part.
 
-The `0` character, if present, is eqivalent to `fpad=1`.  The `width` field is an integer, which is eqivalent to `fwdith=<the filed value>`, and used to give the minimum width for a numeric value.  If both `0` and `width` present, leading zeros will be padded after any *sign* character to meet the specified width. If only `width` present, leading spaces will be padded.
+The `0` character, if present, is equivalent to `fpad=1`.  The `width` field is an integer, which is equivalent to `fwdith=<the field value>`, and used to give the minimum width for a numeric value.  If both `0` and `width` present, leading zeros will be padded after any *sign* character to meet the specified width. If only `width` is present, leading spaces will be padded.
 
 The *sep* can be one of the following characters:
 | shorthand  | equivalents |
@@ -563,52 +563,37 @@ The *prec* filed value is formed of a decimal point followed by the precision in
 
 Examples of using packed string for integer formats:
 ```altro
+print([:f], 1000000000.25, " ⭠ [:f] fixed\n");
+print([:e], 1000000000.25, " ⭠ [:e] scientific\n");
+print([:g], 1000000000.25, " ⭠ [:g] general, \n");
+print([:g#], 1000000000.25, " ⭠ [:g#] general, show fractional part\n");
+print([:g#/], 1000000000.25, " ⭠ [:g#] general, show fractional part but remove trailing zeros\n");
+print([:g.14], 1000000000.25, " ⭠ [:g.14] general, prec=14\n");
+print([:g#.14], 1000000000.25, " ⭠ [:g#.14] general, prec=14, trailing  zeros to make up 14 digits \n");
+print([:g+], 1000000000.25, " ⭠ [:g+] general, show positive sign\n");
+print([:g/'], 1000000000.25, " ⭠ [:g/'] general, remove trailing zeros, comma separated\n");
+print([:g24'], 1000000000.25, " ⭠ [:g24'] general, commas separated, leading spaces to make up width of 24\n");
 print("Using ", setlocale(LC_NUMERIC, "de_DE"), " for numeric output:\n");
-print([:dL], 1000000000, " ⭠ ibase=dec, isep=1(German)\n");
-print([:d+L], 1000000000, " ⭠ ibase=dec, isign=1, isep=1(German)\n");
-print([:d+24'], 1000000000, " ⭠ ibase=dec, iwidth=24, isign=1, isep=2(comma)\n");
-print([:d+024L], 1000000000, " ⭠ ibase=dec, iwidth=24, isign=1, isep=1(German), ipad=1\n");
-print([:X08'], 1000000000, " ⭠ ibase=hex, iwidth=8, isep=2(space), iupper=1\n");
-print([:x#08], 1000000000, " ⭠ ibase=hex, iwidth=8, showbase=1\n");
+print([:gL], 1000000000.25, " ⭠ [:gL] general, separated by locale-aware separators\n");
+print([:E24L], 1000000000.25, " ⭠ [:E+24L] scientific, fwidth=24, fsign=2(comma), fupper=1\n");
+print([:g024L], 1000000000.25, " ⭠ [:g+024L] general, fwidth=24, fsep=1(German), fpad=1\n");
 _______________________________________________________
 output:
+1000000000.250000 ⭠ [:f] fixed
+1.000000e+09 ⭠ [:e] scientific
+1e+09 ⭠ [:g] general,
+1.00000e+09 ⭠ [:g#] general, show fractional part
+1.e+09 ⭠ [:g#] general, show fractional part but remove trailing  zeros
+1000000000.25 ⭠ [:g.14] general, prec=14
+1000000000.2500 ⭠ [:g#.14] general, prec=14, trailing zeros to make up 14 digits
++1e+09 ⭠ [:g+] general, show positive sign
+1,000,000,000.25 ⭠ [:g/'] general, remove trailing zeros, comma separated
+    1,000,000,000.250000 ⭠ [:g24'] general, commas separated, leading spaces to make up width of 24
 Using de_DE for numeric output:
-1.000.000.000 ⭠ ibase=dec, isep=1
-+1.000.000.000 ⭠ ibase=dec, isign=1, isep=1(German)
-+          1.000.000.000 ⭠ ibase=dec, iwidth=24, isign=1, isep=2(comma)
-+00000000001.000.000.000 ⭠ ibase=dec, iwidth=24, isign=1, isep=1(German), ipad=1
-3B 9A CA 00 ⭠ ibase=hex, iwidth=8, isep=2(space), iupper=1
-0x3b9aca00 ⭠ ibase=hex, iwidth=8, showbase=1
+1.000.000.000,250000 ⭠ [:gL] general, separated by locale-aware separators
+            1,000000E+09 ⭠ [:E+24L] scientific, fwidth=24, fsign=2(comma), fupper=1
+00001.000.000.000,250000 ⭠ [:g+024L] general, fwidth=24, fsep=1(German), fpad=1
 ```
 
 
-
-
-The sign value specifies how the sign for an numeric value is to be printed. It can take the following options:
-
-* `+` – A sign should always be printed for both negative and non-negative values.
-* `-` – A sign should only be printed for negative values. This is the default.
-* (space) – A sign should be printed for negative values, and a space for non-negative values.
-
-The `#` character, if used, causes a decimal point character to always be printed, even if there is no fractional part. This does not apply to infinity and NaN values.
-
-The `0` character is only valid when also specifying a width value. If present it pads the field with 0 characters after any *sign* character and/or base indicator. The *width* value is used to give the minimum width for a numeric value. If the value needs more characters than the specified width, it will be displayed in full, not truncated to the width.
-
-The *prec* value is formed by a decimal point followed by an integer to indicate the precision. The precision value is only valid for floating-point. It is used to determine how many digits after decimals should be printed.
-
-The 'L' character, when present, indicates that the value should be printed in a locale-aware format, for instance, using comma as decimal point and using space for thousand separator in German locale. See [Locale](Locale.md) for more information.
-
-The *type* character gives differnt floating-point presentation as given below.
-
-* `e` – Prints the value in scientific notation. If no *prec* value is given, it defaults to 6.
-* `f` – Prints the value in fixed-point notation. If no *prec* value is given, it defaults to 6.
-* `g` – Prints the value in a general way, which picks between `e` and `f` form depending on which form is the shortest.
-* `a` – Prints the value using scientific notation, but with the number represented in hexadecimal. Because `e` is a valid hex digit, the exponent is indicated with a `p` character.
-
-**Shorthands for Integer Values**
-| fgen       | fbase=0 (general format for floating point number)      |
-| fixed      | fbase=1 (fixed point format)  |
-| sci        | fbase=2 (scientific)        |
-| %          | fbase=3 (percentage)        |
-| hsci       | fbase=4 (hexadecimal scientific)  
 
