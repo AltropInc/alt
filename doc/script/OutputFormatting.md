@@ -597,13 +597,13 @@ Using de_DE for numeric output:
 
 ## Using Formatter in Print
 
-A formatter can be inserted in any position in the input list of the `print` function. The formatter takes effect on all inputs that follows the formatter until the end of the input list or a new formatter of the same type which overrides the previous formatter.
+A formatter can be inserted in any position in the input list of the `print` function. The formatter value takes effect on all inputs that follows the formatter until the end of the input list or a new formatter value of the same type which overrides the previous one.
 
 Here is an example of calling the `print` with multiple formatters:
 ```altro
 for (x := 1; x<10; ++x)
     print( [bold], x,   // print x in bold
-           [/bold],     // cancel bold atrribute
+           [/bold],     // cancel bold attribute
            ": ",        // print string ": " in normal
            [:s<10],  x, "² = ", x²,  // print x, string "² = ", and x² together in specified alignment
            [:s<10], x, "³ = ", x³,   // print x, string "³ = ", and x³ together in specified alignment
@@ -620,6 +620,28 @@ The output:<br><pre>
 <b>7</b>: 7² = 49   7³ = 343
 <b>8</b>: 8² = 64   8³ = 512
 <b>9</b>: 9² = 81   9³ = 729
+</pre>
+
+When using packed format for string alignment and numeric format, all previous formatter values in that category, if any, are overriden, even when the respective value is not provided in the packed format. For instance,
+```altro
+for (x := 1; x<=1000000000; x*=10)
+      print( [:d16'], x, // :d16' is a packed format for integer has ibase=dec, iwidth=16, isep=2
+             ' ',
+             [:X'], x,   // :X' is a packed format for integer has ibase=hex, isep=2
+             "\n"
+           );
+```
+When the formatter `[:X']` overrides the formatter `[:d16']`, all format values for integer format are overriden. The format value `iwidth`, though not presented in `[:X']`, the default value `0` is used to override the previous value `16`. Here is the output:<br><pre>
+               1 1
+              10 A
+             100 64
+           1,000 3 E8
+          10,000 27 10
+         100,000 1 86 A0
+       1,000,000 F 42 40
+      10,000,000 98 96 80
+     100,000,000 5 F5 E1 00
+   1,000,000,000 3B 9A CA 00
 </pre>
 
 
