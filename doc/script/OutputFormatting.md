@@ -631,7 +631,8 @@ for (x := 1; x<=1000000000; x*=10)
              "\n"
            );
 ```
-When the formatter `[:X']` overrides the formatter `[:d16']`, all format values for integer format are overriden. The format value `iwidth`, though not presented in `[:X']`, the default value `0` is used to override the previous value `16`. Here is the output:<br><pre>
+When the formatter `[:X']` overrides the formatter `[:d16']`, all format values for integer format are overriden. The format value `iwidth`, though not presented in `[:X']`, the default value `0` is used to override the previous value `16`. Here is the output:<br>
+```
                1 1
               10 A
              100 64
@@ -642,7 +643,7 @@ When the formatter `[:X']` overrides the formatter `[:d16']`, all format values 
       10,000,000 98 96 80
      100,000,000 5 F5 E1 00
    1,000,000,000 3B 9A CA 00
-</pre>
+```
 
 
 
