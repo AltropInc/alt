@@ -611,15 +611,16 @@ for (x := 1; x<10; ++x)
          );
 ```
 The output:<br>
-**1**: 1² = 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1³ = 1<br>
-**2**: 2² = 4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2³ = 8<br>
-**3**: 3² = 9&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3³ = 27<br>
+**1**: 1² = 1&nbsp;&nbsp;&nbsp;&nbsp;1³ = 1<br>
+**2**: 2² = 4&nbsp;&nbsp;&nbsp;&nbsp;2³ = 8<br>
+**3**: 3² = 9&nbsp;&nbsp;&nbsp;&nbsp;3³ = 27<br>
 **4**: 4² = 16&nbsp;&nbsp;4³ = 64<br>
 **5**: 5² = 25&nbsp;&nbsp;5³ = 125<br>
 **6**: 6² = 36&nbsp;&nbsp;6³ = 216<br>
 **7**: 7² = 49&nbsp;&nbsp;7³ = 343<br>
 **8**: 8² = 64&nbsp;&nbsp;8³ = 512<br>
 **9**: 9² = 81&nbsp;&nbsp;9³ = 729<br>
+
 
 
 
