@@ -73,6 +73,7 @@ The following members are used for string alignments:
 | fill      |  char   | filling character in alignment             |
 | width     |  int    | width (number of screen columns) of alignment            |
 | align     |  0~2    | alignment: left(0), right(1), center(2)          |
+| level     |  int    | alignment element level          |
 
 The *start* is an optional character put at the very beginning of the aligned and filled text, and the *end* is another optional character put at the end. The start and the end characters are not counted in *width*, and they are not affected by other format values such as align, color, and font.
 
@@ -85,6 +86,8 @@ The *align* value gives the alignment to use. It can be a value from 0 to 2. The
 * 1 – The text is right-justified in the field width.
 * 2 – The text is centered in the field width. Any filling will be distributed evenly on the left and right sides of the value. If an odd number of padding characters is needed, the extra one will always be on the right.
 
+The *level* is an integer for the level of elements to be aligned. When the level is 0, the alignment is applied to the elements at the same level of the formatter; When the level is 1, the alignment is applied to the elements at a deeper level, that is, the elements of the elements at the same level of the formatter; and so on.
+
 The following shorthands are provided for text alignment:
 | shorthand  | equivalents                                                        |
 |:---------- |:------------------------------------------------------------------ |
@@ -92,11 +95,11 @@ The following shorthands are provided for text alignment:
 | right      | align=1 (right)   |
 | center     | align=2 (center)   |
 
-The following packed string, started with `:s`, can also be used for string alignment:
+The following packed string, started with `{\*}:s`, can also be used for string alignment:
 
-:s\[\[\[*start*]*fill*]*align*]\[*width*]\[*end*]
+{\*}:s\[\[\[*start*]*fill*]*align*]\[*width*]\[*end*]
 
-`:s` introduces a packed string for string alignment formats. If the first character following `:s` is immediately followed by one of the alignment characters, that first character is treated as the fill character to use. The fill and align values only make sense if you also specify a width value, although it is not an error to specify them without width, but without width, the alignment will not take effect. The `align` character can have any of the values <, >, or ^. The meaning of these is as follows:
+`{\*}:s` introduces a packed string for string alignment formats. The optional staring '\*' sequence indicates the alignment level, which is equal to the number of stars in the sequence. If the first character following `:s` is immediately followed by one of the `align` characters (<, >, or ^), that first character is treated as the fill character to use. The fill and align values only make sense if you also specify a width value, although it is not an error to specify them without width, but without width, the alignment will not take effect. The meaning of the `align` character is as follows:
 
 * \< – left-justified, which is equivalent to `align=0`, and this is the default.
 * \> – right-justified, which is equivalent to `align=1`.
@@ -120,6 +123,19 @@ print (underline, [:s【^10】], 1.23)
 In the output:<br>
 【<ins>&nbsp;&nbsp;&nbsp;1.23&nbsp;&nbsp;&nbsp;</ins>】<br>
 the underline effect is not applied to the starting and the ending characters.
+
+Here are example of using different alignment levels to print a composite data `('x', "xyz", (2,3))`:
+```altro
+print([:s| ^20|], ('x', "xyz", (2,3)), [/align], " ⭠ aligment at level 0\n");
+print([*:s| ^20|], ('x', "xyz", (2,3)), " ⭠ aligment at level 1\n");
+print([**:s| ^20|], ('x', "xyz", (2,3)), " ⭠ aligment at level 2\n");
+```
+The first print center-aligned the output `(x,xyz,(2,3))' as a whole. The second print center-aligned each element of the output `(x,xyz,(2,3))'. The third print center-aligned each element of the `(2,3)', which is the last element of the output `(x,xyz,(2,3))'. The print output is shown as below:
+```
+|   (x,xyz,(2,3))    | ⭠ aligment at level 0
+(|         x          |,|        xyz         |,|       (2,3)        |) ⭠ aligment at level 1
+(x,xyz,(|         2          |,|         3          |)) ⭠ aligment at level 2
+```
 
 #### Appearance  Formatter
 
