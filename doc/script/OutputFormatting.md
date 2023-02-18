@@ -630,7 +630,15 @@ The `cnum` value indicates the format used to print the number.
 You can use the following format string to define a format to print a float-point number:<br>
 :c\[\[*start*]*sep*]\[*cnum*]\[*end*]\[*cnmax*]
 
-The *start* character is the starting character for the composite value. The default starting character is `(`. If the starting character is `0`, no starting character will be displayed. The *sep* character is the separator character between elements. If the separator character is `0`, no separator character will be displayed. The *end* character is the ending character for the composite value. The default starting character is `)`. If the ending character is `0`, no ending character will be displayed. The *cnum* is an integer to indicated how many elements will be displayed per line. The *cnmax* field value is formed of a decimal point followed by the  integerto indicate the maximum number of elements to be displayed. 
+The *start* character is the starting character for the composite value. The default starting character is `(`.  The *sep* character is the separator character between elements. The default separator character is `,`. The *end* character is the ending character for the composite value. The default ending character is `)`. Because characters '\0', `,` and `]` has specialing meaning in a format string (they are the terminator of a format string), you have to used a replacement character for  `,` and `]`. The following is a list of replacement characters:
+
+| character       | equivalents |
+|:---------- |:------------|
+| n          | '\0': no character for start, end or separator is displayed    |
+| b          | ']': the character is a right bracket    |
+| c          | ',': the character character is a comma    |
+
+If the starting character is `n`, no starting character will be displayed. The *sep* character is the separator character between elements. If the separator character is `0`, no separator character will be displayed. The *end* character is the ending character for the composite value. The default starting character is `)`. If the ending character is `0`, no ending character will be displayed. The *cnum* is an integer to indicated how many elements will be displayed per line. The *cnmax* field value is formed of a decimal point followed by the  integerto indicate the maximum number of elements to be displayed. 
 
 ## Using Formatter in Print
 
