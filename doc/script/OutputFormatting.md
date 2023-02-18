@@ -130,7 +130,7 @@ print([:s| ^20|], ('x', "xyz", (2,3)), [/align], " ⭠ aligment at level 0\n");
 print([*:s| ^20|], ('x', "xyz", (2,3)), " ⭠ aligment at level 1\n");
 print([**:s| ^20|], ('x', "xyz", (2,3)), " ⭠ aligment at level 2\n");
 ```
-The first print center-aligned the output `(x,xyz,(2,3))' as a whole. The second print center-aligned each element of the output `(x,xyz,(2,3))'. The third print center-aligned each element of the `(2,3)', which is the last element of the output `(x,xyz,(2,3))'. The print output is shown as below:
+The first print center-aligned the output `(x,xyz,(2,3))` as a whole. The second print center-aligned each element of the output `(x,xyz,(2,3))`. The third print center-aligned each element of the `(2,3)`, which is the last element of the output `(x,xyz,(2,3))`. The print output is shown as below:
 ```
 |   (x,xyz,(2,3))    | ⭠ aligment at level 0
 (|         x          |,|        xyz         |,|       (2,3)        |) ⭠ aligment at level 1
@@ -158,6 +158,7 @@ The following members are used for text appearance:
 The following shorthands are provided for text appearance:
 
 * **Shorthands for common color names:**
+
 | shorthand  | equivalents                                                        |
 |:---------- |:------------------------------------------------------------------ |
 | /color     | cancel text color, using default text color   |
@@ -180,6 +181,7 @@ The following shorthands are provided for text appearance:
 | yellow     | color=3 or bcolor=3 (yellow)   |
 
 * **Shorthands for common text attributes:**
+
 | shorthand  | equivalents                                                        |
 |:---------- |:------------------------------------------------------------------ |
 | b          | intense=1   |
@@ -575,7 +577,7 @@ The *sep* can be one of the following characters:
 | L          | fsep=1 (locale awareness separator)    |
 | '          | fsep=2 (comma separator for decimals and space for other formats)    |
 
-The *prec* filed value is formed of a decimal point followed by the precision integer, and is eqivalent to `prec=<the filed value>`. 
+The *prec* field value is formed of a decimal point followed by the precision integer, and is eqivalent to `prec=<the filed value>`. 
 
 Examples of using packed string for integer formats:
 ```altro
@@ -610,6 +612,25 @@ Using de_DE for numeric output:
       1,000000000250E+09 ⭠ [:E24L.12] scientific, fupper=1, fwidth=24, fsep=1(German), prec=12
 00001.000.000.000,250000 ⭠ [:g+024L] general, fwidth=24, fsep=1(German), fpad=1
 ```
+
+### Formatters for Composite Values
+
+The following members are used for the format of composite values:
+| name       | values  | Description                                                         |
+|:---------- |:------- |:-------------------------------------------------------------- |
+| cnum       |  int    | number of elements to be displayed per line.             |
+| cnmax      |  int    | maximum number of elements to be displayed |
+| csep       |  char   | separator character. '0' means no separator. Default is ','             |
+| cstart     |  char   | starting character. '0' means no starting. Default is '('             |
+| cend       |  char   | ending character. '0' means no ending. Default is ')'              |
+| cnamed     |  0~1    | display value only(0)  display value and name or index(1)                 |
+    
+The `cnum` value indicates the format used to print the number.
+
+You can use the following format string to define a format to print a float-point number:<br>
+:c\[\[*start*]*sep*]\[*cnum*]\[*end*]\[*cnmax*]
+
+The *start* character is the starting character for the composite value. The default starting character is `(`. If the starting character is `0`, no starting character will be displayed. The *sep* character is the separator character between elements. If the separator character is `0`, no separator character will be displayed. The *end* character is the ending character for the composite value. The default starting character is `)`. If the ending character is `0`, no ending character will be displayed. The *cnum* is an integer to indicated how many elements will be displayed per line. The *cnmax* field value is formed of a decimal point followed by the  integerto indicate the maximum number of elements to be displayed. 
 
 ## Using Formatter in Print
 
