@@ -39,8 +39,9 @@ The above expression specifies a formatter for printing right-aligned contents i
 print([width=40, align=1, fill='─', bold=1], "this is bold text")
 ```
 generates the following screen output:
-
-**───────────────────────this is bold text**
+<pre>
+<b>───────────────────────this is bold text</b>
+</pre>
 
 In addition to the typical form of `fromat_name=fromat_value`, a number of shorthands are also provided for readability and convenience. For instance, instead of using integers for color code in the form `color=1`, you can also use color names such as `red`, and `green`. Format values can also be packed in a specific string similar to Python output format. The following expressions give the same set of formatter values:
 ```altro
@@ -56,7 +57,7 @@ There are two ways to use formatters in `print` function:
 * Provide formatters as input parameters.
 * Provide formatters in a format string.
 
-When we use a formatter as an input parameter, the formatter can be inserted in any position in the input list of the `print` function. The formatter value takes effect on all inputs that follow the formatter until the end of the input list or a new formatter value of the same type which overrides the previous one. The effect of the formatter is only active within the current print function. For instance,
+When we use a formatter as an input parameter, the formatter can be inserted in any position in the input list of the `print` function. The formatter value takes effect on all inputs that follow the formatter until the end of the input list or a new formatter value of the same type which overrides the previous one. The effect of the formatter is only active within the current print function. Example:
 ```altro
 print ("output:\n", [hex], 10, ' ', 20, ' ', 30, ' ', [dec], 40, ' ', 50, ' ', 60);
 ─────────────────────────────────
@@ -746,16 +747,65 @@ When the formatter `[:X']` overrides the formatter `[:d16']`, all format values 
 
 ## Using Formatters in Format String
 
-A format string can be used in a formatter as the first input parameter in the input list of a `print` function call:
+A format string can be used in a formatter as the first input parameter in the input list of a `print` function call. In the format string, the place holder defined in curly brackets `{}` is used to represent a particular input parameter in the function call. The placeholders can be just an empty placeholder and the input parameter chosen is the one in the same order appearing in the input list:
 ```altro
-print ([format="My name is {}, I'm {}"], "John", 36);
+print ([format="My name is {}, I'm {}\n"], "John", 36);
 ```
 The output is
 ```
 My name is John, I'm 36
 ```
-In the format string, the palce holder defined in curly brackets `{}` are used to represent a particular input parameter in the function call.
+Placeholders can be indexed, allowing us to change the order of the arguments or even repeat them:
+```altro
+print ([format="My name is {2}, I'm {1}\n"], 36, "John");
+```
+The output is
+```
+My name is John, I'm 36
+```
+Note that the index starts from 1, because the first input parameter is the format string itself.
 
+In the placeholder brackets `{}`, you can put formatters to customize the output format. These formatters must be specific to the type of its corresponding input parameter, otherwise, it  does not take any effect. The formatter appear in the placeholder has no effect on the input parameters corresponding to the next placeholder, even the placeholder maps to the same input parameter: 
+```altro
+print ([format="binary 10: {1:[bin]}, default 10: {1}, Hexicadecimal 10: {1:[:X#02]} \n"], 10);
+```
+Output:
+```
+binary 10: 0b1010, default 10: 10, Hexicadecimal 10: 0X0A
+```
+If an unindexed placeholder follows an indexed placeholder, the input parameter is the next one to the input parameter corresponding to the previous indexed placeholder:
+```altro
+print ([format="My name is {1}, I'm {}\n"], "John", 36);
+```
+The output is
+```
+My name is John, I'm 36
+```
+If there are remaining input parameters after the input parameter with the largest index used by all placeholders in the format string, the remaining input parameters will be printed at the end:
+```altro
+print ([format="My name is {2}, I'm {1}"], 36, "John", " old.\n");
+```
+The output is
+```
+My name is John, I'm 36 old.
+```
+If the input parameter corresponding to the placeholder is a formatter, the input parameter next to the formatter will be used, and the formatter will be applied to the input parameter that is used: 
+```altro
+print ([format="My name is {1}, I'm {}"], [bold], "John", 36, " old.\n");
+```
+The output is
+<pre>
+My name is <b>John</b>, I'm 36 old.
+</pre>
+Note that the formatter `[bold]` is applied only to the input parameter corresponded by the placeholder.
 
+The formatter value used in the first formatter with the format string will be applied to app parameters and the characters in the format string:
+```altro
+print ([format="My name is {1}, I'm {[/bold]}", bold], "John", 36, " old.\n");
+```
+The `bold` format value is applied to all parameters and the characters in the format string, except for the integer 36 which has the formatter value that overrides the bold attribute. The output is:
+<pre>
+<b>My name is John, I'm </b>36<b> old.</b>
+</pre>
 
 
