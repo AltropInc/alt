@@ -783,29 +783,29 @@ My name is John, I'm 36
 ```
 If there are remaining input parameters after the input parameter with the largest index used by all placeholders in the format string, the remaining input parameters will be printed at the end:
 ```altro
-print ([format="My name is {2}, I'm {1}"], 36, "John", " yeas old.\n");
+print ([format="My name is {2}, I'm {1}"], 36, "John", " years old.\n");
 ```
 The output is
 ```
-My name is John, I'm 36 yeas old.
+My name is John, I'm 36 years old.
 ```
 If the input parameter corresponding to the placeholder is a formatter, the input parameter next to the formatter will be used, and the formatter will be applied to the input parameter that is used: 
 ```altro
-print ([format="My name is {1}, I'm {}"], [bold], "John", 36, " yeas old.\n");
+print ([format="My name is {1}, I'm {}"], [bold], "John", 36, " years old.\n");
 ```
 The output is
 <pre>
-My name is <b>John</b>, I'm 36 yeas old.
+My name is <b>John</b>, I'm 36 years old.
 </pre>
 Note that the formatter `[bold]` is applied only to the input parameter corresponded by the placeholder.
 
 The formatter value used in the first formatter with the format string will be applied to app parameters and the characters in the format string:
 ```altro
-print ([format="My name is {1}, I'm {[/bold]}", bold], "John", 36, " yeas old.\n");
+print ([format="My name is {1}, I'm {[/bold]}", bold], "John", 36, " years old.\n");
 ```
 The `bold` format value is applied to all parameters and the characters in the format string, except for the integer 36 which has the formatter value that overrides the bold attribute. The output is:
 <pre>
-<b>My name is John, I'm </b>36<b> yeas old.</b>
+<b>My name is John, I'm </b>36<b> years old.</b>
 </pre>
 
 
