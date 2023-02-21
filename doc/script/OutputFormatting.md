@@ -79,9 +79,9 @@ Formatters for strings provide specifications of text layout arrangement, alignm
 print([italic=1], "pi = ", 3.14);
 ```
 The formatter `[italic=1]` are applied to all arguments following this formatter, including the string `"pi = "` and the floating-point number `3.14`:
-
-*pi = 3.14*
-
+<pre>
+<em>pi = 3.14</em>
+</pre>
 Formatters for strings include **Alignment Formatter** and **Appearance Formatter**:
 
 #### Alignment Formatter
