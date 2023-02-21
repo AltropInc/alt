@@ -56,7 +56,7 @@ There are two ways to use formatters in `print` function:
 * Provide formatters as input parameters.
 * Provide formatters in a format string.
 
-When we use a formatter as an input parameter, the formatter can be inserted in any position in the input list of the `print` function. The formatter value takes effect on all inputs that follow the formatter until the end of the input list or a new formatter value of the same type which overrides the previous one. This likes to use C++ output manipulators in std::cout. However, the effect of the formatter is only active with the current print function. For instance,
+When we use a formatter as an input parameter, the formatter can be inserted in any position in the input list of the `print` function. The formatter value takes effect on all inputs that follow the formatter until the end of the input list or a new formatter value of the same type which overrides the previous one. The effect of the formatter is only active within the current print function. For instance,
 ```altro
 print ("output:\n", [hex], 10, ' ', 20, ' ', 30, ' ', [dec], 40, ' ', 50, ' ', 60);
 ─────────────────────────────────
@@ -694,9 +694,9 @@ _______________________________________________________
 1,2,3, ...
 ```
 
-## Using Formatter in Print
+## Using Formatters as Input Parameters in Print
 
-A formatter can be inserted in any position in the input list of the `print` function. The formatter value takes effect on all inputs that follow the formatter until the end of the input list or a new formatter value of the same type which overrides the previous one.
+A formatter can be used as an input parameter inserted in any position in the input list of a `print` function call. The formatter value takes effect on all inputs that follow the formatter until the end of the input list or a new formatter value of the same type which overrides the previous one. This resembles using [C++ output manipulators](https://cplusplus.com/reference/library/manipulators/) to change formatting parameters on streams, except that the formatter takes effect only within the current `print` function call. 
 
 Here is an example of calling the `print` with multiple formatters:
 ```altro
@@ -743,6 +743,18 @@ When the formatter `[:X']` overrides the formatter `[:d16']`, all format values 
      100,000,000 5 F5 E1 00
    1,000,000,000 3B 9A CA 00
 ```
+
+## Using Formatters in Format String
+
+A format string can be used in a formatter as the first input parameter in the input list of a `print` function call:
+```altro
+print ([format="My name is {}, I'm {}"], "John", 36);
+```
+The output is
+```
+My name is John, I'm 36
+```
+In the format string, the palce holder defined in curly brackets `{}` are used to represent a particular input parameter in the function call.
 
 
 
