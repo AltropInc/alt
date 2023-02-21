@@ -29,6 +29,7 @@ A **formatter** is the specification of a printing format. It provides support f
 * Formatters for strings
 * Formatters for integers
 * Formatters for floating-point numbers
+* Formatters for elements of containers
 
 A formatter can be expressed by a formatter expression with a set of formatter values listed in a pair of brackets `[]`. Each format value is typically given by the format member name defined by the `fmt` type and followed by an equal sign with a format value.  For instance,
 ```altro
