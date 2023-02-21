@@ -1,26 +1,22 @@
 # Output Formatting
 
-The `print` function provided in the `sys` library prints text to the screen or any other output device or media. The input to the `print` function can be values or instances of any type. For example,
+The the function `print', `err`, `str`, and `file.write` provided in the `sys` library prints values from an given input to the screen or in other output media. The input to these functions can be values or instances of any type. For example,
 ```altro
-print(3.14);  // print a real number
-print('π');   // print a character
-print("the ratio of circumference to diameter"); // print a string
-```
-The output on the printed target is a text of one or multiple characters:
-```altro
-3.14
-π
-the ratio of circumference to diameter
+print(3.14);    // print a real number
+print('π');     // print a character
+err("An error is detected"); // print an error message
+age := str(64); // convert an integer to a string and put in the variable 'age'
+file("./temp.txt").write("Copyright 2023 all rights reserved, Altrop Inc.\n");  // write a string to a file
 ```
 You can provide any number of input values to a print function. For example,
 ```altro
 print("π = ", 3.14); // print a string and a real number
 ```
-The output is,
+The output are the combined values of all inputs:
 ```altro
 π = 3.14
 ```
-However, we often wish we can have alternative ways to present the output for the input values. For instance, we wish we can print colored text if the media supports colors, we wish we can print text with specific align arrangement, we wish we can print a real number in percentage, or we wish we can print the date and time in a particular language and region's preference. This is what **output Formatting** does.
+We often wish we can have alternative ways to present the output for the input values. For instance, we wish we can print colored text if the output media supports colors, we wish we can print text with specific align arrangement, we wish we can print a real number in percentage, or we wish we can print the date and time in a particular language and region's preference. This is what **output Formatting** does.
 
 ## Formatter
 
