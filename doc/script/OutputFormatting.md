@@ -51,6 +51,25 @@ In addition to the typical form of `fromat_name=fromat_value`, a number of short
 ```
 Formatter shorthands will be discussed in the following sections.
 
+There are two ways to use formatters in `print` function:
+
+* Provide formatters as input parameters.
+* Provide formatters in a format string.
+
+When we use a formatter as an input parameter, the formatter can be inserted in any position in the input list of the `print` function. The formatter value takes effect on all inputs that follow the formatter until the end of the input list or a new formatter value of the same type which overrides the previous one. This likes to use C++ output manipulators in std::cout. However, the effect of the formatter is only active with the current print function. For instance,
+```altro
+print ("output:\n", [hex], 10, ' ', 20, ' ', 30, ' ', [dec], 40, ' ', 50, ' ', 60);
+─────────────────────────────────
+output:
+a 14 1e 40 50 60
+```
+When we use formatters in a format string, the formatter is applied only to the corresponding input parameter in the `print` function. For example:
+```altro
+print ([format="output: {[bin]}, {[oct]}, {[dec]}, {[hex]} \n"], 10, 20, 30, 47);
+─────────────────────────────────
+output:  0b1010, 24, 30, 2f
+```
+
 ### Formatters for Strings
 
 Formatters for strings provide specifications of text layout arrangement, alignment and appearance. They are applied to strings converted from all types of values. For example,
@@ -340,10 +359,10 @@ output:
 **Integer Format with Packed Format String**
 
 The following packed string can also be used for integer output format:<br>
-:*base*\[*sign*]*#*]\[*0*]\[*width*]\[*sep*]
+:*format*\[*sign*]*#*]\[*0*]\[*width*]\[*sep*]
 
-The *base* can be one of the following characters:
-| base       | equivalents                                                        |
+The *format* can be one of the following characters:
+| format     | equivalents                                                        |
 |:---------- |:------------------------------------------------------------------ |
 | d          | ibase=0 (decimal)      |
 | x          | ibase=1 (hexadecimal)  |
@@ -351,7 +370,7 @@ The *base* can be one of the following characters:
 | o          | ibase=2 (octal)        |
 | b          | ibase=3 (binary)       |
 | B          | ibase=3, iupper=1 (binary)       |
-The base character is mandatory.
+The format character is mandatory.
 
 The *sign* can be one of the following characters:
 | sign       | equivalents |
@@ -545,10 +564,10 @@ output:
 **Float-Point Number Format with Packed Format String**
 
 You can use the following format string to define a format to print a float-point number:<br>
-:*base*\[*sign*]*#*]\[*0*]\[*width*]\[*sep*]\[*prec*]
+:*format*\[*sign*]*#*]\[*0*]\[*width*]\[*sep*]\[*prec*]
 
-The *base* can be one of the following characters:
-| base       | equivalents                                                        |
+The *format* can be one of the following characters:
+| format     | equivalents                                                        |
 |:---------- |:------------------------------------------------------------------ |
 | g          | fbase=0 (general)      |
 | G          | fbase=0 (general), fupper=1      |
@@ -618,8 +637,8 @@ Using de_DE for numeric output:
 The following members are used for the format of composite values:
 | name       | values  | Description                                                         |
 |:---------- |:------- |:-------------------------------------------------------------- |
-| cnum       |  int    | number of elements to be displayed per line.             |
-| cnmax      |  int    | maximum number of elements to be displayed |
+| cnum       |  int    | number of elements to be displayed per line, zero or default means single line. |
+| cmax       |  int    | maximum number of elements to be displayed |
 | csep       |  char   | separator character. '0' means no separator. Default is ','             |
 | cstart     |  char   | starting character. '0' means no starting. Default is '('             |
 | cend       |  char   | ending character. '0' means no ending. Default is ')'              |
@@ -628,9 +647,16 @@ The following members are used for the format of composite values:
 The `cnum` value indicates the format used to print the number.
 
 You can use the following format string to define a format to print a float-point number:<br>
-:c\[\[*start*]*sep*]\[*cnum*]\[*end*]\[*cnmax*]
+:*format*\[\[*start*]*sep*]\[*cnum*]\[*end*]\[*cmax*]
 
-The *start* character is the starting character for the composite value. The default starting character is `(`.  The *sep* character is the separator character between elements. The default separator character is `,`. The *end* character is the ending character for the composite value. The default ending character is `)`. Because characters '\0', `,` and `]` has specialing meaning in a format string (they are the terminator of a format string), you have to used a replacement character for  `,` and `]`. The following is a list of replacement characters:
+The *format* can be one of the following characters:
+| format     | equivalents                                                  |
+|:---------- |:------------------------------------------------------------ |
+| c          | cnamed=0, print composite element values only                |
+| C          | cnamed=1, print composite element name or index and values   |
+The format character is mandatory.
+
+The *start* character is the starting character for the composite value. The default starting character is `(`.  The *sep* character is the separator character between elements. The default separator character is `,`. The *end* character is the ending character for the composite value. The default ending character is `)`. Because characters '\0', `,` and `]` has specialing meaning in a format string (they are the terminator of a format string), you have to used a replacement character for  these characters. The following is a list of replacement characters:
 
 | character       | equivalents |
 |:---------- |:------------|
@@ -638,7 +664,35 @@ The *start* character is the starting character for the composite value. The def
 | b          | ']': the character is a right bracket    |
 | c          | ',': the character character is a comma    |
 
-If the starting character is `n`, no starting character will be displayed. The *sep* character is the separator character between elements. If the separator character is `0`, no separator character will be displayed. The *end* character is the ending character for the composite value. The default starting character is `)`. If the ending character is `0`, no ending character will be displayed. The *cnum* is an integer to indicated how many elements will be displayed per line. The *cnmax* field value is formed of a decimal point followed by the  integerto indicate the maximum number of elements to be displayed. 
+The *cnum* field is an integer to indicated how many elements will be displayed per line. The *cmax* field value is formed of a decimal point followed by the integer to indicate the maximum number of elements to be displayed. 
+
+Examples of printing an tuple value with format `c` and `C`:
+```altro
+p: tuple (name: string; age: int; address: string) = ("John Smith", 27, "47 Arbor Lane, FL 23034");
+print("Unamed, all elemenets in one line with brackets:\n", [:c[c0b], p, '\n');
+print("Named, one element per line, no brackets, no separactor:\n", [:Cnn1n], p, '\n');
+_______________________________________________________
+Unamed, all elemenets in one line with brackets:
+[John Smith,27,47 Arbor Lane, FL 23034]
+Named, one element per line, no brackets, no separactor:
+name = John Smith
+age = 27
+address = 47 Arbor Lane, FL 23034
+```
+If the element is unnamed, using named format will cause index of the element being printed:
+```altro
+print([:Cnc1n.3], (1, 2, 3), '\n');
+_______________________________________________________
+[0] = 1
+[1] = 2
+[2] = 3
+```
+If *cmax* is given and not all elements are printed, `...` will be appended at the end of the output:
+```altro
+print([:cnc0n.3], (1, 2, 3, 5, 6, 7, 8, 9, 10), '\n');
+_______________________________________________________
+1,2,3, ...
+```
 
 ## Using Formatter in Print
 
