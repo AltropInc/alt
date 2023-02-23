@@ -92,6 +92,22 @@ r"quoted \"word\" here"
 r"C:\Windows\System32"
 ```
 
+## Locale-Sensitive String
+
+Locale-sensitive strings are strings to be displayed in different text according to a specific language and region. Locale-sensitive string are started with an underscore, for example,
+```
+_"Fri"
+```
+is a short form Friday and it is displayed as `Fri` in English, `周五`  in Chinese China, and 週五` in Chinese Taiwan. When we print the string, it will be translated to the text in the current locale setting. For example:
+```altro
+setlanguage("中文", "台灣");
+print("In Taiwan, the short form of Friday is ",  _"Fri", ", and the long form is ",  _"Friday", ".\n");
+```
+The output of the print is:
+```
+In Taiwan, the short form of Friday is 週五, and the long form is 星期五.
+```
+
 ## Creating Strings
 
 A direct way to create a string is to write the string in string literal and assign the literal to a name (variable) so that it can be accessed later:
@@ -336,7 +352,7 @@ both special and ordinary characters. See [Regular expression](https://en.wikipe
 
 The operator ~= or ≅ can be used to check if a string matches to a regular expression:
 ```altscript
-"foo.txt" ≅ "([a-z]+)\\.([a-z]+)"    // the result is true.
+"foo.txt" ≅ r"([a-z]+)\.([a-z]+)"    // the result is true.
 ```
 This operator simply returns true or false, indicating whether a match for the given regex in a string. However, we want to know not just
 whether a string is matched, but also how it is matched. To capture this information about a match, we need to create a 'regex' object. The
@@ -366,12 +382,12 @@ enum regex_grammar (
 ```
 Here are examples of regex object creation:
 ```altscript
-re1 := regex("([a-z]+)\\.([a-z]+)");
-re2 := regex("\\bd\\w+", regex_opts(IgnoreCase), regex_grammar::ECMAScript);
+re1 := rregex("([a-z]+)\.([a-z]+)");
+re2 := regex(r"\bd\w+", regex_opts(IgnoreCase), regex_grammar::ECMAScript);
 ```
 A regex object can also be obtained by converting from a string directly:
 ```altscript
-re : regex = "([a-z]+)\\.([a-z]+)";
+re : regex = r"([a-z]+)\.([a-z]+)";
 ```
 The regex object povides the follinwg methods to perform pattern matching within strings:
 
@@ -395,7 +411,7 @@ type regex_flags = set of regex_flag;
 ```
 Example of using regex match:
 ```altscript
-re : regex = "([a-z]+)\\.([a-z]+)";
+re : regex = r"([a-z]+)\.([a-z]+)";
 re.match("foo.txt");  // returns a string stream ("foo.txt", "foo", "txt")
 ```
 * `func search (str:string, flags:regex_flags=()): string...` --
@@ -403,7 +419,7 @@ re.match("foo.txt");  // returns a string stream ("foo.txt", "foo", "txt")
    the unsearched part of the given input, the second element is the substring that mactchs the enire regular expression, and the rest elements
    give substrings that match all subpatterns given in the regular expression. If it does not find any macth, an empty string stream is reurned.
 ```altscript
-re : regex = "([a-z]+)\\.([a-z]+)";
+re : regex = r"([a-z]+)\.([a-z]+)";
 str := "file_names: foo.txt bar.txt";
 ma := re.search(str);          // returns a string stream (" bar.txt", "foo.txt", "foo", "txt")
 while (ma.length() > 0)
@@ -415,15 +431,22 @@ while (ma.length() > 0)
    performs the match to all subsequence in the given string. If it finds any match, it returns a stream of string stream, in which each
    string stream gives the result of a macth to the subsequence in the given string. 
 ```altscript
-re : regex = "([a-z]+)\\.([a-z]+)";
+re : regex = r"([a-z]+)\.([a-z]+)";
 str := "foo.txt bar.txt";
 ma := re.findall(str);          // returns a string stream stream (("foo.txt", "foo", "txt"), ("bar.txt", "bar", "txt"))
+```
+* `func split (str:string, trim:bool=false, flags:regex_flags=()): string...` --
+   performs the match to all seperators in the given string. If any separators are find by the match, the string will be separated into a set of strings based on the position of the separators found. When `trim is true, the lead and trailing spaces in the split strings will be removed.
+```altscript
+re : regex = "[.,/]+";
+str := "12.abc//56, 1237 ... 321";
+print(re.split(str, true));          // the output is (12,abc,56,1237,321)
 ```
 * `func replace (str:string, substitute:string, flags:regex_flags=()): string` --
    performs the match to all subsequence in the given string. If it finds a match, it replaces the subsequence with the given substitute and
    returns the substituted string. If it does not find a match, it returns a null string.
 ```altscript
-re : regex = "([a-z]+)\\.([a-z]+)";
+re : regex = r"([a-z]+)\.([a-z]+)";
 str := "foo.txt bar.txt";
 re.replace(str, "[$&]");                                                 // returns a string "[foo.txt] [bar.txt]"
 re.replace(str, "[$&]", regex_flags(FirstMatchOnly));                    // returns a string "[foo.txt] bar.txt"
@@ -441,6 +464,7 @@ match (s)
     {
         // do something on r, which has the value (('a', 'b'), "cd", ('4', '5', '4', '5'), "xyz")
         // and r is in the type of  (first: (char; char); second: string; third: (char; char; char; char); fourth: string) 
+        print(r);   // the output if the print is ((a,b),cd,(4,5,4,5),xyz)
     }
 };
 ```
