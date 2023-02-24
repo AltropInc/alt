@@ -453,7 +453,7 @@ re.replace(str, "[$&]", regex_flags(FirstMatchOnly,CopyMatchedOnly));    // retu
 
 ### Use Match Pattern on String
 
-Because strings are streams, like other type of streams and arrays, they can be used in match statement to be compared with match patterns:
+Because strings are streams, like other type of streams and arrays, they can be used in [match statement](StatementMatch.md) to be compared with match patterns:
 ```altscript
 s := "abcd4545xyz";
 match (s)
@@ -467,6 +467,6 @@ match (s)
 };
 ```
 Instead of giving a string stream in match result, match pattern gives a tuple structure and each element in the tuple can be optionally named
-for convenient access to segment values. For a complete discussion anout match pattern, see Match Statement.
+for convenient access to segment values. For a complete discussion anout match pattern, see [Match Statement](StatementMatch.md).
 
 
