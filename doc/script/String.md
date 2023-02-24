@@ -362,12 +362,11 @@ regex(str: string; opts: regex_opt=(); grammar: regex_grammar=regex_grammar::ECM
 ```
 `opts` contains a number of options used to interpret how the regular expression is executed in performing match:
 ```altscript
-enum regex_opt (
+enumset regex_opts (
     IgnoreCase,         // Regular expressions match without regard to case
     Optimize,           // Matching efficiency is preferred over efficiency constructing regex objects
     Collate             // Character ranges, like "[a-b]", are affected by locale.
 );
-type regex_opts = set of regex_opt;
 ```
 `grammar` determines the syntax format used in the regular expression string, and the default is ECMAScript:
 ```altscript
@@ -394,9 +393,9 @@ The regex object povides the follinwg methods to perform pattern matching within
 * `func match (str:string, flags:regex_flags=()) string...` --
    performs the match to the entire target of the given string. If it matches, it returns a string stream in which the first element is
    the same string given in the input, and the rest elements give substrings that match all subpatterns given in the regular expression.
-   If itdoes not match, an empty string stream is reurned. `flags` is a set of flags for match/replacement options, which are defined as:
+   If itdoes not match, an empty string stream is reurned. `flags` is an enumset of flags for match/replacement options, which are defined as:
 ```altscript
-enum regex_flag (
+enumset regex_flag (
     NotBOL,             // The first character will be ignored. (i.e. ^ will not match the first)
     NotEOL,             // The last character will be ignored. (i.e. $ will not match the first)
     NotBOW,             // The first character will not match word boundary (\b)
@@ -407,7 +406,6 @@ enum regex_flag (
     FirstMatchOnly,     // replace-only flag - replace the first match only
     CopyMatchedOnly     // replace-only flag - do not copy un-matched strings into to the result
 );
-type regex_flags = set of regex_flag;
 ```
 Example of using regex match:
 ```altscript
