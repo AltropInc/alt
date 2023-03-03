@@ -185,7 +185,7 @@ for ( i:=0;
 }
 ```
 
-### String Methods
+## String Methods
 
 In addition to methods with common comparison operatiors < > >= <= == != ~=, string has the floowing methods:
 
@@ -345,7 +345,7 @@ greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
 "【".join(strings=("Hello", "World"), separator=", ", tail="】"); // returns "【Hello, World】"
 ```
 
-### Regular Expression
+## Regular Expression
 
 Regular expression (regex) is used to perform pattern matching within strings. A regular expression can be represented by a string conatining
 both special and ordinary characters. See [Regular expression](https://en.wikipedia.org/wiki/Regular_expression) for the format of regex.
@@ -451,7 +451,7 @@ re.replace(str, "[$&]", regex_flags(FirstMatchOnly));                    // retu
 re.replace(str, "[$&]", regex_flags(FirstMatchOnly,CopyMatchedOnly));    // returns a string "[foo.txt]"
 ```
 
-### Use Match Pattern on String
+## Use Match Pattern on String
 
 Because strings are streams, like other type of streams and arrays, they can be used in [match statement](StatementMatch.md) to be compared with match patterns:
 ```altscript
@@ -469,4 +469,54 @@ match (s)
 Instead of giving a string stream in match result, match pattern gives a tuple structure and each element in the tuple can be optionally named
 for convenient access to segment values. For a complete discussion anout match pattern, see [Match Statement](StatementMatch.md).
 
+## String to Value Conversion Using String Parser
 
+We often come across a situation where the data is presented in a string. To extract these data chunks in the string, a string parser is used to  divide the string into a collection of data for the desired information. The class `parser` is defined in the [`sys`](Sys.md) class. Here are some example of using parser:
+```
+dp := parser("04/24/2003");
+month, day, year := (dp.getint(), dp.skipc(), dp.getint(), dp.skipc(), dp.getint());
+print (year, '年', month, '月', day, '日');
+pp := parser("""John Smith, 36, "124 Pave Lane, Harbor, FL 23045"""");
+person : (name: string; age:int; address: string) = (pp.scan(','), pp.getint(), pp.skipc(), pp.getstr());
+print ([:C1], person);  // print the person record using the format :C1 (print tuple name and one element per line)
+```
+The output of the above:
+```
+2003年4月24日
+name = John Smith
+age = 36
+address = 124 Pave Lane, Harbor, FL 23045
+```
+For more information about using string parser, see [String Parser](StringParser.md).
+
+## Value to String Conversion Using `Str` Function
+
+The function `str` or `_str` provided in the [`sys`](Sys.md) class is used to convert any type of values into string. `_str` is the same as `str` except that `_str` makes the converted string locale sensitive, i.e. the converted string, when printed, will be translated into the text in the current application language setting.
+```
+enum DayOfWeek(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday);
+enum Month(Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec);
+date: (year:int; month:Month; day: int; day_of_week: DayOfWeek);
+date = (2003, Month::Mar, 16, DayOfWeek::Thursday);
+date_str := str(date);
+print (date_str, EOL);
+date_str2 := str(date.month) + ' ' + str(date.day) + ", " + str(date.year)  + ", " +  str(date.day_of_week);
+print (date_str2, EOL);
+setlanguage("中文", "台灣");
+print (date.year, '年', _str(date.month), date.day, "日，", _str(date.day_of_week), EOL);
+date_str3 := str([:C1], date);
+print (date_str3);
+date_str4 := str([:d02], date.month.order()+1) + '-' + str(date.day) + "-" + str(date.year)  + ", " +  str(date.day_of_week);
+print (date_str4, EOL);
+```
+The output of the above:
+```
+(2003,Mar,16,Thursday)
+Mar 16, 2003, Thursday
+2003年3月16日，星期四
+year = 2003
+month = Mar
+day = 16
+day_of_week = Thursday
+03-16-2003, Thursday
+```
+The string conversion function supports the output formatter. You can use different formatter values to convert the value into the string in a different format. For instance the `date_str3` is converted using the container formatter `:C1`, and the month string in the `date_str4` is converted using the integer formatter `:d02`. For more information about the output formatter, see [Output Formatting](OutputFormatting.md). Note that the text appearance formatters can only be used for the output media that support text appearance such as bold, underline and text color, and they cannot be used for string conversions
