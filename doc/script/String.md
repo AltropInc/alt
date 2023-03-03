@@ -473,7 +473,7 @@ for convenient access to segment values. For a complete discussion anout match p
 
 We often come across a situation where the data is presented in a string. To extract these data chunks in the string, a string parser is used to  divide the string into a collection of data for the desired information. The class `parser` is defined in the [`sys`](Sys.md) class. Here are some example of using parser:
 ```
-dp := parser("04/24/2003");
+dp := parser("04/27/2023");
 month, day, year := (dp.getint(), dp.skipc(), dp.getint(), dp.skipc(), dp.getint());
 print (year, '年', month, '月', day, '日');
 pp := parser("""John Smith, 36, "124 Pave Lane, Harbor, FL 23045"""");
@@ -482,7 +482,7 @@ print ([:C1], person);  // print the person record using the format :C1 (print t
 ```
 The output of the above:
 ```
-2003年4月24日
+2023年4月27日
 name = John Smith
 age = 36
 address = 124 Pave Lane, Harbor, FL 23045
@@ -496,7 +496,7 @@ The function `str` or `_str` provided in the [`sys`](Sys.md) class is used to co
 enum DayOfWeek(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday);
 enum Month(Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec);
 date: (year:int; month:Month; day: int; day_of_week: DayOfWeek);
-date = (2003, Month::Mar, 16, DayOfWeek::Thursday);
+date = (2023, Month::Mar, 16, DayOfWeek::Thursday);
 date_str := str(date);
 print (date_str, EOL);
 date_str2 := str(date.month) + ' ' + str(date.day) + ", " + str(date.year)  + ", " +  str(date.day_of_week);
@@ -510,13 +510,13 @@ print (date_str4, EOL);
 ```
 The output of the above:
 ```
-(2003,Mar,16,Thursday)
-Mar 16, 2003, Thursday
+(2023,Mar,16,Thursday)
+Mar 16, 2023, Thursday
 2003年3月16日，星期四
-year = 2003
+year = 2023
 month = Mar
 day = 16
 day_of_week = Thursday
-03-16-2003, Thursday
+03-16-2023, Thursday
 ```
 The string conversion function supports the output formatter. You can use different formatter values to convert the value into the string in a different format. For instance the `date_str3` is converted using the container formatter `:C1`, and the month string in the `date_str4` is converted using the integer formatter `:d02`. For more information about the output formatter, see [Output Formatting](OutputFormatting.md). Note that the text appearance formatters can only be used for the output media that support text appearance such as bold, underline and text color, and they cannot be used for string conversions
