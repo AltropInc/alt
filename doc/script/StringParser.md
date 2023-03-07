@@ -35,6 +35,7 @@ The constructor of the parser, `parser (str: string; is_file: bool=false)`, take
 * **func skipl(): bool;** It skips the current line and advances the position to the next line. It returns false if there is no line to skip.
 * **func skipws();** It skips a white spaces. The position is advanced to the next non-space character.
 * **func peer(): char;** It returns the character at the current position and the current position is unchanged.
+* **func peernext(): char;** It returns the character next to the character at the current position and the current position is unchanged.
 * **func scan(to: char): string** It returns a string that contains characters from the current position to the character before the first occurance of the character given by the parameter `to`. The current position is advanced to the next character after the first occurance of the given character.
 * **func scan(to: string): string** It returns a string that contains characters from the current position to the character before the first occurance of the string given by the parameter `to`. The current position is advanced to the next character after the first occurance of the given string.
 * **func scanto(to: char...): string** It returns a string that contains characters from the current position to the character before the first occurance of the character listed in the character stream given by the parameter `to`. The current position is advanced to the first occurance of the character listed in the character stream.
@@ -44,9 +45,59 @@ The constructor of the parser, `parser (str: string; is_file: bool=false)`, take
 
 ## Examples
 
-When any scan function is called, all leading and trailing white spaces, if any, will be removed, unless you set the parameter `rm_ws` to false.
-Also note the difference of the advanced current position in calling `scan` and `scanto`. When `scan` is called, the current position is moved to the next character after the first occurance of the given character. For example:
+All *get* functions will cause the parser to advance the current position to the character after the characters scanned for the output required by the get function. For example,
+```altro
+p := parser("March 16, 2023 Thursday");
+month, day, year, day_of_week := p.getw(), p.geti(), p.skipc(), p.geti(), p.getw();
+print("year=", year, " (type: ", typeof(year), ")\n",
+      "month=", month, " (type: ", typeof(month), ")\n",
+      "day=", day, " (type: ", typeof(day), ")\n",
+      "day_of_week=", day_of_week, " (type: ", typeof(day_of_week), ")\n");
 ```
+Here is the illustration of the current position of the parser of each call of the `get` function:
+```
+   March 16, 2023 Thursday
+   └──────────────────────── initial position
+   March 16, 2023 Thursday
+        └─────────────────── position after the first call of p.getw() for month
+   March 16, 2023 Thursday
+           └──────────────── position after the first call of p.geti() for day
+   March 16, 2023 Thursday
+            └─────────────── position after p.skipc()
+   March 16, 2023 Thursday
+                 └────────── position after the second call of p.geti() for year
+   March 16, 2023 Thursday
+                          └─ position after the second call of p.getw() for day_of_week
+```
+Note that the function `skipc` has not output, so the expression has no contribution in the [parallel declaration](Assignment.md). 
+
+However, if the current position is not at the  type of the data expected, the parser will return a default value and the current position will not be changed.
+
+The `getc` is used to get the character at the current position. Because Alt string uses UTF-8 encoding, the parser may read multiple bytes for a single character.
+```altro
+p := parser("2023年3月16日");
+char_list : char...;
+while (not p.done()) char_list += p.getc();
+print(char_list);
+```
+
+```
+(2,0,2,3,年,3,月,1,6,日)
+```
+
+When any *scan* function is called, all leading and trailing white spaces, if any, will be removed, unless you set the parameter `rm_ws` to false. For example,
+```altro
+p := parser("the music made  \t it   hard      to  \n      concentrate");
+word_list: string...;
+while (not p.done()) word_list += p.scan(' ');
+print(word_list);
+```
+The output is a word list with white spaces removed:
+```
+(the,music,made,it,hard,to,concentrate)
+```
+Note the difference of the advanced current position in calling `scan` and `scanto`. When `scan` is called, the current position is moved to the next character after the first occurance of the given character. For example:
+```altro
 receipt :=
     "Large Eggs       $3.49
      Milk             $3.15
