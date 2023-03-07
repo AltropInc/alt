@@ -512,7 +512,7 @@ The output of the above:
 ```
 (2023,Mar,16,Thursday)
 Mar 16, 2023, Thursday
-2003年3月16日，星期四
+2023年3月16日，星期四
 year = 2023
 month = Mar
 day = 16
