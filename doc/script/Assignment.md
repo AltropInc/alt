@@ -268,6 +268,12 @@ And the following is ill-formed:
 func foo(): (int; string) { (0, "hello") }
 a, b, c := foo(), 3;  // Error: Type cannot be inferred for the name: c
 ```
+If an expression in the initialization list has a `void` type, for example, an expression of calling a function without output, the expression will be executed but ignored in parallel declaration assignment. For example,
+```altro
+func foo() {};
+a, b := "hello", foo(), 3;
+```
+Here `a` gets `"Hello"` and `b`b gets `3`, `foo()` is executed, but ignored.
 
 ## Augmented Assignment `a += expr`
 
