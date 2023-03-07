@@ -69,21 +69,35 @@ Here is the illustration of the current position of the parser of each call of t
    March 16, 2023 Thursday
                           └─ position after the second call of p.getw() for day_of_week
 ```
-Note that the function `skipc` has not output, so the expression has no contribution in the [parallel declaration](Assignment.md). 
+Note that the function `skipc` has no output, so the expression has no contribution to the initialization in the [parallel declaration](Assignment.md). 
 
-However, if the current position is not at the  type of the data expected, the parser will return a default value and the current position will not be changed.
+If the current position is not at the type of the data expected, the parser will return a default value and the current position will not be changed. For example,
+```
+p := parser("April, 2012");
+month, day, year := p.getw(), p.geti(), p.skipc(), p.geti();
+if (day>0) print(month, ' ',  day, ' ', year, "\n"); else print(month, ' ', year, "\n");
+```
+After the first call of `p.getw()` for `month`, the current position is at a comma. The call of `p.geti()` will get nothing and return zero and the position remains at the comma. The output of this code is `April 2012`.
 
-The `getc` is used to get the character at the current position. Because Alt string uses UTF-8 encoding, the parser may read multiple bytes for a single character.
+The `getc` is used to get the character at the current position. Because Altro string uses UTF-8 encoding, the parser may read multiple bytes for a single character. For example:
 ```altro
 p := parser("2023年3月16日");
 char_list : char...;
 while (not p.done()) char_list += p.getc();
 print(char_list);
 ```
-
+The output is shown as below:
 ```
 (2,0,2,3,年,3,月,1,6,日)
 ```
+The `getw` can be used for getting a word or a quated string. The character sequence of a word is ternimated by a white space or character for punctuation or an operator. If the word contains word ternimating characters, using quotation marks. For example,
+```altro
+p := parser("""orange "green apple" pineapple""");
+word_list : string...;
+while (not p.done()) word_list += p.getw();
+print(word_list);
+```
+The output of the above code is `(orange,green apple,pineapple)`.
 
 When any *scan* function is called, all leading and trailing white spaces, if any, will be removed, unless you set the parameter `rm_ws` to false. For example,
 ```altro
