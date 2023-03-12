@@ -1,4 +1,4 @@
-# Math
+# Math Library Class
 
 In mathematics, some constants and functions are important enough to deserve their own names. Examples are constants π, e, τ, and functions +, -, √, and sin. Some constants and functions are defined in the associated class, for example, the class `float` and `double` have have their own version of constant e and function +:
 ```altro
