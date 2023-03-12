@@ -10,26 +10,25 @@ For a list of language codes, see [ISO 639 alpha-2 or alpha-3 language code](htt
 
 For convenience and readability, you can use full name or even native names for some common languages and regions. Example: ("French", "Switzerland") and ("Français", "Suisse") both represent a locale of ("fr", "CH"), and ("Chinese", "Taiwan") and ("中文", "台灣") both represent a locale of ("zh", "TW"). Internally, full names will be translated into codes to find the related locale. This translation is defined in the file "LocaleList.jason" in the "locale" folder distributed with your executable which is built on the alt library.
 
-
 ## Facet
 
 A facet provides a common place for a set of aspects (punctuations, date format, time format, and dictionary) that can be shared by a set of locales. For instance, ("zh", "CN") and ("zh", "SG") both use Simplified Chinese, therefore, they can share most of the aspects in [("zh", "Hans")](https://www.localeplanet.com/icu/zh-Hans/index.html), where "Hans" represents a facet "Simplified Chinese".
 
-## Set Application Locale
+## Set Application Language
 
-The function `set_app_locale` provided in the locale class is typically called during the application start to set the appropriate locale for the entire application:
+The function `setlang` provided in the [`sys` class](LibSys.md) is typically called during the application start to set the appropriate language for the entire application:
 ```altro
-func set_app_locale(language: string; region: string=null);
+func setlang(lang: string; rgn: string=null);
 ```
 This function will not only affect all locale-sensitive operations to be called in future, but will also affect the existing locale-sensitive objects such as text in shown buttons and menus, locale-sensitive images and icons in the graphic user interface.
 
 Here are some examples to call set_app_locale:
 ```altro
-set_app_locale("de");
-set_app_locale("de", "DE");
-set_app_locale("German", "Germany");
-set_app_locale("Deutsch", "Österreich");
-set_app_locale("en:English:English:LTR", "LC:Saint Lucia:Saint Lucia:001");
+setlang("de");
+setlang("de", "DE");
+setlang("German", "Germany");
+setlang("Deutsch", "Österreich");
+setlang("en:English:English:LTR", "LC:Saint Lucia:Saint Lucia:001");
 ```
 The last call is used only when you want to add a new locale that is not provided in the existing system. For the language string, you can have:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;*language-code*:*language-name*:*language-native-name*:*language-orientation*<sub>opt</sub><br>
@@ -122,16 +121,21 @@ All locale-sensitive sound, images, and icons should also be placed in the appro
 
 ## Set Category Locale
 
-You can set locale for some special purpose in certain categories without affect the application locale setting. The locale change in a specific category only affects operations in that category. Locale are divided into five standard categories:
-| category     | operations affected                      |
-|:------------ |:-----------------------------------------|
-| numeric      |  numeric number format                   |
-| time         |  time and date format                    |
-| character    |  character attributes such as lower and upper cases, puctuations   |
-| monetary     |  currency symbol and price format        |
-| collate      |  string comparison, hash and transform   |
+You can set locale for some special purpose in certain categories without affect the application locale setting. The function `setlocale` provided in the [`sys` class](LibSys.md):
+```altro
+func setlocale(cat: int; lang:string; rgn:string=null);
+```
+The locale change in a specific category only affects operations in that category. Locale are divided into five standard categories:
+| category        | operations affected                      |
+|:--------------- |:-----------------------------------------|
+| LC_NUMERIC      |  numeric number format                   |
+| LC_TIME         |  time and date format                    |
+| LC_CTYPE        |  character attributes such as lower and upper cases, puctuations   |
+| LC_MONETARY     |  currency symbol and price format        |
+| LC_COLLATE      |  string comparison, hash and transform   |
+| LC_ALL          |  all of the above five categories   |
 
-Here are some example of numeric number format affected by category locale settings with different decimals and thousands separators:
+Here are some example of calling `setlocale(LC_NUMERIC, language, region)` for numeric number formats with different decimals and thousands separators: 
 | locale                       |  numeric number       |
 |:---------------------------- |:----------------------|
 | default (without any locale) |  4294967295.34        |
