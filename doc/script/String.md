@@ -335,6 +335,46 @@ returns a merged string from the given string stream in the ranged of \[strat, e
 "【".join(strings=("Hello", "World"), separator=", ", tail="】"); // returns "【Hello, World】"
 </pre>
 
+* **`func upper (): string...`** -- returns a converted string with all characters in upper case.<br><pre>
+"über 100 meter".upper();   // returns a string "ÜBER 100 METER"
+</pre>
+
+* **`func lower (): string...`** -- returns a converted string with all characters in lower case.<br><pre>
+"ΎΨΙΛΟΝ".lower();   // returns a string "ύψιλον"
+</pre>
+
+* **`func capitalize (): string...`** -- returns a converted string with first character in upper case.<br><pre>
+"über 100 meter".capitalize();   // returns a string "Über 100 meter"
+</pre>
+
+* **`func decapitalize (): string...`** -- returns a converted string with first character in lower case.<br><pre>
+"Über 100 Meter".decapitalize();   // returns a string "über 100 Meter"
+</pre>
+
+* **`func maketitle (): string...`** -- returns a converted string with first character in each word in upper case.<br><pre>
+"über 100 meter".maketitle();   // returns a string "Über 100 Meter"
+</pre>
+
+* **`func urlencode (): string...`** -- returns a converted string [url-encoded](https://en.wikipedia.org/wiki/URL_encoding).<br><pre>
+"über 100 meter".urlencode();   // returns a string "%C3%BCber%20100%20meter"
+</pre>
+
+* **`func urlencode (): string...`** -- returns a converted string [url-decoded](https://en.wikipedia.org/wiki/URL_encoding).<br><pre>
+""%C3%BCber%20100%20meter".urlencode();   // returns a string "über 100 meter"
+</pre>
+
+* **`func translate (): string...`** -- returns a string translated in currentl locale. If the current locale does not have the translation, the original string is returned<br><pre>
+"April".translate();   // returns "Abril" if the current locale is set to Spanish
+</pre>
+
+* **`func expandtab (): string...`** -- returns a string with tabs expanded to the specified number of whitespaces. Note that the tab spaces is counted by column spaces. For example, <br><pre>
+txt := "H\te\tl\tl\to\n私\tの\t世\t界\t!\n";
+print(txt.expandtab(4));
+</pre> In the output, <br><pre>
+H   e   l   l   o
+私  の  世  界  !
+</pre> three spaces are inserted between `H` and `e`, while only twp sapces are inserted between `私` and `の`, becuase the character `私` occupies two column spaces. 
+
 ## Regular Expression
 
 Regular expression (regex) is used to perform pattern matching within strings. A regular expression can be represented by a string conatining
