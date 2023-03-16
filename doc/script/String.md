@@ -189,161 +189,151 @@ for ( i:=0;
 
 In addition to methods with common comparison operatiors < > >= <= == != ~=, string has the floowing methods:
 
-* `func + (ch: char; repeat: int=1): string` --
+* **`func + (ch: char; repeat: int=1): string`** --
     creates a new string by concatenation of this string with a number of given characters. `ch` is the given character and 'repeat'
-    is the repeat number with default set to 1.
-```altscript
+    is the repeat number with default set to 1.<br><pre>
 greet_world := "Hello, world" + '!';     // "Hello, world!"
 greet_world2 := greet_world + ('!', 2);  // "Hello, world!!!"
-```
-* `func + (str: string): string` --
-    creates a new string by concatenation of this string with another string
-```altscript
+</pre>
+
+* **`func + (str: string): string`** --
+    creates a new string by concatenation of this string with another string.<br><pre>
 greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
-```
-* `func [(index: int)]: char`
-* `func char_at (index: int): char` --
+</pre>
+
+* **`func [(index: int)]: char`**<br>
+**`func char_at (index: int): char`** --
     returns the character at the given byte index position. The byte index can be in any position within a encoded byte sequence of a character.
-    If the given index is invalid, it returns a null character. 
-```altscript
+    If the given index is invalid, it returns a null character.<br><pre>
 "世界"[3];     // returns the character '界'. Note, both '世' and '界' have 3 bytes in the string
 "世界"[4];     // returns the character '界'. Note, the byte at index 4 is at the second byte of '界'
 "世界".char_at(2);  // returns the character '世'.
-```
-* `func byte_at (index: int): utiny` --
-    returns the byte value (in unsigned tiny integer) at the given index position.
-```altscript
+</pre>
+
+* **`func byte_at (index: int): utiny`** --
+    returns the byte value (in unsigned tiny integer) at the given index position..<br><pre>
 "世界".byte_at(4);     // returns 0x95 which is the second byte in the encoding of '界' (\xE7\x95\x8C)
-```
-* `func [(start: int) .. (end: int)]: string`
-* `func substring (start:int; end:int=-1): string` --
+</pre>
+
+* **`func [(start: int) .. (end: int)]: string`**<br>
+**`func substring (start:int; end:int=-1): string`** --
     returns a substring indexed from start to end. The character at the end position is not included. If the end position is given to -1,
-    the end position is at the end of the string. Note, if the start or end position is in the middle of a character, it will be adjusted to the beginning
-    character position before the substring is sliced.
-```altscript
+    the end position is at the end of the string. Note, if the start or end position is in the middle of a character, it will be adjusted to the beginning character position before the substring is sliced.<br><pre>
 "世界"[0..5];   // returns "世". Note the end index 5 is in the middle of "界" and is adjusted to 4 pointing the first byte of '界'.
 "世界".substring(3);   // returns "界".
-```
-* `func length (): int` --
-    returns byte length (number of bytes) used to store the string
-```altscript
+</pre>
+
+* **`func length (): int`** --
+    returns byte length (number of bytes) used to store the string.<br><pre>
 "Hello, 世界!".length();     // returns 14
-```
-* `func is_basic (): bool` --
-    returns true if the string does not contain any characters with multiple code units
-```altscript
+</pre>
+
+* **`func is_basic (): bool`** --
+    returns true if the string does not contain any characters with multiple code units.<br><pre>
 "Hello, World!".is_basic();    // returns true
 "Hello, 世界!".is_basic();     // returns false
-```
-* `func count (): int` --
+</pre>
+
+* **`func count (): int**` --
     returns number of characters contained in the string
-* `func count (start: int; end: int =-1): int` --
-    returns number of characters between the start and the end indices. If end is not given, the defualt is -1, meaning to the end of the string
-```altscript
+    
+* **`func count (start: int; end: int =-1): int`** --
+    returns number of characters between the start and the end indices. If end is not given, the defualt is -1, meaning to the end of the string.<br><pre>
 "Hello, 世界!".count();     // returns 10
 "Hello, 世界!".count(7);    // returns 3 for 3 characters "世界!", counts from the 7th character
-```
+</pre>
 
-* `func width (): int` --
+* **`func width (): int`** --
     returns number of colum positions required to display the string in a fixed width font
-* `func width (start: int; end: int =-1): int` --
-    returns number of colum positions required to display the string between the start and the end indices in a fixed width font . If end is not given, the defualt is -1, meaning to the end of the string
-```altscript
+
+* **`func width (start: int; end: int =-1): int`** --
+    returns number of colum positions required to display the string between the start and the end indices in a fixed width font . If end is not given, the defualt is -1, meaning to the end of the string.<br><pre>
 "Hello, 世界!".width();     // returns 12, one Chinese character requires two colum positions
 "Hello, 世界!".width(7);    // returns 5 for 3 characters "世界!"
-```
+</pre>
 
-* `func begin (): iterator` --
-    returns the iterator points to the first character of the string. If the string is empty, it returns an invalid iterator.
-```altscript
+* **`func begin (): iterator`** --
+    returns the iterator points to the first character of the string. If the string is empty, it returns an invalid iterator.<br><pre>
 "Hello, 世界".begin();     // returns an iterator that points to the first character 'H'
-```
-* `func rbegin (): iterator` --
-    returns the iterator points to the last character of the string. If the string is empty, it returns an invalid iterator.
-```altscript
+</pre>
+
+* **`func rbegin (): iterator`** --
+    returns the iterator points to the last character of the string. If the string is empty, it returns an invalid iterator.<br><pre>
 "Hello, 世界".rbegin();     // returns a backwards iterator that points to the last character '界'
-```
-* `func char_units_at (index: int): char` --
-    returns the number of [code units](https://en.wikipedia.org/wiki/Character_encoding#Terminology) of the character at the byte index position. If the character at the given index is not a valid character, it returns 0. 
-```altscript
+</pre>
+
+* **`func char_units_at (index: int): char`** --
+    returns the number of [code units](https://en.wikipedia.org/wiki/Character_encoding#Terminology) of the character at the byte index position. If the character at the given index is not a valid character, it returns 0.<br><pre>
 "世界".char_units_at(3);     // returns 3. The character '界' have 3 code units (bytes) in the string
 "世界".char_units_at(4);     // returns 0 because it is not a valid leading byte of a character at index 4
-```
-* `func next_char_pos (index: int; nth: int=1): int` --
-    returns the index of the next nth character starting from the current position given by `index`. If there is no valid character after the given position,
-    it returns the length of the string (an index that points to the end of the string). The given current index is not necessarily at the valid
-    character position.
-```altscript
+</pre>
+
+* **`func next_char_pos (index: int; nth: int=1): int`** --
+    returns the index of the next nth character starting from the current position given by `index`. If there is no valid character after the given position, it returns the length of the string (an index that points to the end of the string). The given current index is not necessarily at the valid character position.<br><pre>
 "世界".next_char_pos(0)     // returns 3, which is the positon of '界'
 "世界".next_char_pos(1)     // returns 3, which is the positon of '界'.
 "Hello, 世界".next_char_pos(0,8)   // return 10 for the 8th characte,r which is '界' from the start position 0
-```
-* `func prev_char_pos (index: int; nth: int=1): int` --
-    returns the index of the nth previous character starting from the current position given by `index`. If there is no valid character prior to the given position,
-    it returns -1. The given current index is not necessarily at the valid character position.
-```altscript
+</pre>
+
+* **`func prev_char_pos (index: int; nth: int=1): int`** --
+    returns the index of the nth previous character starting from the current position given by `index`. If there is no valid character prior to the given position, it returns -1. The given current index is not necessarily at the valid character position.<br><pre>
 "世界".prev_char_pos(3);     // returns 0, which is the positon of '世'
 "世界".prev_char_pos("世界".length());     // returns 3, which is the positon of '界'
 "Hello, 世界".prev_char_pos("Hello, 世界".length(), 2)   // returns 7 for 2nd character from the end of the string, which is '世'
-```
-* `func front (): char` --
+</pre>
+
+* **`func front (): char`** --
     returns the first character of the string.
 * `func back (): char` --
-    returns the last character of the string.
-```altscript
+    returns the last character of the string. <br><pre>
 "世界".back();     // returns '界'
 "世界".front();    // returns '世'
-```
-* `func occurs (str: string; start: int=0): int` --
+</pre>
+
+* **`func occurs (str: string; start: int=0): int`** --
     returns the index position where this string occurs first time as a substring from the start index in the given string `str`. Returns -1 if it does not occur.
-* `func find (str: string; start: int=0): int` --
-    returns the index position where the given string `str` is found first time from the start index in this string. Returns -1 if it is not found.
-```altscript
+    
+* **`func find (str: string; start: int=0): int`** --
+    returns the index position where the given string `str` is found first time from the start index in this string. Returns -1 if it is not found.<br><pre>
 "Hello, 世界".find("世界");      // returns 7
 "世界".occurs("Hello, 世界");    // returns 7
-```
-* `func rfind (str: string; end: int=-1): int` --
-    returns the index position where given string `str` is found first time backwards from the end index. Returns -1 if it is not found. If the end index is not given or is given to -1, the search starts from the end of the string
-```altscript
+</pre>
+
+* **`func rfind (str: string; end: int=-1): int`** --
+    returns the index position where given string `str` is found first time backwards from the end index. Returns -1 if it is not found. If the end index is not given or is given to -1, the search starts from the end of the string.<br><pre>
 "Hello, Hello".rfind("Hello");         // returns 7
 "Hello, Hello".rfind("Hello", 7);      // returns 0
-```
-* `func to_stream (): char...` --
-    convert this string in a char stream
-```altscript
+</pre>
+
+* **`func to_stream (): char...`** --
+    convert this string in a char stream<br><pre>
 "Hello, 世界".to_stream();     // returns a stream contains ('H', 'e', 'l', 'l', 'o', 'w', ',', ' ', '世', '界')
-```
-* `func starts_with (str: string): bool` --
+</pre> 
+
+* **`func starts_with (str: string): bool`** --
     returns true if this string starts with the given string `str`.
-* `func ends_with (str: string): bool` --
-    returns true if this string ends with the given string `str`.
-```altscript
+    
+* **`func ends_with (str: string): bool`** --
+    returns true if this string ends with the given string `str`.<br><pre>
 "Hello, 世界".starts_with("Hello");   // returns true
 "Hello, 世界".ends_with("世界");      // returns true
-```
-* `func compare (str:string; ignore_case:bool=false; number_as_whole:bool=false): int` --
-    returns 0 if this string is equal to `str`, a negative value if this string is smaller than `str`, and a positive value if this string is greater that `str`.
-    If `ignore_case` is true, do the caseless comparison. This does not support the case of comparsion involving multiple characters vs. single character
-    such as between "ss" and “ß” in German, and in these cases they are considered not equal. If `number_as_whole` is true and a number starts at the same
-    position of two strings, the compare will use the number as whole instead of comparing digits individually. For instance, "item(12)" is greater than "item(3)"
-```altscript
+</pre>
+
+* **`func compare (str:string; ignore_case:bool=false; number_as_whole:bool=false): int`** --
+returns 0 if this string is equal to `str`, a negative value if this string is smaller than `str`, and a positive value if this string is greater that `str`. If `ignore_case` is true, do the caseless comparison. This does not support the case of comparsion involving multiple characters vs. single character such as between "ss" and “ß” in German, and in these cases they are considered not equal. If `number_as_whole` is true and a number starts at the same position of two strings, the compare will use the number as whole instead of comparing digits individually. For instance, "item(12)" is greater than "item(3)"<br><pre>
 "item(12)".compare("Item(3)", fasle, true);   // returns a positive integer, because "12" is greater than "3"
 "item(12)".compare("Item(3)", fasle, fasle);  // returns a negative integer, because '1' is smaller than '3'
-```
-* `func split (separator:char=','; terminator:char='\0'; skip_leading_sp:bool=true; skip_trailing_sp:bool=true): string...` --
-    returns a splitted string stream. `separator` is the character to divide substrings. `terminator` is character at which the split process stops.
-    `skip_leading_sp` indicates whether the leading spaces of the substring should be skipped. and `skip_trailing_sp` indicates whether the trailing
-    spaces of the substring should be skipped.
-```altscript
+</pre>
+
+* **`func split (separator:char=','; terminator:char='\0'; skip_leading_sp:bool=true; skip_trailing_sp:bool=true): string...`** --
+    returns a splitted string stream. `separator` is the character to divide substrings. `terminator` is character at which the split process stops. `skip_leading_sp` indicates whether the leading spaces of the substring should be skipped. and `skip_trailing_sp` indicates whether the trailing spaces of the substring should be skipped.<br><pre>
 "item(1), item(2), item(3)".split();   // returns a string stream ("item(1)", "item(2)", "item(3)")
-```
-* `func join (strings: string...; start:int=0; end:int=-1; separator:string=null; tail:string=null): string` --
-    returns a merged string from the given string stream in the ranged of \[strat, end). 
-    `separator` is the optional string to be inserted between two strings in the stream and `tail` is the optional string to be appended at the end of the
-    output.
-```altscript
+</pre>
+
+* **`func join (strings: string...; start:int=0; end:int=-1; separator:string=null; tail:string=null): string`** --
+returns a merged string from the given string stream in the ranged of \[strat, end). `separator` is the optional string to be inserted between two strings in the stream and `tail` is the optional string to be appended at the end of the output.<br><pre>
 "【".join(strings=("Hello", "World"), separator=", ", tail="】"); // returns "【Hello, World】"
-```
+</pre>
 
 ## Regular Expression
 
