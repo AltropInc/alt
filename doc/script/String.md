@@ -360,15 +360,15 @@ returns a merged string from the given string stream in the ranged of \[strat, e
 "über 100 meter".maketitle();   // returns a string "Über 100 Meter"
 </pre>
 
-* **`func urlencode (): string...`** -- returns a converted string [url-encoded](https://en.wikipedia.org/wiki/URL_encoding).<br><pre>
+* **`func urlencode (): string...`** -- returns a string that is [url-encoded](https://en.wikipedia.org/wiki/URL_encoding).<br><pre>
 "über 100 meter".urlencode();   // returns a string "%C3%BCber%20100%20meter"
 </pre>
 
-* **`func urlencode (): string...`** -- returns a converted string [url-decoded](https://en.wikipedia.org/wiki/URL_encoding).<br><pre>
+* **`func urldecode (): string...`** -- returns a string that is [url-decoded](https://en.wikipedia.org/wiki/URL_encoding).<br><pre>
 ""%C3%BCber%20100%20meter".urlencode();   // returns a string "über 100 meter"
 </pre>
 
-* **`func translate (): string...`** -- returns a string translated in the current locale. If the current locale does not have the translation, the original string is returned<br><pre>
+* **`func translate (): string...`** -- returns a string that is translated in the current locale. If the current locale does not have the translation, the original string is returned<br><pre>
 "April".translate();   // returns "Abril" if the current locale is set to Spanish
 </pre>
 
