@@ -173,8 +173,7 @@ for (ch:=greet_世界.rbegin(); ch.is_valid(); ch.next())
 Here `ch` is a string iterator and it is automatically converted to the value of `char` whenever it is needed. Since strings are immutable,
 you cannot use string iterator to change the value in the string.
 
-To loop over characters in a string through a byte index, you need to make sure that the index is at the start position of a character
-in the string:
+Because a character may have multiple bytes in a string, to loop over characters in a string through a byte index, you need to make sure that the index is at the start position of a character in the string. The following example uses `next_char_pos` to forward the byte index to the position at the next character:
 ```altscript
 greet_世界 := "Hello, 世界!";
 for ( i:=0;
@@ -187,7 +186,7 @@ for ( i:=0;
 
 ## String Methods
 
-In addition to methods with common comparison operatiors < > >= <= == != ~=, string has the floowing methods:
+In addition to methods with common comparison operatiors < > >= <= == != ~=, string has the following methods:
 
 * **`func + (ch: char; repeat: int=1): string`** --
     creates a new string by concatenation of this string with a number of given characters. `ch` is the given character and 'repeat'
@@ -245,11 +244,12 @@ greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
 </pre>
 
 * **`func width (): int`** --
-    returns number of colum positions required to display the string in a fixed width font
+    returns number of colum positions required to display the string in a fixed width font<br><pre>
+"Hello, 世界!".width();     // returns 12, one Chinese character requires two colum positions
+</pre>
 
 * **`func width (start: int; end: int =-1): int`** --
     returns number of colum positions required to display the string between the start and the end indices in a fixed width font . If end is not given, the defualt is -1, meaning to the end of the string.<br><pre>
-"Hello, 世界!".width();     // returns 12, one Chinese character requires two colum positions
 "Hello, 世界!".width(7);    // returns 5 for 3 characters "世界!"
 </pre>
 
@@ -370,7 +370,6 @@ returns a merged string from the given string stream in the ranged of \[strat, e
 
 * **`func translate (): string...`** -- returns a string translated in the current locale. If the current locale does not have the translation, the original string is returned<br><pre>
 "April".translate();   // returns "Abril" if the current locale is set to Spanish
-h
 </pre>
 
 * **`func expandtab (): string...`** -- returns a string with tabs expanded to the specified number of whitespaces. Note that the tab spaces are counted by column spaces. For example, <br><pre>
