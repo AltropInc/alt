@@ -20,8 +20,9 @@ data class paser
     func scan(to: string): string;
     func scanto(to: char...): string;
     func pos(): (int; int);
+    func atnumeric(): bool;
     func done(): bool;
-    func is_valid(): bool; 
+    func isvalid(): bool; 
 }
 ```
 The constructor of the parser, `parser (str: string; is_file: bool=false)`, takes a string to be parsed, or a text file name given by the `str` input if `is_file` is set to true. The member functions of `parser` are explained below.
@@ -40,8 +41,9 @@ The constructor of the parser, `parser (str: string; is_file: bool=false)`, take
 * **func scan(to: string): string** It returns a string that contains characters from the current position to the character before the first occurance of the string given by the parameter `to`. The current position is advanced to the next character after the first occurance of the given string.
 * **func scanto(to: char...): string** It returns a string that contains characters from the current position to the character before the first occurance of the character listed in the character stream given by the parameter `to`. The current position is advanced to the first occurance of the character listed in the character stream.
 * **func pos(): (int; int)** Returns the current position. The first integer in the returned integer pair is the line number, and the second integer is the column position.
+* **func isnumeric(): bool** Returns true if the first non-whitespace at or after the current position is a numeric data.
 * **func done(): bool** Returns true if the parser comes to the end.
-* **func is_valid(): bool** Returns true if the parser contains a valid string buffer to parse.
+* **func isvalid(): bool** Returns true if the parser contains a valid string buffer to parse.
 
 ## Examples
 
