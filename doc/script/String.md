@@ -6,7 +6,7 @@ The value of a single character is a 32-bit primitive value type  which can be c
 [Unicode code point](https://en.wikipedia.org/wiki/Code_point). Therefore, the representation of single character is different from
 the character representation within a string.
 
-All strings are instances (objects) of the `string` type.
+All strings are instances of the `string` type.
 
 Strings are immutable, that is, the value of a string cannot be changed once it is created. The string type has a number of methods
 that appear to modify strings, but what these methods really do is create and return a new string as the result of the
@@ -114,21 +114,21 @@ A direct way to create a string is to write the string in string literal and ass
 ```altscript
 greeting := "Hello World!"
 ```
-In this case, "Hello world!" is a string literal. Whenever it encounters a string literal in your code, a string object is created with its value — in this case, `Hello world!`. The name `greeting` is used to refer to the string object `Hello world!`. Whenever the name `greeting` presents, it stands for the value
+In this case, "Hello world!" is a string literal. Whenever it encounters a string literal in your code, a string instance is created with its value — in this case, `Hello world!`. The name `greeting` is used to refer to the string instance `Hello world!`. Whenever the name `greeting` presents, it stands for the value
 `Hello world!`.
 
-A string object can also be created by an function output or by automatic conversion from an object in a compatable data structure:
+A string can also be created by an function output or by automatic conversion from a value in a compatable data structure:
 ```altscript
 char_pair := ('世', '界');
 greeting :string = char_pair;
 ```
-In this case, the type of the name `char_pair` is deducted to a tuple `(char; char)`. Since the name `greeting` is declared to be in `string` type, when the tuple value of `char_pair` is assigned to `greeting`, a new string object is created for the name `greeting` by converting the value of string pair.
+In this case, the type of the name `char_pair` is deducted to a tuple `(char; char)`. Since the name `greeting` is declared to be in `string` type, when the tuple value of `char_pair` is assigned to `greeting`, a new string is created for the name `greeting` by converting the value of a character pair.
 
 ## Common String Operations
 
 ### Comparison
 
-Strings are compariable objects and standard comparison operators (=, ≠, <, ≤, >, ≥) can be applied to them. For instance
+Strings are compariable and standard comparison operators (=, ≠, <, ≤, >, ≥) can be applied to them. For instance
 ```altscript
 "abstract" ≥ "concrete"    // the result is false. Note, operator ≥ is same as >=
 ```
@@ -443,8 +443,7 @@ enumset regex_flag (
     FirstMatchOnly,     // replace-only flag - replace the first match only
     CopyMatchedOnly     // replace-only flag - do not copy un-matched strings into to the result
 );
-</pre>
-Example of using regex match:<br><pre>
+</pre> Example of using regex match:<br><pre>
 re : regex = r"([a-z]+)\.([a-z]+)";
 re.match("foo.txt");  // returns a string stream ("foo.txt", "foo", "txt")
 </pre>
