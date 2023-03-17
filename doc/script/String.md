@@ -219,7 +219,7 @@ greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
 **`func substring (start:int; end:int=-1): string`** --
     returns a substring indexed from start to end. The character at the end position is not included. If the end position is given to -1,
     the end position is at the end of the string. Note, if the start or end position is in the middle of a character, it will be adjusted to the beginning character position before the substring is sliced.<br><pre>
-"世界"[0..5];   // returns "世". Note the end index 5 is in the middle of "界" and is adjusted to 4 pointing the first byte of '界'.
+"世界"[0..5];  // returns "世". Note the end index 5 is in the middle of "界" and is adjusted to 4 at the first byte of '界'.
 "世界".substring(3);   // returns "界".
 </pre>
 
@@ -234,13 +234,14 @@ greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
 "Hello, 世界!".is_basic();     // returns false
 </pre>
 
-* **`func count (): int**` --
-    returns number of characters contained in the string
+* **`func count (): int`** --
+    returns number of characters contained in the string<br><pre>
+"Hello, 世界!".count();     // returns 10
+</pre>
     
 * **`func count (start: int; end: int =-1): int`** --
     returns number of characters between the start and the end indices. If end is not given, the defualt is -1, meaning to the end of the string.<br><pre>
-"Hello, 世界!".count();     // returns 10
-"Hello, 世界!".count(7);    // returns 3 for 3 characters "世界!", counts from the 7th character
+"Hello, 世界!".count(7);    // counts from the 7th character and returns 3 for 3 characters "世界!" 
 </pre>
 
 * **`func width (): int`** --
@@ -279,24 +280,27 @@ greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
     returns the index of the nth previous character starting from the current position given by `index`. If there is no valid character prior to the given position, it returns -1. The given current index is not necessarily at the valid character position.<br><pre>
 "世界".prev_char_pos(3);     // returns 0, which is the positon of '世'
 "世界".prev_char_pos("世界".length());     // returns 3, which is the positon of '界'
-"Hello, 世界".prev_char_pos("Hello, 世界".length(), 2)   // returns 7 for 2nd character from the end of the string, which is '世'
+"Hello, 世界".prev_char_pos("Hello, 世界".length(), 2)  // returns 7 for the 2nd character from the end, which is '世'
 </pre>
 
 * **`func front (): char`** --
-    returns the first character of the string.
-* `func back (): char` --
+    returns the first character of the string. <br><pre>
+"世界".front();    // returns '世'
+</pre>
+    
+* **`func back (): char`** --
     returns the last character of the string. <br><pre>
 "世界".back();     // returns '界'
-"世界".front();    // returns '世'
 </pre>
 
 * **`func occurs (str: string; start: int=0): int`** --
-    returns the index position where this string occurs first time as a substring from the start index in the given string `str`. Returns -1 if it does not occur.
+    returns the index position where this string occurs first time as a substring from the start index in the given string `str`. Returns -1 if it does not occur.<br><pre>
+"世界".occurs("Hello, 世界");    // returns 7
+</pre>
     
 * **`func find (str: string; start: int=0): int`** --
     returns the index position where the given string `str` is found first time from the start index in this string. Returns -1 if it is not found.<br><pre>
 "Hello, 世界".find("世界");      // returns 7
-"世界".occurs("Hello, 世界");    // returns 7
 </pre>
 
 * **`func rfind (str: string; end: int=-1): int`** --
@@ -311,11 +315,12 @@ greet_world := "Hello" + ',' +  "world";     // "Hello, world!"
 </pre> 
 
 * **`func starts_with (str: string): bool`** --
-    returns true if this string starts with the given string `str`.
+    returns true if this string starts with the given string `str`.<br><pre>
+"Hello, 世界".starts_with("Hello");   // returns true
+</pre>
     
 * **`func ends_with (str: string): bool`** --
     returns true if this string ends with the given string `str`.<br><pre>
-"Hello, 世界".starts_with("Hello");   // returns true
 "Hello, 世界".ends_with("世界");      // returns true
 </pre>
 
@@ -363,21 +368,25 @@ returns a merged string from the given string stream in the ranged of \[strat, e
 ""%C3%BCber%20100%20meter".urlencode();   // returns a string "über 100 meter"
 </pre>
 
-* **`func translate (): string...`** -- returns a string translated in currentl locale. If the current locale does not have the translation, the original string is returned<br><pre>
+* **`func translate (): string...`** -- returns a string translated in the current locale. If the current locale does not have the translation, the original string is returned<br><pre>
 "April".translate();   // returns "Abril" if the current locale is set to Spanish
+h
 </pre>
 
-* **`func expandtab (): string...`** -- returns a string with tabs expanded to the specified number of whitespaces. Note that the tab spaces is counted by column spaces. For example, <br><pre>
+* **`func expandtab (): string...`** -- returns a string with tabs expanded to the specified number of whitespaces. Note that the tab spaces are counted by column spaces. For example, <br><pre>
 txt := "H\te\tl\tl\to\n私\tの\t世\t界\t!\n";
+print(txt.expandtab(2));
 print(txt.expandtab(4));
 </pre> In the output, <br><pre>
+H e l l o
+私の世界!
 H   e   l   l   o
 私  の  世  界  !
-</pre> three spaces are inserted between `H` and `e`, while only twp sapces are inserted between `私` and `の`, becuase the character `私` occupies two column spaces. 
+</pre> the number of spaces inserted between `H` and `e` is one more than the number of spaces inserted between `私` and `の`, because the character `私` occupies two column spaces while `H` occupies only one column space.
 
 ## Regular Expression
 
-Regular expression (regex) is used to perform pattern matching within strings. A regular expression can be represented by a string conatining
+Regular expression (regex) is used to perform pattern matching within strings. A regular expression can be represented by a string containing
 both special and ordinary characters. See [Regular expression](https://en.wikipedia.org/wiki/Regular_expression) for the format of regex.
 
 The operator ~= or ≅ can be used to check if a string matches to a regular expression:
@@ -418,13 +427,12 @@ A regex object can also be obtained by converting from a string directly:
 ```altscript
 re : regex = r"([a-z]+)\.([a-z]+)";
 ```
-The regex object povides the follinwg methods to perform pattern matching within strings:
+The regex object provides the following methods to perform pattern matching within strings:
 
-* `func match (str:string, flags:regex_flags=()) string...` --
+* **`func match (str:string, flags:regex_flags=()) string...`** --
    performs the match to the entire target of the given string. If it matches, it returns a string stream in which the first element is
    the same string given in the input, and the rest elements give substrings that match all subpatterns given in the regular expression.
-   If itdoes not match, an empty string stream is reurned. `flags` is an enumset of flags for match/replacement options, which are defined as:
-```altscript
+   If itdoes not match, an empty string stream is reurned. `flags` is an enumset of flags for match/replacement options, which are defined as:<br><pre>
 enumset regex_flag (
     NotBOL,             // The first character will be ignored. (i.e. ^ will not match the first)
     NotEOL,             // The last character will be ignored. (i.e. $ will not match the first)
@@ -436,17 +444,16 @@ enumset regex_flag (
     FirstMatchOnly,     // replace-only flag - replace the first match only
     CopyMatchedOnly     // replace-only flag - do not copy un-matched strings into to the result
 );
-```
-Example of using regex match:
-```altscript
+</pre>
+Example of using regex match:<br><pre>
 re : regex = r"([a-z]+)\.([a-z]+)";
 re.match("foo.txt");  // returns a string stream ("foo.txt", "foo", "txt")
-```
-* `func search (str:string, flags:regex_flags=()): string...` --
+</pre>
+
+* **`func search (str:string, flags:regex_flags=()): string...`** --
    performs the match to some subsequence in the given string. If it finds a match, it returns a string stream in which the first element is
    the unsearched part of the given input, the second element is the substring that mactchs the enire regular expression, and the rest elements
-   give substrings that match all subpatterns given in the regular expression. If it does not find any macth, an empty string stream is reurned.
-```altscript
+   give substrings that match all subpatterns given in the regular expression. If it does not find any macth, an empty string stream is reurned <br><pre>
 re : regex = r"([a-z]+)\.([a-z]+)";
 str := "file_names: foo.txt bar.txt";
 ma := re.search(str);          // returns a string stream (" bar.txt", "foo.txt", "foo", "txt")
@@ -454,32 +461,35 @@ while (ma.length() > 0)
 {
     ma = re.search(ma[0]);   // returns a string stream ("", "bar.txt", "bar", "txt")
 }
-```
-* `func findall (str:string, flags:regex_flags=()): string......` --
+</pre>
+
+* **`func findall (str:string, flags:regex_flags=()): string......`** --
    performs the match to all subsequence in the given string. If it finds any match, it returns a stream of string stream, in which each
    string stream gives the result of a macth to the subsequence in the given string. 
-```altscript
+<br><pre>
 re : regex = r"([a-z]+)\.([a-z]+)";
 str := "foo.txt bar.txt";
 ma := re.findall(str);          // returns a string stream stream (("foo.txt", "foo", "txt"), ("bar.txt", "bar", "txt"))
-```
-* `func split (str:string, trim:bool=false, flags:regex_flags=()): string...` --
+</pre>
+
+* **`func split (str:string, trim:bool=false, flags:regex_flags=()): string...`** --
    performs the match to all seperators in the given string. If any separators are find by the match, the string will be separated into a set of strings based on the position of the separators found. When `trim is true, the lead and trailing spaces in the split strings will be removed.
-```altscript
+<br><pre>
 re : regex = "[.,/]+";
 str := "12.abc//56, 1237 ... 321";
 print(re.split(str, true));          // the output is (12,abc,56,1237,321)
-```
-* `func replace (str:string, substitute:string, flags:regex_flags=()): string` --
+</pre>
+
+* **`func replace (str:string, substitute:string, flags:regex_flags=()): string`** --
    performs the match to all subsequence in the given string. If it finds a match, it replaces the subsequence with the given substitute and
    returns the substituted string. If it does not find a match, it returns a null string.
-```altscript
+<br><pre>
 re : regex = r"([a-z]+)\.([a-z]+)";
 str := "foo.txt bar.txt";
 re.replace(str, "[$&]");                                                 // returns a string "[foo.txt] [bar.txt]"
 re.replace(str, "[$&]", regex_flags(FirstMatchOnly));                    // returns a string "[foo.txt] bar.txt"
 re.replace(str, "[$&]", regex_flags(FirstMatchOnly,CopyMatchedOnly));    // returns a string "[foo.txt]"
-```
+</pre>
 
 ## Use Match Pattern on String
 
@@ -519,7 +529,7 @@ address = 124 Pave Lane, Harbor, FL 23045
 ```
 For more information about using string parser, see [String Parser](StringParser.md).
 
-## Value to String Conversion Using `Str` Function
+## Value to String Conversion Using `str` Function
 
 The function `str` or `_str` provided in the [`sys`](Sys.md) class is used to convert any type of values into string. `_str` is the same as `str` except that `_str` makes the converted string locale sensitive, i.e. the converted string, when printed, will be translated into the text in the current application language setting.
 ```
