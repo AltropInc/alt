@@ -29,7 +29,7 @@ class iterator #(type iterable_type: iterable)
 {
     func value(): iterable_type.element_type;
     func ended(): bool;
-    func valid(): bool;
+    func is_valid(): bool;
     func next();
     func reverse();
     func index(): int;
@@ -42,7 +42,7 @@ An iterator has the following member functions:
 |:--------- |:----------------------------------------------------------------------- |
 | value     | gest the value/object referred by the iterator (dereferencing)          |
 | ended     | tells if the iterator reaches to the end and it referes to null         |
-| valid     | tells if the iterator points to a valid element, valid()=!ended()       |
+| is_valid  | tells if the iterator points to a valid element, is_valid()=!ended()    |
 | index     | returns the order of the element the iterator refers to in the iterable |
 | next      | advances the iterator for the next or the previous element depending in its direction |
 | reverse   | reverses the direction of the iterator |
@@ -66,7 +66,7 @@ For any type that implement the iterable interface, you can also iterate their e
 ```altro
   utf8_string := "greet 世界";
   unicode_chars: char...;
-  for (ch:=utf8_string.rbegin(); ch.valid(); ch.next()) 
+  for (ch:=utf8_string.rbegin(); ch.is_valid(); ch.next()) 
   {
       unicode_chars += ch;
   }
