@@ -47,29 +47,38 @@ class node
 
 * **func parent(): node;** It returns the parent node.
 
-* **func ancestor(type t: node): node;** It returns the ancestor node in the given type `t`.<br><pre>
+* **func ancestor(type t: node): node;** It returns the ancestor node in the given type `t`. Example: <br><pre>
 object popup: Window
 {
-    object toplevel: Frame
-    {
-        object left_panel: Frame
-        {
-            ctor()
-            { 
-                outer_window := ancestor(Window); // get ancestor that is an object of Window, which is 'popup'
-            }
-        }
-    }
+&nbsp;   object toplevel: Frame
+&nbsp;   {
+&nbsp;       object left_panel: Frame
+&nbsp;       {
+&nbsp;           ctor()
+&nbsp;           { 
+&nbsp;               outer_window := ancestor(Window); // get ancestor that is an object of Window, which is 'popup'
+&nbsp;           }
+&nbsp;       }
+&nbsp;   }
 }
 </pre>
-
 * **func child(name: string): node;** It returns the child node in the given name.<br><pre>
 object popup: Window
 {
-    object toplevel: Frame { }
-    ctor()
-    {
-        toplevel_frame := child("toplevel");
-    }
+&nbsp;   object toplevel: Frame { }
+&nbsp;   ctor()
+&nbsp;   {
+&nbsp;       toplevel_frame := child("toplevel");  // toplevel_frame refers to popup's child named "toplevel"
+&nbsp;   }
+}
+</pre>
+* **func member(name: string): node;** It returns the member node in the given name.<br><pre>
+object popup: Window
+{
+&nbsp;   object toplevel: Frame { }
+&nbsp;   ctor()
+&nbsp;   {
+&nbsp;       toplevel_frame := child("toplevel");  // toplevel_frame refers to popup's child named "toplevel"
+&nbsp;   }
 }
 </pre>
