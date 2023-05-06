@@ -35,6 +35,16 @@ class node
     func call(f: string): any;
     func call(f: string; input: tuple): any;
     func call(fcall): any;
+    func evaluate(n: node): any;
+    func getvalue(n: string): any;
+    func load(name: string; file: string): node;
+    func load(name: string; file: string; input: tuple): node;
+    func preload(name: string; file: string): bool;
+    func preload(name: string; file: string; input: tuple): bool;
+    func unload(name: string): bool;
+    func unload(chd: node): bool;
+    func unloadall(): bool;
+
 }
 ```
 * **func name(): string;** It returns the name of the node or a null string if the node is anonymous.
@@ -60,8 +70,7 @@ object popup: Window
 &nbsp;           }
 &nbsp;       }
 &nbsp;   }
-}
-</pre>
+}</pre>
 * **func child(name: string): node;** It returns the child node in the given name.<br><pre>
 object popup: Window
 {
@@ -70,8 +79,7 @@ object popup: Window
 &nbsp;   {
 &nbsp;       toplevel_frame := child("toplevel");  // toplevel_frame refers to popup's child named "toplevel"
 &nbsp;   }
-}
-</pre>
+}</pre>
 * **func member(name: string): node;** It returns the member node in the given name.<br><pre>
 object popup: Window
 {
@@ -80,5 +88,4 @@ object popup: Window
 &nbsp;   {
 &nbsp;       toplevel_frame := child("toplevel");  // toplevel_frame refers to popup's child named "toplevel"
 &nbsp;   }
-}
-</pre>
+}</pre>
