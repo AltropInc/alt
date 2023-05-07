@@ -27,9 +27,9 @@ class node
     func prev(type t: node): node;
     func childnum(): int;
     func childnum(type t: node): int;
-    func children(): int;
-    func children(type t: node): int;
-    func children(filter: fn(n:node):bool): int;
+    func children(): node...;
+    func children(type t: node): node...;
+    func children(filter: fn(n:node):bool): node...;
     func callable(f: string): fcall;
     func callable(f: string; input: tuple): fcall;
     func call(f: string): any;
@@ -80,12 +80,145 @@ object popup: Window
 &nbsp;       toplevel_frame := child("toplevel");  // toplevel_frame refers to popup's child named "toplevel"
 &nbsp;   }
 }</pre>
-* **func member(name: string): node;** It returns the member node in the given name.<br><pre>
+* **func member(name: string): node;** It returns the member node in the given name. Note that members are not limited to child nodes, but can also be declared names, including those inherited from the base class. For example:<br><pre>
+class base  { x:= 1; }
+class derived: base { y:= 2; }
+object derived_obj: derived {}
+x_member := derived_obj.member("x"); 
+// x_member refers to the expression node for the declared name "x"</pre>
+* **func offspring(names: string...): node;** It returns the offspring node in the path of the given name list.<br><pre>
 object popup: Window
 {
-&nbsp;   object toplevel: Frame { }
-&nbsp;   ctor()
+&nbsp;   object toplevel: Frame
 &nbsp;   {
-&nbsp;       toplevel_frame := child("toplevel");  // toplevel_frame refers to popup's child named "toplevel"
+&nbsp;       object left_panel: Frame { }
 &nbsp;   }
-}</pre>
+}
+panel := popup.offspring("toplevel", "left_panel");
+// panel refers to the offspring left_panel</pre>
+* **func firstchild(): node;** It returns the reference to the first child node.<br><pre>
+object popup: Window
+{
+&nbsp;   object topframe: Frame {}
+&nbsp;   object bottomframe: Frame {}
+}
+first_frame := popup.firstchild();
+// first_frame referes to topframe</pre> 
+* **func firstchild(type t: node): node;** It returns the reference to the first child node in the given type.<br><pre>
+object popup: Window
+{
+&nbsp;   object topframe: Frame {}
+&nbsp;   object bottomframe: Frame {}
+&nbsp;   object leftbutton: Button {}
+&nbsp;   object rightbutton: Button {}
+}
+first_button := popup.firstchild(Button);
+// first_button referes to leftbutton</pre> 
+* **func next(): node;**  It returns the reference to the next node.<br><pre>
+object popup: Window
+{
+&nbsp;   object topframe: Frame {}
+&nbsp;   object bottomframe: Frame {}
+&nbsp;   object leftbutton: Button {}
+&nbsp;   object rightbutton: Button {}
+}
+next_frame := popup.topframe.next();
+// next_frame referes to bottomframe</pre> 
+* **func next(type t: node): node;** It returns the reference to the next node in the given type.<br><pre>
+object popup: Window
+{
+&nbsp;   object topframe: Frame {}
+&nbsp;   object bottomframe: Frame {}
+&nbsp;   object leftbutton: Button {}
+&nbsp;   object rightbutton: Button {}
+}
+next_button := popup.topframe.next(Button);
+// next_button referes to leftbutton</pre>
+* **func lastchild(): node;**  It returns the reference to the last child node.<br><pre>
+object popup: Window
+{
+&nbsp;   object topframe: Frame {}
+&nbsp;   object bottomframe: Frame {}
+}
+last_frame := popup.lastchild();
+// last_frame referes to bottomframe</pre>
+* **func lastchild(type t: node): node;** It returns the reference to the last child node in the given type.<br><pre>
+object popup: Window
+{
+&nbsp;   object topframe: Frame {}
+&nbsp;   object bottomframe: Frame {}
+&nbsp;   object leftbutton: Button {}
+&nbsp;   object rightbutton: Button {}
+}
+last_frame := popup.lastchild(Frame);
+// last_frame referes to bottomframe</pre>
+* **func prev(): node;**  It returns the reference to the previous node.<br><pre>
+object popup: Window
+{
+&nbsp;   object topframe: Frame {}
+&nbsp;   object bottomframe: Frame {}
+&nbsp;   object leftbutton: Button {}
+&nbsp;   object rightbutton: Button {}
+}
+prev_node := popup.rightbutton.prev();
+// prev_node referes to leftbutton</pre>
+* **func prev(type t: node): node;**  It returns the reference to the previous node in the given type.<br><pre>
+object popup: Window
+{
+&nbsp;   object topframe: Frame {}
+&nbsp;   object bottomframe: Frame {}
+&nbsp;   object leftbutton: Button {}
+&nbsp;   object rightbutton: Button {}
+}
+prev_frame := popup.rightbutton.prev(Frame);
+// prev_frame referes to bottomframe</pre>
+* **func childnum(): int;**  It returns number of child nodes.<br><pre>
+class base  { object x {} }
+class derived: base { object y {} }
+object derived_obj: derived {}
+n := derived_obj.childnum(); // n gets 2</pre>
+* **func childnum(type t: node): int;** It returns number of child nodes in the given type.<br><pre>
+class base  { object x {} }
+class derived: base { object y: Drawable{} }
+object derived_obj: derived {}
+n := derived_obj.childnum(Drawable); // n gets 1</pre>
+* **func children(): node...;** It returns a list of all child nodes.<br><pre>
+class base  { object x {} }
+class derived: base { object y {} }
+object derived_obj: derived {}
+n := derived_obj.children(); // n gets a node list (x, y)</pre>
+* **func children(type t: node): node...;**  It returns a list of all child nodes in the given type.<br><pre>
+class base  { object x {} }
+class derived: base { object y: Drawable{} }
+object derived_obj: derived { object z: Drawable{} }
+n := derived_obj.children(Drawable); // n gets a node list (y,z)</pre>
+* **func children(filter: fn(n:node):bool): int;**  .<br><pre>
+</pre>
+* **func callable(f: string): fcall;**  .<br><pre>
+</pre>
+* **func callable(f: string; input: tuple): fcall;**  .<br><pre>
+</pre>
+* **func call(f: string): any;**  .<br><pre>
+</pre>
+* **func call(f: string; input: tuple): any;**  .<br><pre>
+</pre>
+* **func call(fcall): any;**  .<br><pre>
+</pre>
+* **func evaluate(n: node): any;**  .<br><pre>
+</pre>
+* **func getvalue(n: string): any;**  .<br><pre>
+</pre>
+* **func load(name: string; file: string): node;**  .<br><pre>
+</pre>
+* **func load(name: string; file: string; input: tuple): node;**  .<br><pre>
+</pre>
+* **func preload(name: string; file: string): bool;**  .<br><pre>
+</pre>
+* **func preload(name: string; file: string; input: tuple): bool;**  .<br><pre>
+</pre>
+* **func unload(name: string): bool;**  .<br><pre>
+</pre>
+* **func unload(chd: node): bool;**  .<br><pre>
+</pre>
+* **func unloadall(): bool;**  .<br><pre>
+</pre>
