@@ -199,7 +199,7 @@ object derived_obj: derived { object z {} }
 n := derived_obj.children({ n.name().starts_with("ch") }); // n gets a node list (ch1, ch2)</pre>
 * **func callable(f: string): fcall;** It returns a fcall expression if the member of the given name is callable. The fcall expression is a tuple pair of a routine and an input expression:<br><pre>
 type fcall : tuple (rt: type; input: expr);</pre>
-The fcall expression can be executed by calling the routine 'rt' with the expression 'input'. here is an example to use `callable`:<br><pre>
+The fcall expression can be executed by calling the routine `rt` with the expression `input`. here is an example to use `callable`:<br><pre>
 object ob1
 {
 &nbsp;   i:=5;
@@ -227,21 +227,21 @@ object ob1
 &nbsp;   func mf(x:int): int { x + i }
 };
 print(ob1.call("mf", 10));  // prints an integer: 15</pre>
-If the callable in the given name is not found or does not have an interface that matches the given input, this function returns a value of type `none`. If the callable has no output when called, this function returns void.
+If the callable in the given name is not found or does not have an interface that matches the given input, this function returns a value of type `none`. If the callable has no output when called, this function returns void:<br><pre>
 object ob1
 {
 &nbsp;   i:=5;
 &nbsp;   func mf() {}
 &nbsp;   func mf(x:int): int { x + i }
 };
-print(ob1.call("mf");                  // prints an empty string for void</pre>
+print(ob1.call("mf");                  // prints an empty string for void
 print(ob1.call("mf", "test string"));  // prints a string "none" for matched callable unfounded</pre>
 * **func call(fcall): any;** It calls the callable with the input stored in the fcall tuple.<br><pre>
 object ob1 { func mf(x:int): int { x*x } };
 fc := ob1.callable("mf", 10);
 if (not fc.empty())
 {
-    println (ob1.call(fc));   // this prints an integer 100
+&nbsp;   println (ob1.call(fc));   // this prints an integer 100
 }</pre>
 * **func getvalue(n: string): any;**  .<br><pre>
 </pre>
