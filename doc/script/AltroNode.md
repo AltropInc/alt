@@ -185,19 +185,32 @@ n := derived_obj.childnum(Drawable); // n gets 1</pre>
 * **func children(): node...;** It returns a list of all child nodes.<br><pre>
 class base  { object x {} }
 class derived: base { object y {} }
-object derived_obj: derived {}
-n := derived_obj.children(); // n gets a node list (x, y)</pre>
+object derived_obj: derived { object z: Drawable{} }
+n := derived_obj.children(); // n gets a node list (z, x, y)</pre>
 * **func children(type t: node): node...;**  It returns a list of all child nodes in the given type.<br><pre>
 class base  { object x {} }
 class derived: base { object y: Drawable{} }
 object derived_obj: derived { object z: Drawable{} }
-n := derived_obj.children(Drawable); // n gets a node list (y,z)</pre>
-* **func children(filter: fn(n:node):bool): int;**  .<br><pre>
-</pre>
-* **func callable(f: string): fcall;**  .<br><pre>
-</pre>
-* **func callable(f: string; input: tuple): fcall;**  .<br><pre>
-</pre>
+n := derived_obj.children(Drawable); // n gets a node list (z,y)</pre>
+* **func children(filter: fn(n:node):bool): node...;**  It returns a list of all child nodes that satisfy the condition given by the functor filter.<br><pre>
+class base  { object ch1 {} }
+class derived: base { object ch2 {} }
+object derived_obj: derived { object z {} }
+n := derived_obj.children({ n.name().starts_with("ch") }); // n gets a node list (ch1, ch2)</pre>
+* **func callable(f: string): fcall;** It returns a fcall expression if the member of the givem name is callable.<br><pre>
+object ob1
+{
+    i:=5;
+    func mf(): int { i }
+};
+println(ob1.callable("mf"));  // prints a fcall expression: (mf(): int, null)</pre>
+* **func callable(f: string; input: tuple): fcall;** It returns a fcall expression if the member of the givem name is callable with the given input.<br><pre>
+object ob1
+{
+    i:=5;
+    func mf(x:int): int { x + i }
+};
+println(ob1.callable("mf", 10)); // prints a fcall expression: (mf(x: int): int, (10))</pre>
 * **func call(f: string): any;**  .<br><pre>
 </pre>
 * **func call(f: string; input: tuple): any;**  .<br><pre>
