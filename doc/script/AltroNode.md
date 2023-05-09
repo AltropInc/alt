@@ -243,16 +243,70 @@ if (not fc.empty())
 {
 &nbsp;   println (ob1.call(fc));   // this prints an integer 100
 }</pre>
-* **func getvalue(n: string): any;**  .<br><pre>
-</pre>
-* **func load(name: string; file: string): node;**  .<br><pre>
-</pre>
-* **func load(name: string; file: string; input: tuple): node;**  .<br><pre>
-</pre>
-* **func preload(name: string; file: string): bool;**  .<br><pre>
-</pre>
-* **func preload(name: string; file: string; input: tuple): bool;**  .<br><pre>
-</pre>
+* **func evaluate(n: node): any; ** It returns the value of a member node given by `n`.<br><pre>
+class member_class { y: int = 2; }
+object member1: member_class { }
+y_member := member1.member("y");
+if (y_member!=null)
+{
+&nbsp;   y_val := member1.evaluate(x_member); // y_val gets integer 2
+}</pre>
+* **func getvalue(n: string): any;** It returns the value of a member declaration in the given name.<br><pre>
+class member_class { y: int = 2; }
+object member1: member_class { }
+y_val := member1.getvalue("y");    // y_val gets integer 2</pre>
+If the member of the goven does not exist, a value of `none` is returned. This function is a combination of `member` and `evaluate`.
+* **func load(name: string; file: string): node;** It creates a child in the given mame from an Altro script file.<br><pre>
+using sys;
+object test: Object
+{
+&nbsp;   loaded := load("mychild", "MyClass.alt");  // When succeeded, the load makes the 'loaded' to refer to an child object of MyClass
+}</pre>
+Note that this function can only succeed if `MyClass` has a [default constructor](Constructor.md). If `MyClass` has a constructor that requires input, an input expreesion mu be provided using the following function.
+* **func load(name: string; file: string; input: tuple): node;** It creates a child in the given mame from an Altro script file with an input expression required by the constructor of the class specified in the file. For instance, if we class file `Person.alt` with the following contents:<br><pre>
+class Person
+{
+&nbsp;   name: string;
+&nbsp;   age:  int;
+&nbsp;   ctor (n: string; a: int)
+&nbsp;   {
+&nbsp;       name = n;
+&nbsp;       age = a;
+&nbsp;   }
+}</pre>
+We can use this function to create a child with an string input:<br><pre>
+using sys;
+object test
+{
+&nbsp;   loaded := load("person", "Person.alt", ("John", 17)); 
+&nbsp;   // When succeeded, the load makes the 'loaded' to refer to an child object of Person with name "John" and age 17
+}</pre>
+* **func preload(name: string; file: string): bool;** It creates a child in the given mame from an Altro script file. The loading process is in a seperate thread. After the loading process is finished, the loading process will notify the caller thread, the thread that calls this function, typically, the main thread. The caller thread will transfer the loaded object into the child list of the given parent and calls the parent `onload`.<br><pre>
+using sys;
+object test
+{
+&nbsp;   func onload(loaded: node)
+&nbsp;   {
+&nbsp;       println("a child with name ", loaded, " is loaded!");
+&nbsp;   }
+&nbsp;   ctor()
+&nbsp;   {
+&nbsp;       preload("mychild", "TestClass.alt");
+&nbsp;   }
+}</pre>
+* **func preload(name: string; file: string; input: tuple): bool;** It creates a child in the given mame from an Altro script file with an input expression required by the constructor of the class specified in the file and the loading process is in a seperate thread.<br><pre>
+using sys;
+object test
+{
+&nbsp;   func onload(loaded: node)
+&nbsp;   {
+&nbsp;       println("a person ", loaded.getvalue("name"), " with age=", loaded.getvalue("age"), " is loaded!");
+&nbsp;   }
+&nbsp;   ctor()
+&nbsp;   {
+&nbsp;       preload("person", "Person.alt", ("John", 17));
+&nbsp;   }
+}</pre>
 * **func unload(name: string): bool;**  .<br><pre>
 </pre>
 * **func unload(chd: node): bool;**  .<br><pre>
