@@ -197,28 +197,52 @@ class base  { object ch1 {} }
 class derived: base { object ch2 {} }
 object derived_obj: derived { object z {} }
 n := derived_obj.children({ n.name().starts_with("ch") }); // n gets a node list (ch1, ch2)</pre>
-* **func callable(f: string): fcall;** It returns a fcall expression if the member of the given name is callable. The fcall expression is a tuple pair of a routine and an input expression. The fcall expression can be executed by calling the routine with the input.<br><pre>
+* **func callable(f: string): fcall;** It returns a fcall expression if the member of the given name is callable. The fcall expression is a tuple pair of a routine and an input expression:<br><pre>
+type fcall : tuple (rt: type; input: expr);</pre>
+The fcall expression can be executed by calling the routine 'rt' with the expression 'input'. here is an example to use `callable`:<br><pre>
 object ob1
 {
-    i:=5;
-    func mf(): int { i }
+&nbsp;   i:=5;
+&nbsp;   func mf(): int { i }
 };
-println(ob1.callable("mf"));  // prints a fcall expression: (mf(): int, null)</pre>
+print(ob1.callable("mf"));  // prints a fcall expression: (mf(): int, null)</pre>
 * **func callable(f: string; input: tuple): fcall;** It returns a fcall expression if the member of the given name is callable with the given input. If the callable has no matched interface for the given input, an empty fcall expression will be returned.<br><pre>
 object ob1
 {
-    i:=5;
-    func mf(x:int): int { x + i }
+&nbsp;   i:=5;
+&nbsp;   func mf(x:int): int { x + i }
 };
-println(ob1.callable("mf", 10)); // prints a fcall expression: (mf(x: int): int, (10))</pre>
-* **func call(f: string): any;**  .<br><pre>
-</pre>
-* **func call(f: string; input: tuple): any;**  .<br><pre>
-</pre>
-* **func call(fcall): any;**  .<br><pre>
-</pre>
-* **func evaluate(n: node): any;**  .<br><pre>
-</pre>
+print(ob1.callable("mf", 10)); // prints a fcall expression: (mf(x: int): int, (10))</pre>
+* **func call(f: string): any;** It finds a callable in the given name, calls it, and returns the value that the callable returns after called.<br><pre>
+object ob1
+{
+&nbsp;   i:=5;
+&nbsp;   func mf(): int { i }
+};
+print(ob1.call("mf"));  // prints an integer: 5</pre>
+* **func call(f: string; input: tuple): any;** It finds a callable in the given name and with an interface that matches the given input, calls it with the input, and returns the value that the callable returns after called..<br><pre>
+object ob1
+{
+&nbsp;   i:=5;
+&nbsp;   func mf(x:int): int { x + i }
+};
+print(ob1.call("mf", 10));  // prints an integer: 15</pre>
+If the callable in the given name is not found or does not have an interface that matches the given input, this function returns a value of type `none`. If the callable has no output when called, this function returns void.
+object ob1
+{
+&nbsp;   i:=5;
+&nbsp;   func mf() {}
+&nbsp;   func mf(x:int): int { x + i }
+};
+print(ob1.call("mf");                  // prints an empty string for void</pre>
+print(ob1.call("mf", "test string"));  // prints a string "none" for matched callable unfounded</pre>
+* **func call(fcall): any;** It calls the callable with the input stored in the fcall tuple.<br><pre>
+object ob1 { func mf(x:int): int { x*x } };
+fc := ob1.callable("mf", 10);
+if (not fc.empty())
+{
+    println (ob1.call(fc));   // this prints an integer 100
+}</pre>
 * **func getvalue(n: string): any;**  .<br><pre>
 </pre>
 * **func load(name: string; file: string): node;**  .<br><pre>
