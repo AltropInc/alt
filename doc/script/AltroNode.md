@@ -197,14 +197,14 @@ class base  { object ch1 {} }
 class derived: base { object ch2 {} }
 object derived_obj: derived { object z {} }
 n := derived_obj.children({ n.name().starts_with("ch") }); // n gets a node list (ch1, ch2)</pre>
-* **func callable(f: string): fcall;** It returns a fcall expression if the member of the givem name is callable.<br><pre>
+* **func callable(f: string): fcall;** It returns a fcall expression if the member of the given name is callable. The fcall expression is a tuple pair of a routine and an input expression. The fcall expression can be executed by calling the routine with the input.<br><pre>
 object ob1
 {
     i:=5;
     func mf(): int { i }
 };
 println(ob1.callable("mf"));  // prints a fcall expression: (mf(): int, null)</pre>
-* **func callable(f: string; input: tuple): fcall;** It returns a fcall expression if the member of the givem name is callable with the given input.<br><pre>
+* **func callable(f: string; input: tuple): fcall;** It returns a fcall expression if the member of the given name is callable with the given input. If the callable has no matched interface for the given input, an empty fcall expression will be returned.<br><pre>
 object ob1
 {
     i:=5;
