@@ -2,9 +2,15 @@
 
 Altro nodes are used to represent a hierarchical [tree structure](https://en.wikipedia.org/wiki/Tree_(data_structure)). Each node in the tree can be connected to multiple child nodes, but must be connected to exactly one parent (owner) node, except for the root node, which has no parent. Each child can be treated like the root node of its own subtree. A node can either be anonymous or named. Named child nodes can be searched through their parents by their names. Altro nodes are basic components used to implement [objects](Object.md), [dictionary](Dictionary.md), Altro syntactic entities such expressions and declarations, and any data structure that requires a hierarchical tree structure.
 
-## The Class Node
+## The Class `node`
 
-The class `node` is the abstraction of Altro nodes.
+The class `node` is the abstraction for all Altro nodes. It provides a set of function to enable the ability to examine, introspect, and modify the structure and behavior of a class and object, the ability often referred as [reflection or reflective programming](https://en.wikipedia.org/wiki/Reflective_programming), used to observe and modify program execution at runtime, and allow inspection of classes, interfaces, member fields and functions at runtime without knowing the specification of the class. For example, you can dynamically create a child object by loading a file that provides a class specification, and then observe and modify the value of the member fields of the child object or call the member functions of the child object without knowing what are actually specified in the class specification:
+```altro
+chd_obj := load("object_name", "MyChildClassFIle.alt");
+value1 := chd_obj.getvalue("myChildProperty1");
+chd_obj.call(setProperty2, property2_value);
+```
+The class `node` provides the following functions:
 ```altro
 class node
 {
