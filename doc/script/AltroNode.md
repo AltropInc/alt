@@ -1,10 +1,10 @@
 # Altro Nodes
 
-Altro nodes are used to represent a hierarchical [tree structure](https://en.wikipedia.org/wiki/Tree_(data_structure)). Each node in the tree can be connected to multiple child nodes, but must be connected to exactly one parent (owner) node, except for the root node, which has no parent. Each child can be treated like the root node of its own subtree. A node can either be anonymous or named. Named child nodes can be serached through its parent by their names. Altro nodes are basic components used to implement [objects](Object.md), [dictionary](Dictionary.md), Altro syntactic entities such expresions and declarations, and any data structure that requires a hierarchical tree structure.
+Altro nodes are used to represent a hierarchical [tree structure](https://en.wikipedia.org/wiki/Tree_(data_structure)). Each node in the tree can be connected to multiple child nodes, but must be connected to exactly one parent (owner) node, except for the root node, which has no parent. Each child can be treated like the root node of its own subtree. A node can either be anonymous or named. Named child nodes can be searched through their parents by their names. Altro nodes are basic components used to implement [objects](Object.md), [dictionary](Dictionary.md), Altro syntactic entities such expressions and declarations, and any data structure that requires a hierarchical tree structure.
 
 ## The Class Node
 
-The class `node` is the abstraction of altro nodes.
+The class `node` is the abstraction of Altro nodes.
 ```altro
 class node
 {
@@ -103,7 +103,7 @@ object popup: Window
 &nbsp;   object bottomframe: Frame {}
 }
 first_frame := popup.firstchild();
-// first_frame referes to topframe</pre> 
+// first_frame refers  to topframe</pre> 
 * **func firstchild(type t: node): node;** It returns the reference to the first child node in the given type.<br><pre>
 object popup: Window
 {
@@ -113,7 +113,7 @@ object popup: Window
 &nbsp;   object rightbutton: Button {}
 }
 first_button := popup.firstchild(Button);
-// first_button referes to leftbutton</pre> 
+// first_button refers  to leftbutton</pre> 
 * **func next(): node;**  It returns the reference to the next node.<br><pre>
 object popup: Window
 {
@@ -123,7 +123,7 @@ object popup: Window
 &nbsp;   object rightbutton: Button {}
 }
 next_frame := popup.topframe.next();
-// next_frame referes to bottomframe</pre> 
+// next_frame refers  to bottomframe</pre> 
 * **func next(type t: node): node;** It returns the reference to the next node in the given type.<br><pre>
 object popup: Window
 {
@@ -133,7 +133,7 @@ object popup: Window
 &nbsp;   object rightbutton: Button {}
 }
 next_button := popup.topframe.next(Button);
-// next_button referes to leftbutton</pre>
+// next_button refers to leftbutton</pre>
 * **func lastchild(): node;**  It returns the reference to the last child node.<br><pre>
 object popup: Window
 {
@@ -141,7 +141,7 @@ object popup: Window
 &nbsp;   object bottomframe: Frame {}
 }
 last_frame := popup.lastchild();
-// last_frame referes to bottomframe</pre>
+// last_frame refers to bottomframe</pre>
 * **func lastchild(type t: node): node;** It returns the reference to the last child node in the given type.<br><pre>
 object popup: Window
 {
@@ -151,7 +151,7 @@ object popup: Window
 &nbsp;   object rightbutton: Button {}
 }
 last_frame := popup.lastchild(Frame);
-// last_frame referes to bottomframe</pre>
+// last_frame refers to bottomframe</pre>
 * **func prev(): node;**  It returns the reference to the previous node.<br><pre>
 object popup: Window
 {
@@ -161,7 +161,7 @@ object popup: Window
 &nbsp;   object rightbutton: Button {}
 }
 prev_node := popup.rightbutton.prev();
-// prev_node referes to leftbutton</pre>
+// prev_node refers to leftbutton</pre>
 * **func prev(type t: node): node;**  It returns the reference to the previous node in the given type.<br><pre>
 object popup: Window
 {
@@ -171,7 +171,7 @@ object popup: Window
 &nbsp;   object rightbutton: Button {}
 }
 prev_frame := popup.rightbutton.prev(Frame);
-// prev_frame referes to bottomframe</pre>
+// prev_frame refers to bottomframe</pre>
 * **func childnum(): int;**  It returns number of child nodes.<br><pre>
 class base  { object x {} }
 class derived: base { object y {} }
@@ -255,14 +255,14 @@ if (y_member!=null)
 class member_class { y: int = 2; }
 object member1: member_class { }
 y_val := member1.getvalue("y");    // y_val gets integer 2</pre>
-If the member of the goven does not exist, a value of `none` is returned. This function is a combination of `member` and `evaluate`.
+If the member of the given  does not exist, a value of `none` is returned. This function is a combination of `member` and `evaluate`.
 * **func load(name: string; file: string): node;** It creates a child in the given mame from an Altro script file.<br><pre>
 using sys;
 object test: Object
 {
 &nbsp;   loaded := load("mychild", "MyClass.alt");  // When succeeded, the load makes the 'loaded' to refer to an child object of MyClass
 }</pre>
-Note that this function can only succeed if `MyClass` has a [default constructor](Constructor.md). If `MyClass` has a constructor that requires input, an input expreesion mu be provided using the following function.
+Note that this function can only succeed if `MyClass` has a [default constructor](Constructor.md). If `MyClass` has a constructor that requires input, an input expression mu be provided using the following function.
 * **func load(name: string; file: string; input: tuple): node;** It creates a child in the given mame from an Altro script file with an input expression required by the constructor of the class specified in the file. For instance, if we class file `Person.alt` with the following contents:<br><pre>
 class Person
 {
@@ -281,7 +281,7 @@ object test
 &nbsp;   loaded := load("person", "Person.alt", ("John", 17)); 
 &nbsp;   // When succeeded, the load makes the 'loaded' to refer to an child object of Person with name "John" and age 17
 }</pre>
-* **func preload(name: string; file: string): bool;** It creates a child in the given mame from an Altro script file. The loading process is in a seperate thread. After the loading process is finished, the loading process will notify the caller thread, the thread that calls this function, typically, the main thread. The caller thread will transfer the loaded object into the child list of the given parent and calls the parent `onload`.<br><pre>
+* **func preload(name: string; file: string): bool;** It creates a child in the given name from an Altro script file. The loading process is in a separate thread. After the loading process is finished, the loading process will notify the caller thread, the thread that calls this function, typically, the main thread. The caller thread will transfer the loaded object into the child list of the given parent and calls the parent `onload`.<br><pre>
 using sys;
 object test
 {
@@ -294,7 +294,7 @@ object test
 &nbsp;       preload("mychild", "TestClass.alt");
 &nbsp;   }
 }</pre>
-* **func preload(name: string; file: string; input: tuple): bool;** It creates a child in the given mame from an Altro script file with an input expression required by the constructor of the class specified in the file and the loading process is in a seperate thread.<br><pre>
+* **func preload(name: string; file: string; input: tuple): bool;** It creates a child in the given name from an Altro script file with an input expression required by the constructor of the class specified in the file and the loading process is in a separate thread.<br><pre>
 using sys;
 object test
 {
@@ -307,9 +307,34 @@ object test
 &nbsp;       preload("person", "Person.alt", ("John", 17));
 &nbsp;   }
 }</pre>
-* **func unload(name: string): bool;**  .<br><pre>
-</pre>
-* **func unload(chd: node): bool;**  .<br><pre>
-</pre>
-* **func unloadall(): bool;**  .<br><pre>
-</pre>
+* **func unload(name: string): bool;**  It removes a child in the given name. The child to be removed must be created by calling the load or preload function.<br><pre>
+using sys;
+object test
+{
+&nbsp;   func loadnext(person_file: string; name: string; age: int)
+&nbsp;   {
+&nbsp;       unload("person");
+&nbsp;       loaded = load("person", person_file, (name, age));
+&nbsp;   }
+}</pre>
+* **func unload(chd: node): bool;** It removes a child given by `chd`. The child to be removed must be created by calling the load or preload function.<br><pre>
+using sys;
+object test
+{
+&nbsp;   loaded: node;
+&nbsp;   func loadnext(person_file: string; name: string; age: int)
+&nbsp;   {
+&nbsp;       if (loaded!=null) unload(loaded);
+&nbsp;       loaded = load(name, person_file, (name, age));
+&nbsp;   }
+}</pre>
+* **func unloadall(): bool;** It removes all children created by calling the load or preload function.<br><pre>
+using sys;
+object test
+{
+&nbsp;   func loadnext(person_file: string; name: string; age: int)
+&nbsp;   {
+&nbsp;       unloadall();
+&nbsp;       loaded = load(name, person_file, (name, age));
+&nbsp;   }
+}</pre>
