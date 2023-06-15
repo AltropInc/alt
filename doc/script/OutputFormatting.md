@@ -26,6 +26,7 @@ A **formatter** is the specification of a printing format. It provides support f
 * Formatters for integers
 * Formatters for floating-point numbers
 * Formatters for elements of containers
+* Formatters for date and time
 
 A formatter can be expressed by a formatter expression with a set of formatter values listed in a pair of brackets `[]`. Each format value is typically given by the format member name defined by the `fmt` type and followed by an equal sign with a format value.  For instance,
 ```altro
@@ -691,6 +692,60 @@ print([:cnc0n.3], (1, 2, 3, 5, 6, 7, 8, 9, 10), '\n');
 _______________________________________________________
 1,2,3, ...
 ```
+
+### Formatters for Date and Time
+
+The date and time values are stored as [**time**](DateAndTime.md), [**date**](DateAndTime.md) values. When we need to print the datetime objects into various string formats for better readability, we use a date-time formatter, which is a packed string, started with `:t` follwoed by a string with a list of date and time element format indicators such as `%d`, `%m`, `%Y` etc. For exaple, a date-time formatter `:t"%d-%m-%Y %H:%M:%S"` will convert a time value into a string like `2023-06-15 16:26:24`:
+```altro
+print([:t"%d-%m-%Y %H:%M:%S"], time.now());
+// print current time in the format like `2023-06-15 16:26:24`
+```
+Below are the date and time element format indicators:
+
+* %d: Prints the day of the month, from 1 to 31
+* %0d: Prints the day of the month, from 01 to 31
+* %Ld: Prints the day of the month in locale digits, Like, 二十三.
+* %m: Prints the month of the year, from 1 to 12
+* %0m: Prints the month of the year, Like 01 to 12
+* %Lm: Prints the month of the year in locale digits, Like, 十二
+* %Ld: Prints the day of the month in locale digits, Like, 二十三
+* %Y: Prints the year in four-digit format (Year with century). like, 2023
+* %LY: Prints the year in in four digits of current locale. Like, 二〇二三
+* %y: Prints year in two-digit format (year without century). like, 19, 20, 23
+* %A: Prints the weekday full name in current locale. Like, Monday or 星期一
+* %a: Prints the weekday short name in current locale. Like, Mon or 周一
+* %B: Prints month full name in current locale. Like, June, July, or 六月, 七月
+* %b: Prints month short name in current locale. Like, Jun, Jul, or 6月, 7月
+* %H: Prints the hour number from 1 to 12
+* %0H: Prints the hour number from 01 to 12
+* %LH: Prints the hour number from 1 to 12 in current locale digits
+* %I: Prints the hour number from 1 to 23
+* %0I: Prints the hour number from 01 to 23
+* %LI: Prints the hour number from 1 to 23 in current locale digits
+* %M: Prints the minute number from 0 to 59
+* %0M: Prints the minute number from 00 to 59
+* %LM: Prints the minute number from 0 to 59 in current locale digits
+* %S: Prints the second from 0 to 59
+* %0S: Prints the second from 00 to 59
+* %LS: Prints the second number from 0 to 59 in current locale digits
+* %f: Prints the microseconds from 000000 to 999999
+* %n: Prints the nanoseconds from 000000000 to 999999999
+* %p: Prints time in AM/PM format in the current locale, like AM, PM, or 上午, 下午
+* %c: Prints a locale’s short date and time format. Like 06/15/2023 10:36:38 or 2023/06/15 10:36:24
+* %lc: Prints a locale’s long date and time format. Like Thursday, Jun 15, 10:39:41, 2023 or 2023年06月15日10点39分41秒
+* %Lc: Prints a locale’s long date and time format using local digits. Like  二〇二三年六月十五日十点四十三分三十七秒
+* %x: Prints a locale’s short date format. Like 06/15/2023 or 2023/06/15
+* %lx: Prints a locale’s long date format. Like Thursday, Jun 15, 2023 or 2023年06月15日
+* %Lx: Prints a locale’s long date format using local digits. Like  二〇二三年六月十五日
+* %X: Prints a locale’s short time format. Like 10:36:38
+* %lX: Prints a locale’s long date and time format. Like 10:36:38 or 10点39分41秒
+* %LX: Prints a locale’s time format using local digits. Like  十点四十三分三十七秒
+* %z: Prints the UTC offset in the form ±HHMM[SS[.ffffff]] (empty string if the object is naive)
+* %Z: Prints the Time zone name (empty string if the object is naive).
+* %j: Prints the day of the year from 01 to 366
+* %w: Prints weekday as a decimal number, where 0 is Sunday and 6 is Saturday.
+* %U: Prints the week number of the year (Sunday as the first day of the week) from 00 to 53
+* %W: Prints the week number of the year (Monday as the first day of the week) from 00 to 53
 
 ## Using Formatters as Input Parameters in Print
 
