@@ -752,15 +752,15 @@ Below are the date and time element format indicators:
 
 Examples:
 ```altro
-t:time = time.now();
+t := time.now();
 println([:t"Today's date: %A, %B %d, %Y"], t);
 println([:t"Time of day: %0H:%0M:%0S"], t);
 println([:t"Time of day: %0I:%0M:%0S %p"], t);
 println("Date and time in default format: ", t);
-println("Date and time in default local short format: ", [:t"%c"], t);
-println("Date and time in default local long format: ", [:t"%lc"], t);
-println([:t"%0d-%0m-%y %0H:%0M:%0S"], "In format dd-mm-yyyy HH:MM:SS:", t);    
-setlang("中文", "台灣");  // set locale to Taiwan, Chinese
+println("Date and time in short format: ", [:t"%c"], t);
+println("Date and time in long format: ", [:t"%lc"], t);
+println([:t"%0d-%0m-%y %0H:%0M:%0S"], "Custom format dd-mm-yyyy HH:MM:SS: ", t);    
+setlang("中文", "台灣");
 println("Date and time in Chinese short format: ", [:t"%c"], t);
 println("Date and time in Chinese long format: ", [:t"%lc"], t);
 println("Date and time in Chinese digit format: ", [:t"%Lc"], t);
@@ -769,16 +769,16 @@ println("Date and time in custom Chinese format: ", [:t"%E%LY年%Lm月%Ld日%A%p
 Output:
 ```
 Today's date: Thursday, June 15, 2023
-Time of day: 14:52:13
-Time of day: 02:52:13 PM
-Date and time in default format: 20230615-14:52:13.730603150
-Date and time in default local short format: 6/15/2023 14:55:32
-Date and time in default local long format: Thursday, Jun 15, 14:52:13, 2023
-In format dd-mm-yyyy HH:MM:SS:15-06-23 14:52:13
-Date and time in Chinese short format: 2023/6/15 14:52:13
-Date and time in Chinese long format: 2023年6月15日14點52分13秒
-Date and time in Chinese digit format: 二零二三年六月十五日十四點五十二分十三秒
-Date and time in custom Chinese format: 公元二零二三年六月十五日星期四下午二點五十二分十三秒
+Time of day: 15:50:02
+Time of day: 03:50:02 PM
+Date and time in default format: 20230615-15:50:02.458671650
+Date and time in short format: 06/15/2023 15:50:02
+Date and time in long format: Thursday, Jun 15, 15:50:02, 2023
+Custom format dd-mm-yyyy HH:MM:SS: 15-06-23 15:50:02
+Date and time in Chinese short format: 2023/06/15 15:50:02
+Date and time in Chinese long format: 2023年6月15日15點50分2秒
+Date and time in Chinese digit format: 2023年6月15日15點50分2秒
+Date and time in custom Chinese format: 公元二零二三年六月十五日星期四下午三点五十分二秒
 ```
 
 ## Using Formatters as Input Parameters in Print
