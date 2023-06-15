@@ -751,7 +751,7 @@ Below are the date and time element format indicators:
 * %0W: Prints the week number of the year (Monday as the first day of the week) from 00 to 53
 
 Examples:
-  ``altro
+```altro
 t:time = time.now();
 println([:t"Today's date: %A, %B %d, %Y"], t);
 println([:t"Time of day: %0H:%0M:%0S"], t);
