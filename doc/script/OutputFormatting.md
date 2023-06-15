@@ -777,7 +777,7 @@ Date and time in long format: Thursday, Jun 15, 15:50:02, 2023
 Custom format dd-mm-yyyy HH:MM:SS: 15-06-23 15:50:02
 Date and time in Chinese short format: 2023/06/15 15:50:02
 Date and time in Chinese long format: 2023年6月15日15點50分2秒
-Date and time in Chinese digit format: 2023年6月15日15點50分2秒
+Date and time in Chinese digit format: 二零二三年六月十五日十五点五十分二秒
 Date and time in custom Chinese format: 公元二零二三年六月十五日星期四下午三点五十分二秒
 ```
 
