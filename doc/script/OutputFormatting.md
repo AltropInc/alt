@@ -740,12 +740,46 @@ Below are the date and time element format indicators:
 * %X: Prints a locale’s short time format. Like 10:36:38
 * %lX: Prints a locale’s long date and time format. Like 10:36:38 or 10点39分41秒
 * %LX: Prints a locale’s time format using local digits. Like  十点四十三分三十七秒
-* %z: Prints the UTC offset in the form ±HHMM[SS[.ffffff]] (empty string if the object is naive)
-* %Z: Prints the Time zone name (empty string if the object is naive).
-* %j: Prints the day of the year from 01 to 366
+* %z: Prints the UTC offset in the form ±HHMM (empty string if the value is naive)
+* %Z: Prints the Time zone name (empty string if the value is naive).
+* %j: Prints the day of the year from 1 to 366
+* %0j: Prints the day of the year from 001 to 366
 * %w: Prints weekday as a decimal number, where 0 is Sunday and 6 is Saturday.
-* %U: Prints the week number of the year (Sunday as the first day of the week) from 00 to 53
-* %W: Prints the week number of the year (Monday as the first day of the week) from 00 to 53
+* %U: Prints the week number of the year (Sunday as the first day of the week) from 0 to 53
+* %0U: Prints the week number of the year (Sunday as the first day of the week) from 00 to 53
+* %W: Prints the week number of the year (Monday as the first day of the week) from 0 to 53
+* %0W: Prints the week number of the year (Monday as the first day of the week) from 00 to 53
+
+Examples:
+  ``altro
+t:time = time.now();
+println([:t"Today's date: %A, %B %d, %Y"], t);
+println([:t"Time of day: %0H:%0M:%0S"], t);
+println([:t"Time of day: %0I:%0M:%0S %p"], t);
+println("Date and time in default format: ", t);
+println("Date and time in default local short format: ", [:t"%c"], t);
+println("Date and time in default local long format: ", [:t"%lc"], t);
+println([:t"%0d-%0m-%y %0H:%0M:%0S"], "In format dd-mm-yyyy HH:MM:SS:", t);    
+setlang("中文", "台灣");  // set locale to Taiwan, Chinese
+println("Date and time in Chinese short format: ", [:t"%c"], t);
+println("Date and time in Chinese long format: ", [:t"%lc"], t);
+println("Date and time in Chinese digit format: ", [:t"%Lc"], t);
+println("Date and time in custom Chinese format: ", [:t"%E%LY年%Lm月%Ld日%A%p%LI点%LM分%LS秒"], t);
+```
+Output:
+```
+Today's date: Thursday, June 15, 2023
+Time of day: 14:52:13
+Time of day: 02:52:13 PM
+Date and time in default format: 20230615-14:52:13.730603150
+Date and time in default local short format: 6/15/2023 14:55:32
+Date and time in default local long format: Thursday, Jun 15, 14:52:13, 2023
+In format dd-mm-yyyy HH:MM:SS:15-06-23 14:52:13
+Date and time in Chinese short format: 2023/6/15 14:52:13
+Date and time in Chinese long format: 2023年6月15日14點52分13秒
+Date and time in Chinese digit format: 二零二三年六月十五日十四點五十二分十三秒
+Date and time in custom Chinese format: 公元二零二三年六月十五日星期四下午二點五十二分十三秒
+```
 
 ## Using Formatters as Input Parameters in Print
 
