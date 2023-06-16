@@ -134,7 +134,7 @@ interface class real is numeric
 
 ## Built-in Number Types
 
-All concrete built-in number types are derived from the `numeric` interface. They are [value types](ValueType.md) and their instances are [passed by value](ArgumentPassing.md). They are also simple types so you can use literals to represent instances of the type. 
+All concrete built-in number types are derived from the `numeric` interface. They are [value types](ValueClass.md) and their instances are [passed by value](ArgumentPassing.md). They are also simple types so you can use literals to represent instances of the type. 
 
 ### Built-in Integer Types
 
