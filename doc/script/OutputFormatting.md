@@ -695,7 +695,7 @@ _______________________________________________________
 
 ### Formatters for Date and Time
 
-The date and time values are stored as [**time**](DateAndTime.md), [**date**](DateAndTime.md) values. When we need to print the datetime objects into various string formats for better readability, we use a date-time formatter, which is a packed string, started with `:t` follwoed by a string with a list of date and time element format indicators such as `%d`, `%m`, `%Y` etc. For exaple, a date-time formatter `:t"%d-%m-%Y %H:%M:%S"` will convert a time value into a string like `2023-06-15 16:26:24`:
+The date and time values are stored as [**time**](TypeTime.md), [**date**](TypeTime.md) values. When we need to print the datetime objects into various string formats for better readability, we use a date-time formatter, which is a packed string, started with `:t` follwoed by a string with a list of date and time element format indicators such as `%d`, `%m`, `%Y` etc. For exaple, a date-time formatter `:t"%d-%m-%Y %H:%M:%S"` will convert a time value into a string like `2023-06-15 16:26:24`:
 ```altro
 print([:t"%d-%m-%Y %H:%M:%S"], time.now());
 // print current time in the format like `2023-06-15 16:26:24`
