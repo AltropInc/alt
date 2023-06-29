@@ -35,7 +35,7 @@ t4 := time.now()(); // current time
 t5 := time.today(); // midnight of the current time in local time zone
 t6 := time.today("Asia/Tokyo"); // Tokyo midnight of the current time
 ```
-You can also use the format `yyyymmdd-hh:mm:ss` to represent a time value. For example, `20221031-10:15:45` represents a time value `10:15:45 on Oct 31, 2022` in the local time zone. This special format can only be used when a time value is expected. For example:
+You can also use the format `yyyymmdd-hh:mm:ss.nnnnnnnnn` to represent a time value. For example, `20221031-10:15:45` represents a time value `10:15:45 on Oct 31, 2022` in the local time zone. This special format can only be used when a time value is expected. For example:
 ```altro
 t7: time = 20221031-10:15:45;
 t8 := 20221031-10:15:45; // Error: Semicolon expected
@@ -44,6 +44,7 @@ Here `t7` gets the time value that represents `10:15:45 on Oct 31, 2022` because
 ```altro
 t8 := time::20221031-10:15:45;
 t9 := time::20221031;   // local midnight of Oct 31, 2022
+t10: time = 20221031-10:15:45.023173494;   // time stamp with nanoseconds
 ```
 
 Note that the value for timezone on the Windows platform works only when it is "GMT" or is null for the local timezone, and all other timezone values are ignored so that the local timezone will be assumed. 
