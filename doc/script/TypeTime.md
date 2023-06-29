@@ -2,22 +2,23 @@
 
 Altro provides following types for time and date:
 
-* **time**: represents a timepoint which a [UTC time](https://en.wikipedia.org/wiki/Coordinated_Universal_Time) value represented by the amount of period away from a specific point in time, regardless of the local time zone, such as 12:00 pm on January 1, 2023, GMT. 
-* **duration**: represents a period of time used to specify the difference between two relative timepoints. For examples, 3 hours, 2 seconds, etc. A duration can be negative, for example,  the duration from the midnight of today to the midnight of yesterday is -24 hours. 
+* **time**: represents a time point which a [UTC time](https://en.wikipedia.org/wiki/Coordinated_Universal_Time) value represented by the amount of period away from a specific point in time, regardless of the local time zone, such as 12:00 pm on January 1, 2023, GMT. 
+* **duration**: represents a period of time used to specify the difference between two relative timepoints. For example, 3 hours, 2 seconds, etc. A duration can be negative, for example,  the duration from the midnight of today to the midnight of yesterday is -24 hours. 
 * **date**: represents a calendar day, a specific 24-hour time period that begins at midnight of a day and ends at midnight the following day. For example, the date June 15, 2023. The date is time zone dependent because the midnight of a day varies in different time zones.
 * * **timeinfo**: provides a tuple of values to give the time information such as the year, month, day, weekday, timezone, etc. for a specific time point in a given time zone.
 
 ## Time
 
-The value of `time` is represented in terms of number nanoseconds before or after UNIX epoch (the time point January 1, 1970, 00:00:00 UTC). In current implementation, Altro uses a 64-bit signed integer to represent a time value, which can represents a range approximately 584 years. Therefore, the minmum year the time value can have is 1678 and the maximum year the time value can have is 2264.
+The value of `time` is represented in terms of the number of nanoseconds before or after the UNIX epoch (the time point January 1, 1970, 00:00:00 UTC). In current implementation, Altro uses a 64-bit signed integer to represent a time value, which can represent a range approximately 584 years. Therefore, the minimum year the time value can have is 1678 and the maximum year the time value can have is 2264.
 
-A time value can be written in a foramt `yyyymmdd-hh:mm:ss`. For example, `20221031-10:15:45` represents a time value `10:15:45 on Oct 31, 2022` in local time zone. 
+A time value can be written in a format `yyyymmdd-hh:mm:ss`. For example, `20221031-10:15:45` represents a time value `10:15:45 on Oct 31, 2022` in the local time zone.
 
 The class `time` is defined as below:
 
 ```altro
 value class time
 {
+    time();  // constructs time value of the current time
     time(year,month,mday: int; tz: string=null);  // constructs time value of the midnight of a given date
     time(year,month,mday,hour,min,sec: int; tz: string=null);  // constructs time value of the given time
     meta func now(): time;                    // gets current time
@@ -27,34 +28,47 @@ value class time
     func ti(tz: string=null): timeinfo;       // converts to value to timeinfo in a given time zone
 }
 ```
-* **`time(year,month,mday: int; tz: string=null)`** --
-    constructs the time value of the midnight of a given date in (year,month,mday). `tz' gives the timezone of the given date, andi f not given, local time zone is assumed<br><pre>
-t := time(year=2022; month=10; mday=31; zone="America/New_York"); // get midnight of a Oct 31, 2022 New York time
-println([:t"%Lc%Z"], t.ti("GMT"));  // print the time info in GMT
+Note that the value for timezone on the Windows platform works only when it is "GMT" or is null for the local timezone, and all other timezone values are ignored so that the local timezone will be assumed. 
+
+* **`time()`** --
+    constructs the time value of the current time<br><pre>
+t := time(); // get current time
+println([:t"%Lc%Z"], "Current time: ", t);
+println([:t"%Lc%Z"], "Current time in GMT: ", t.ti("GMT"));
 ────────────────────────────────────────────────
 Output:
-Monday, Oct 31, 05:00:00, 2022 GMT
+Current time: Thursday, Jun 29, 10:28:34, 2023 CDT
+Current time in GMT: Thursday, Jun 29, 15:28:34, 2023 GMT
+</pre>
+
+* **`time(year,month,mday: int; tz: string=null)`** --
+    constructs the time value of the midnight of a given date in (year,month,mday). `tz' gives the timezone of the given date, andi f not given, local time zone is assumed<br><pre>
+t := time(year=2022; month=10; mday=31; tz="America/New_York"); // get midnight of a Oct 31, 2022 New York time
+println([:t"%Lc%Z"], t.ti("GMT"));  // print the time info in GMT
+────────────────────────────────────────────────
+Output: (GMT is 4 hours ahead of EDT):
+Monday, Oct 31, 04:00:00, 2022 GMT
 </pre>
 
 * **`time(year,month,mday,hour,min,sec: int; tz: string=null)`** --
     constructs the time value of the given time in (year,month,mday,hour,min,sec). `tz' gives the timezone of the given time, and if not given, local time zone is assumed<br><pre>
-t := time(year=2022; month=10; mday=31; hour=10; min=15; sec=45, zone="GMT"); // get time value of Oct 31, 10:15:45, 2022 GMT
+t := time(2022, 10, 31, 10, 15, 45, "GMT");     // get time value of Oct 31, 10:15:45, 2022 GMT
 println([:t"%Lc%Z"], t.ti("America/New_York")); // print the time info in New York time
 ────────────────────────────────────────────────
-Output:
+Output (EDT is 4 hours behind of GMT):
 Monday, Oct 31, 06:15:45, 2022 EDT
 </pre>
 
 * **`meta func now(): time`** --
-    returns the current time value. The actual time value got dependens on the clock type used in the application. See [Clock Type](Clock.md) for more information.<br><pre>
-println([:t"The current time printed inlocal time zone: %lc"], time.now());
+    returns the current time value. The actual time value depends on the clock type used in the application. See [Clock Type](Clock.md) for more information.<br><pre>
+println([:t"The current time printed in local time zone: %lc"], time.now());
 ────────────────────────────────────────────────
 Output:
-The current time printed inlocal time zone: Thursday, Jun 15, 22:32:47, 2023
+The current time printed in local time zone: Thursday, Jun 15, 22:32:47, 2023
 </pre>
 
 * **`meta func today(tz: string=null): time`** --
-    returns the midnight time of the current date. `tz` gives the time zone identifier ([TZ Identifer](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)) such as `America/New_York`, `Asia/Tokyo`, and `GMT` etc, which is used to determine the date boundary. If the time zone is not given, the defualt time zone used in the system or set by the application is assumed. <br><pre>
+    returns the midnight time of the current date. `tz` gives the time zone identifier ([TZ Identifer](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)) such as `America/New_York`, `Asia/Tokyo`, and `GMT` etc, which is used to determine the date boundary. If the time zone is not given, the default time zone used in the system or set by the application is assumed. <br><pre>
 println([:t"Today's midnight time in local: %lc%Z"], time.today());
 println([:t"Today's Tokyo midnight time printed in local time: %lc%Z"], time.today("Asia/Tokyo"));
 println([:t"Today's GMT midnight time printed in local time: %lc%Z"], time.today("GMT"));
@@ -66,7 +80,7 @@ Today's GMT midnight time printed in local time: Thursday, Jun 15, 19:00:00, 202
 </pre>
 
 * **`func tod(tz: string=null): duration`** --
-    returns the time of the day, which is the duration elapsed from the last midnight of the time. `tz` gives the time zone identifier used to determine the date boundary. If the time zone is not given, the defualt time zone used in the system or set by the application is assumed. <br><pre>
+    returns the time of the day, which is the duration elapsed from the last midnight of the time. `tz` gives the time zone identifier used to determine the date boundary. If the time zone is not given, the default time zone used in the system or set by the application is assumed. <br><pre>
 t :time = 20221031-10:15:45;
 println("Time of the day in t: ", t.tod());
 println("Tokyo's time of the day in t: ", t.tod("Asia/Tokyo"));
@@ -79,7 +93,7 @@ GMT's time of the day in t: 15:15:45
 </pre>
 
 * **`func dt(tz: string=null): datetime`** --
-    returns the date and time of the day. `tz` gives the time zone identifier used to determine the date boundary, and if not given, the defualt time zone is the one in the system or set by the application. <br><pre>
+    returns the date and time of the day. `tz` gives the time zone identifier used to determine the date boundary, and if not given, the default time zone is the one in the system or set by the application. <br><pre>
 t :time = 20221031-10:15:45;
 println("Time of the day in t: ", t.tod());
 println("Tokyo's time of the day in t: ", t.tod("Asia/Tokyo"));
@@ -92,7 +106,7 @@ GMT's time of the day in t: 15:15:45
 </pre>
 
 * **`func ti(tz: string=null): timeinfo`** --
- returns the timeinfo. `tz` gives the time zone identifier used to determine the date boundary, and if not given, the defualt time zone is the one in the system or set by the application. <br><pre>
+ returns the timeinfo. `tz` gives the time zone identifier used to determine the date boundary, and if not given, the default time zone is the one in the system or set by the application. <br><pre>
 t1 := time(year=2022; month=10; mday=31; hour=10; min=15; sec=45, zone="GMT");   // get time value from GMT time 20221031-10:15:45
 println([:t"%Lc%Z"], t.ti("Asia/Tokyo"));   // print the time info in Tokyo local time
 ────────────────────────────────────────────────
