@@ -5,13 +5,11 @@ Altro provides following types for time and date:
 * **time**: represents a time point which a [UTC time](https://en.wikipedia.org/wiki/Coordinated_Universal_Time) value represented by the amount of period away from a specific point in time, regardless of the local time zone, such as 12:00 pm on January 1, 2023, GMT. 
 * **duration**: represents a period of time used to specify the difference between two relative timepoints. For example, 3 hours, 2 seconds, etc. A duration can be negative, for example,  the duration from the midnight of today to the midnight of yesterday is -24 hours. 
 * **date**: represents a calendar day, a specific 24-hour time period that begins at midnight of a day and ends at midnight the following day. For example, the date June 15, 2023. The date is time zone dependent because the midnight of a day varies in different time zones.
-* * **timeinfo**: provides a tuple of values to give the time information such as the year, month, day, weekday, timezone, etc. for a specific time point in a given time zone.
+* **timeinfo**: provides a tuple of values to give the time information such as the year, month, day, weekday, timezone, etc. for a specific time point in a given time zone.
 
 ## Time
 
 The value of `time` is represented in terms of the number of nanoseconds before or after the UNIX epoch (the time point January 1, 1970, 00:00:00 UTC). In current implementation, Altro uses a 64-bit signed integer to represent a time value, which can represent a range approximately 584 years. Therefore, the minimum year the time value can have is 1678 and the maximum year the time value can have is 2264.
-
-A time value can be written in a format `yyyymmdd-hh:mm:ss`. For example, `20221031-10:15:45` represents a time value `10:15:45 on Oct 31, 2022` in the local time zone.
 
 The class `time` is defined as below:
 
@@ -28,6 +26,26 @@ value class time
     func ti(tz: string=null): timeinfo;       // converts to value to timeinfo in a given time zone
 }
 ```
+You can constrcut a time value uing one of its constuctors or meta functions:
+```altro
+t1 := time();  // current time
+t2 := time(year=2022; month=10; mday=31; hour=10; min=15; sec=45);
+t3 := (2022, 10, 31, 10, 15, 45, "GMT");
+t4 := time.now()(); // current time
+t5 := time.today(); // midnight of the current time in local time zone
+t6 := time.today("Asia/Tokyo"); // Tokyo midnight of the current time
+```
+You can also use the format `yyyymmdd-hh:mm:ss` to represent a time value. For example, `20221031-10:15:45` represents a time value `10:15:45 on Oct 31, 2022` in the local time zone. This special format can only be used when a time value is expected. For example:
+```altro
+t7: time = 20221031-10:15:45;
+t8 := 20221031-10:15:45; // Error: Semicolon expected
+```
+Here `t7` gets the time value that represents `10:15:45 on Oct 31, 2022` because the initialization expression for `t7` expects a time value. However, the name declaration `t8` generates a compiler error because we do not know the type of `t8` and we do not expect a time value from the initialization. To use the format in situition where it is unknown if a time value is required, a type qualifier with double colon `::` can be used:
+```altro
+t8 := time::20221031-10:15:45;
+t9 := time::20221031;   // local midnight of Oct 31, 2022
+```
+
 Note that the value for timezone on the Windows platform works only when it is "GMT" or is null for the local timezone, and all other timezone values are ignored so that the local timezone will be assumed. 
 
 * **`time()`** --
