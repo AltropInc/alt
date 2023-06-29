@@ -14,7 +14,7 @@ The value of `time` is represented in terms of the number of nanoseconds before 
 The class `time` is defined as below:
 
 ```altro
-value class time
+value class time is comparable
 {
     time();  // constructs time value of the current time
     time(year,month,mday: int; tz: string=null);  // constructs time value of the midnight of a given date
@@ -24,6 +24,8 @@ value class time
     func tod(tz: string=null): duration;      // gets duration elapsed from the midnight of a given time zone
     func dt(tz: string=null): datetime;       // converts to value to (date, duration since midnight) in a given time zone
     func ti(tz: string=null): timeinfo;       // converts to value to timeinfo in a given time zone
+    func <=> (other: date): int;              //compare with date
+    func <=> (other: datetime): int;          //compare with datetime
 }
 ```
 You can constrcut a time value uing one of its constuctors or meta functions:
@@ -132,3 +134,22 @@ println([:t"%Lc%Z"], t.ti("Asia/Tokyo"));   // print the time info in Tokyo loca
 Output:
 Monday, Oct 31, 19:15:45, 2022 JST
 </pre>
+
+* **`func <=> (other: date): int;`**<br>
+**`func <=> (other: datetime): int;`** --
+ compares the time value with a date value or a datetime value. Local time zone is always assumed for date or datetime value. Because the `time` class implements the `comparable` interface, time values are already comparable values. These two functions are provided for comparing a time value with a value of different type. Here are some comparison examples <br><pre>
+t1 := time();
+t2 := time();
+midnight := time.today();
+println(t1 < t2);
+println(t1 > midnight);
+t3: time = 20221031-10:15:45;
+d1: date = 20221031;
+println(t3 > d1);
+────────────────────────────────────────────────
+Output:
+true
+true
+false
+</pre>
+
