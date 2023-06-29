@@ -35,6 +35,7 @@ println([:t"%Lc%Z"], t.ti("GMT"));  // print the time info in GMT
 Output:
 Monday, Oct 31, 05:00:00, 2022 GMT
 </pre>
+
 * **`time(year,month,mday,hour,min,sec: int; tz: string=null)`** --
     constructs the time value of the given time in (year,month,mday,hour,min,sec). `tz' gives the timezone of the given time, and if not given, local time zone is assumed<br><pre>
 t := time(year=2022; month=10; mday=31; hour=10; min=15; sec=45, zone="GMT"); // get time value of Oct 31, 10:15:45, 2022 GMT
@@ -43,6 +44,7 @@ println([:t"%Lc%Z"], t.ti("America/New_York")); // print the time info in New Yo
 Output:
 Monday, Oct 31, 06:15:45, 2022 EDT
 </pre>
+
 * **`meta func now(): time`** --
     returns the current time value. The actual time value got dependens on the clock type used in the application. See [Clock Type](Clock.md) for more information.<br><pre>
 println([:t"The current time printed inlocal time zone: %lc"], time.now());
@@ -50,6 +52,7 @@ println([:t"The current time printed inlocal time zone: %lc"], time.now());
 Output:
 The current time printed inlocal time zone: Thursday, Jun 15, 22:32:47, 2023
 </pre>
+
 * **`meta func today(tz: string=null): time`** --
     returns the midnight time of the current date. `tz` gives the time zone identifier ([TZ Identifer](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)) such as `America/New_York`, `Asia/Tokyo`, and `GMT` etc, which is used to determine the date boundary. If the time zone is not given, the defualt time zone used in the system or set by the application is assumed. <br><pre>
 println([:t"Today's midnight time in local: %lc%Z"], time.today());
@@ -61,6 +64,7 @@ Today's midnight time in local: Friday, Jun 16, 00:00:00, 2023 CDT
 Today's Tokyo midnight time printed in local time: Friday, Jun 16, 10:00:00, 2023 CDT
 Today's GMT midnight time printed in local time: Thursday, Jun 15, 19:00:00, 2023 CDT
 </pre>
+
 * **`func tod(tz: string=null): duration`** --
     returns the time of the day, which is the duration elapsed from the last midnight of the time. `tz` gives the time zone identifier used to determine the date boundary. If the time zone is not given, the defualt time zone used in the system or set by the application is assumed. <br><pre>
 t :time = 20221031-10:15:45;
@@ -73,6 +77,7 @@ Time of the day in t: 10:15:45
 Tokyo's time of the day in t: 00:15:45
 GMT's time of the day in t: 15:15:45
 </pre>
+
 * **`func dt(tz: string=null): datetime`** --
     returns the date and time of the day. `tz` gives the time zone identifier used to determine the date boundary, and if not given, the defualt time zone is the one in the system or set by the application. <br><pre>
 t :time = 20221031-10:15:45;
@@ -85,6 +90,7 @@ Time of the day in t: 10:15:45
 Tokyo's time of the day in t: 00:15:45
 GMT's time of the day in t: 15:15:45
 </pre>
+
 * **`func ti(tz: string=null): timeinfo`** --
  returns the timeinfo. `tz` gives the time zone identifier used to determine the date boundary, and if not given, the defualt time zone is the one in the system or set by the application. <br><pre>
 t1 := time(year=2022; month=10; mday=31; hour=10; min=15; sec=45, zone="GMT");   // get time value from GMT time 20221031-10:15:45
