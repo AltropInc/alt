@@ -150,6 +150,22 @@ println(t3 > d1);
 Output:
 true
 true
+true
+</pre>To compare a time value with date or datetime in different time zone, you will need to convert the date or datetime value into time value. Consider:<br><pre>
+println([:t"Local timezone is: %Z"], time());
+t1 := time::20230629-11:32:00;
+d1 := date::20230630;
+println([:t"The t1 value in GMT: %Lc%Z"], t1.ti("GMT"));
+println([:t"The CDT midnight of 20230630 in GMT: %Lc%Z"], d1.time().ti("GMT"));
+println([:t"The JST midnight of 20230630 in GMT: %Lc%Z"], d1.time("Asia/Tokyo").ti("GMT"));
+println(t1 > d1);
+println(t1 > d1.time("Asia/Tokyo"));
+────────────────────────────────────────────────
+Output:
+Local timezone is: CDT
+The t1 value in GMT: Thursday, Jun 29, 16:32:00, 2023 GMT
+The CDT midnight of 20230630 in GMT: Friday, Jun 30, 05:00:00, 2023 GMT
+The JST midnight of 20230630 in GMT: Thursday, Jun 29, 15:00:00, 2023 GMT
 false
+true
 </pre>
-
