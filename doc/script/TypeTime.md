@@ -16,12 +16,14 @@ The class `time` is defined as below:
 ```altro
 value class time is comparable
 {
+    // predefined time constants 
+    meta const MAX_YEAR := 2264;
+    meta const MIN_YEAR := 1678;
+
     time();  // constructs time value of the current time
     time(year,month,mday: int; tz: string=null);  // constructs time value of the midnight of a given date
     time(year,month,mday,hour,min,sec: int; tz: string=null);  // constructs time value of the given time
     time(ticks: long);  // constructs time value of the number of ticks
-    meta func ymax (): int;                   // returns largest year number the time value can represent
-    meta func ymin (): int;                   // returns smallest year number the time value can represent
     meta func now(): time;                    // gets current time
     meta func today(tz: string=null): time;   // gets midnight time of the current date in a given time zone
     const func ticks (): long;                      // returns number of ticks of the time value
@@ -67,17 +69,6 @@ println([:t"%Lc%Z"], "Current time in GMT: ", t.ti("GMT"));
 Output:
 Current time: Thursday, Jun 29, 10:28:34, 2023 CDT
 Current time in GMT: Thursday, Jun 29, 15:28:34, 2023 GMT
-</pre>
-  
-* **`meta func ymax (): int`** --<br>
-**`meta func ymin (): int;`** --
-    returns largest/smallest year number the time value can represent<br><pre>
-println("The largest year number the time value can represent is ", time.ymax());
-println("The smallest year number the time value can represent is ", time.ymin());
-────────────────────────────────────────────────
-Output:
-The largest year number the time value can represent is 2264
-The smallest year number the time value can represent is 1678
 </pre>
 
 * **`time(year,month,mday: int; tz: string=null)`** --
@@ -218,7 +209,7 @@ The value of `duration` is represented in terms of the number of nanoseconds, wh
 The class `duration` is defined as below:
 
 ```altro
-value duration time is comparable implements addable, incrementable, negatable
+value duration time implements comparable, addable, incrementable, negatable
 {
     // predefined duration constants 
     meta const ONE_MICROSEC, ONE_MILLISEC, ONE_SEC, ONE_MIN, ONE_HOUR, ONE_DAY, ONE_WEEK: duration;
@@ -249,53 +240,64 @@ t7: duration = 10:15:45;
 t8 := duration::10:15:45;
 ```
 A duration can also be represented by a sequence of integers with special suffixes such as hour, minutes, days, etc. The following special suffixes can be used for duration values:
+| suffix                              | meaning                   |
+|:----------------------------------- |:------------------------- |
+| w, week, weeks                      | number of weeks           |
+| d, day, days                        | number of days            |
+| h, hour, hours                      | number of hours           |
+| m, min, minute, minutes             | number of minutes         |
+| s, sec, second, seconds             | number of seconds         |
+| millisec, millisecond, milliseconds | number of milliseconds    |
+| microsec, microsecond, microseconds | number of microseconds    |
+| n, ns, nse, nanosecond, nanoseconds | number of nanoseconds     |
+You can use combined duration units, for example:
+```altro
+d1: duration = 1 day 12 hours 30 minutes;
+d2: duration = 1 day -12 hours;
+d2 += 1 hour 20 minutes;
+```
 
-
-
-* **`time()`** --
-    constructs the time value of the current time<br><pre>
-t := time(); // get current time
-println([:t"%Lc%Z"], "Current time: ", t);
-println([:t"%Lc%Z"], "Current time in GMT: ", t.ti("GMT"));
+Because `duration` implements the interfaces of comparable, addable, incrementable, and negatable, you can use all functions provided in these interfaces. For example:
+```altro
+d1: duration = 30 minutes;
+d2: duration = 1000 seconds;
+println(d1 > d2);
+d2 += 800 seconds;
+println(d1 == d2);
+d2++;
+println(d2);
+d2 = -d2;
+println(d2);
 ────────────────────────────────────────────────
 Output:
-Current time: Thursday, Jun 29, 10:28:34, 2023 CDT
-Current time in GMT: Thursday, Jun 29, 15:28:34, 2023 GMT
-</pre>
-  
-* **`meta func ymax (): int`** --<br>
-**`meta func ymin (): int;`** --
-    returns largest/smallest year number the time value can represent<br><pre>
-println("The largest year number the time value can represent is ", time.ymax());
-println("The smallest year number the time value can represent is ", time.ymin());
+true
+true
+0:30:0.000000001
+-0:30:0.000000001
+```
+
+The class `duration` does not implement functions required by the `scalable` interface. However, it has its own special version of functions to define how duration values can be multiplied or divided.
+
+* **`duration()`** --
+    constructs a zero duration value<br><pre>
+println(duration());
 ────────────────────────────────────────────────
 Output:
-The largest year number the time value can represent is 2264
-The smallest year number the time value can represent is 1678
+0:0:0
 </pre>
 
-* **`time(year,month,mday: int; tz: string=null)`** --
-    constructs the time value of the midnight of a given date in (year,month,mday). `tz' gives the timezone of the given date, andi f not given, local time zone is assumed<br><pre>
-t := time(year=2022; month=10; mday=31; tz="America/New_York"); // get midnight of a Oct 31, 2022 New York time
-println([:t"%Lc%Z"], t.ti("GMT"));  // print the time info in GMT
+* **`duration(hour,min,sec: int; ns:int=0)`** --
+    constructs the duration value by (hours,minutes,seconds,nanoseconds).<br><pre>
+println(duration(10, 15, 45));
 ────────────────────────────────────────────────
-Output: (GMT is 4 hours ahead of EDT):
-Monday, Oct 31, 04:00:00, 2022 GMT
+10:15:45
 </pre>
 
-* **`time(year,month,mday,hour,min,sec: int; tz: string=null)`** --
-    constructs the time value of the given time in (year,month,mday,hour,min,sec). `tz' gives the timezone of the given time, and if not given, local time zone is assumed<br><pre>
-t := time(2022, 10, 31, 10, 15, 45, "GMT");     // get time value of Oct 31, 10:15:45, 2022 GMT
-println([:t"%Lc%Z"], t.ti("America/New_York")); // print the time info in New York time
+* **`duration(ticks: long)`** --
+    constructs the duration value from number of ticks.<br><pre>
+println(duration(1000000));   // 1 millisecond
 ────────────────────────────────────────────────
-Output (EDT is 4 hours behind of GMT):
-Monday, Oct 31, 06:15:45, 2022 EDT
-</pre>
-
-* **`time(ticks: long)`** --
-    constructs the time value from number of ticks.<br><pre>
-t := time.now();
-t1 := time(t.ticks() + 1);
+0:0:0.001
 </pre>
 
 * **`meta func now(): time`** --
