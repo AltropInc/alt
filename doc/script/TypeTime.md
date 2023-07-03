@@ -197,15 +197,15 @@ false
 true
 </pre>
 
-* **`const func + (duration): time;`** --<br><pre>
-**`const func - (duration): time;`** --
+* **`const func + (duration): time;`**
+**`const func - (duration): time;`** --<br><pre>
     returns the time value after or before a duration from this time value<br><pre>
 tomorrow := time.today() + duration::1 day;
 yesterday := time.today() - duration::1 day;
 </pre>
 
-* **`func += (d: duration): time;`** --<br><pre>
-**`func -= (d: duration): time;`** --
+* **`func += (d: duration): time;`**
+**`func -= (d: duration): time;`** --<br><pre>
     applies the offset `d` to this time value and returns the modified time value<br><pre>
 t := time.today();
 t += duration::2 hours 30 minutes;
