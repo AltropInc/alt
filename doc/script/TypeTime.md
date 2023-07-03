@@ -2,9 +2,9 @@
 
 Altro provides following types for time and date:
 
-* **time**: represents a time point which a [UTC time](https://en.wikipedia.org/wiki/Coordinated_Universal_Time) value represented by the amount of period away from a specific point in time, regardless of the local time zone, such as 12:00 pm on January 1, 2023, GMT. 
+* **time**: represents a time point which is a [UTC time](https://en.wikipedia.org/wiki/Coordinated_Universal_Time) value represented by the amount of period away from a specific point in time, regardless of the local time zone, such as 12:00 pm on January 1, 2023, GMT. 
 * **duration**: represents a period of time used to specify the difference between two relative timepoints. For example, 3 hours, 2 seconds, etc. A duration can be negative, for example,  the duration from the midnight of today to the midnight of yesterday is -24 hours. 
-* **date**: represents a calendar day, a specific 24-hour time period that begins at midnight of a day and ends at midnight the following day. For example, the date June 15, 2023. The date is time zone dependent because the midnight of a day varies in different time zones.
+* **date**: represents a calendar day, a specific 24-hour time period that begins at midnight of a day and ends at midnight the following day. For example, the date June 15, 2023. The date, when converted to time, is timezone dependent because the midnight of a day varies in different timezones.
 * **timeinfo**: provides a tuple of values to give the time information such as the year, month, day, weekday, timezone, etc. for a specific time point in a given time zone.
 
 ## Time
@@ -19,13 +19,21 @@ value class time is comparable
     time();  // constructs time value of the current time
     time(year,month,mday: int; tz: string=null);  // constructs time value of the midnight of a given date
     time(year,month,mday,hour,min,sec: int; tz: string=null);  // constructs time value of the given time
+    time(ticks: long);  // constructs time value of the number of ticks
+    meta func ymax (): int;                   // returns largest year number the time value can represent
+    meta func ymin (): int;                   // returns smallest year number the time value can represent
     meta func now(): time;                    // gets current time
     meta func today(tz: string=null): time;   // gets midnight time of the current date in a given time zone
-    func tod(tz: string=null): duration;      // gets duration elapsed from the midnight of a given time zone
-    func dt(tz: string=null): datetime;       // converts to value to (date, duration since midnight) in a given time zone
-    func ti(tz: string=null): timeinfo;       // converts to value to timeinfo in a given time zone
-    func <=> (other: date): int;              //compare with date
-    func <=> (other: datetime): int;          //compare with datetime
+    const func ticks (): long;                      // returns number of ticks of the time value
+    const func tod(tz: string=null): duration;      // gets duration elapsed from the midnight of a given time zone
+    const func dt(tz: string=null): datetime;       // converts to value to (date, duration since midnight) in a given time zone
+    const func ti(tz: string=null): timeinfo;       // converts to value to timeinfo in a given time zone
+    const func <=> (other: date): int;              // compare with date
+    const func <=> (other: datetime): int;          // compare with datetime
+    const func + (duration): time;                  // performs add operations involving a time point
+    const func - (duration): time;                  // performs subtract operations involving a time point
+    func += (duration): time;                 // add the offset by the duration to this time point
+    func -= (duration): time;                 // subtract the offset by the duration from this time point
 }
 ```
 You can constrcut a time value uing one of its constuctors or meta functions:
@@ -48,7 +56,6 @@ t8 := time::20221031-10:15:45;
 t9 := time::20221031;   // local midnight of Oct 31, 2022
 t10: time = 20221031-10:15:45.023173494;   // time stamp with nanoseconds
 ```
-
 Note that the value for timezone on the Windows platform works only when it is "GMT" or is null for the local timezone, and all other timezone values are ignored so that the local timezone will be assumed. 
 
 * **`time()`** --
@@ -60,6 +67,19 @@ println([:t"%Lc%Z"], "Current time in GMT: ", t.ti("GMT"));
 Output:
 Current time: Thursday, Jun 29, 10:28:34, 2023 CDT
 Current time in GMT: Thursday, Jun 29, 15:28:34, 2023 GMT
+</pre>
+    meta func ymax (): int;                   // returns largest year number the time value can represent
+    meta func ymin (): int;                   // returns smallest year number the time value can represent
+  
+* **`meta func ymax (): int`** --<br>
+**` meta func ymin (): int;`** --
+    returns largest/smallest year number the time value can represent<br><pre>
+println("The largest year number the time value can represent is ", time.ymax());
+println("The smallest year number the time value can represent is ", time.ymin());
+────────────────────────────────────────────────
+Output:
+The largest year number the time value can represent is 2264
+The smallest year number the time value can represent is 1678
 </pre>
 
 * **`time(year,month,mday: int; tz: string=null)`** --
@@ -78,6 +98,12 @@ println([:t"%Lc%Z"], t.ti("America/New_York")); // print the time info in New Yo
 ────────────────────────────────────────────────
 Output (EDT is 4 hours behind of GMT):
 Monday, Oct 31, 06:15:45, 2022 EDT
+</pre>
+
+* **`time(ticks: long)`** --
+    constructs the time value from number of ticks.<br><pre>
+t := time.now();
+t1 := time(t.ticks() + 1);
 </pre>
 
 * **`meta func now(): time`** --
@@ -100,6 +126,9 @@ Today's Tokyo midnight time printed in local time: Friday, Jun 16, 10:00:00, 202
 Today's GMT midnight time printed in local time: Thursday, Jun 15, 19:00:00, 2023 CDT
 </pre>
 
+* **`const func ticks (): long;`** --
+    returns number of ticks (nanoseconds away from Unix epoch) of the time value.
+
 * **`func tod(tz: string=null): duration`** --
     returns the time of the day, which is the duration elapsed from the last midnight of the time. `tz` gives the time zone identifier used to determine the date boundary. If the time zone is not given, the default time zone used in the system or set by the application is assumed. <br><pre>
 t :time = 20221031-10:15:45;
@@ -113,7 +142,7 @@ Tokyo's time of the day in t: 00:15:45
 GMT's time of the day in t: 15:15:45
 </pre>
 
-* **`func dt(tz: string=null): datetime`** --
+* **`const func dt(tz: string=null): datetime`** --
     returns the date and time of the day. `tz` gives the time zone identifier used to determine the date boundary, and if not given, the default time zone is the one in the system or set by the application. <br><pre>
 t :time = 20221031-10:15:45;
 println("Time of the day in t: ", t.tod());
@@ -126,7 +155,7 @@ Tokyo's time of the day in t: 00:15:45
 GMT's time of the day in t: 15:15:45
 </pre>
 
-* **`func ti(tz: string=null): timeinfo`** --
+* **`const func ti(tz: string=null): timeinfo`** --
  returns the timeinfo. `tz` gives the time zone identifier used to determine the date boundary, and if not given, the default time zone is the one in the system or set by the application. <br><pre>
 t1 := time(year=2022; month=10; mday=31; hour=10; min=15; sec=45, zone="GMT");   // get time value from GMT time 20221031-10:15:45
 println([:t"%Lc%Z"], t.ti("Asia/Tokyo"));   // print the time info in Tokyo local time
@@ -135,8 +164,8 @@ Output:
 Monday, Oct 31, 19:15:45, 2022 JST
 </pre>
 
-* **`func <=> (other: date): int;`**<br>
-**`func <=> (other: datetime): int;`** --
+* **`const func <=> (other: date): int;`**<br>
+**`const func <=> (other: datetime): int;`** --
  compares the time value with a date value or a datetime value. Local time zone is always assumed for date or datetime value. Because the `time` class implements the `comparable` interface, time values are already comparable values. These two functions are provided for comparing a time value with a value of different type. Here are some comparison examples <br><pre>
 t1 := time();
 t2 := time();
@@ -168,4 +197,18 @@ The CDT midnight of 20230630 in GMT: Friday, Jun 30, 05:00:00, 2023 GMT
 The JST midnight of 20230630 in GMT: Thursday, Jun 29, 15:00:00, 2023 GMT
 false
 true
+</pre>
+
+* **`const func + (duration): time;`** --<br>
+**` const func - (duration): time;`** --
+    returns the time value after or before a duration from this time value<br><pre>
+tomorrow := time.today() + duration::1 day;
+yesterday := time.today() - duration::1 day;
+</pre>
+
+* **func += (d: duration): time;`** --<br>
+**` func -= (d: duration): time;`** --
+    applies the offset `d` to this time value and returns the modified time value<br><pre>
+t := time.today();
+t += duration::2 hours 30 minutes;
 </pre>
