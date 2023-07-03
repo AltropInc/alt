@@ -68,11 +68,9 @@ Output:
 Current time: Thursday, Jun 29, 10:28:34, 2023 CDT
 Current time in GMT: Thursday, Jun 29, 15:28:34, 2023 GMT
 </pre>
-    meta func ymax (): int;                   // returns largest year number the time value can represent
-    meta func ymin (): int;                   // returns smallest year number the time value can represent
   
 * **`meta func ymax (): int`** --<br>
-**` meta func ymin (): int;`** --
+**`meta func ymin (): int;`** --
     returns largest/smallest year number the time value can represent<br><pre>
 println("The largest year number the time value can represent is ", time.ymax());
 println("The smallest year number the time value can represent is ", time.ymin());
@@ -199,15 +197,15 @@ false
 true
 </pre>
 
-* **`const func + (duration): time;`** --<br>
-**` const func - (duration): time;`** --
+* **`const func + (duration): time;`** --<br><pre>
+**`const func - (duration): time;`** --
     returns the time value after or before a duration from this time value<br><pre>
 tomorrow := time.today() + duration::1 day;
 yesterday := time.today() - duration::1 day;
 </pre>
 
-* **func += (d: duration): time;`** --<br>
-**` func -= (d: duration): time;`** --
+* **`func += (d: duration): time;`** --<br><pre>
+**`func -= (d: duration): time;`** --
     applies the offset `d` to this time value and returns the modified time value<br><pre>
 t := time.today();
 t += duration::2 hours 30 minutes;
