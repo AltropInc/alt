@@ -250,13 +250,13 @@ A duration can also be represented by a sequence of integers with special suffix
 | millisec, millisecond, milliseconds | number of milliseconds    |
 | microsec, microsecond, microseconds | number of microseconds    |
 | n, ns, nse, nanosecond, nanoseconds | number of nanoseconds     |
+
 You can use combined duration units, for example:
 ```altro
 d1: duration = 1 day 12 hours 30 minutes;
 d2: duration = 1 day -12 hours;
 d2 += 1 hour 20 minutes;
 ```
-
 Because `duration` implements the interfaces of comparable, addable, incrementable, and negatable, you can use all functions provided in these interfaces. For example:
 ```altro
 d1: duration = 30 minutes;
