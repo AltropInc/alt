@@ -386,7 +386,7 @@ Output:
 
 ## Date
 
-The value of `date` is represented in an interger in the format of `yyyymmdd`. For example, 20230612 represents the date June 12, 2023. Becuase the year zero in the astronomical year numbering system coincides with the Julian year 1 BC, the value `00001231` represents December 31, 1 BC, one day before `00010101` (January 1, 1 AD).
+The value of `date` is represented in an integer in the format of `yyyymmdd`. For example, 20230612 represents the date June 12, 2023. Because the year zero in the astronomical year numbering system coincides with the Julian year 1 BC, the value `00001231` represents December 31, 1 BC, one day before `00010101` (January 1, 1 AD)..
 
 The class `date` is defined as below:
 
@@ -411,7 +411,7 @@ The class `date` implements the comparable and incrementable interfaces. Therefo
 
 Note that the value for timezone in the Windows platform works only when it is "GMT" or is null for the local timezone, and all other timezone values are ignored so that the local timezone will be assumed. 
 
-You can constrcut a date value uing one of its constuctors or meta functions:
+You can construct a date value using one of its constructors or meta functions:
 ```altro
 d1 := date();             // today in local time zone
 d2 := date(20221031);     // date Oct. 31, 2022
@@ -421,20 +421,20 @@ d3 := date(2022, 10, 31); // date Oct. 31, 2022
 d4 := date.today();       // today in local time zone
 d5 := date.today("Asia/Tokyo"); // today in Tokyo time
 ```
-You can also use the format `yyyymmdd` to represent a date value, and in this format. This special format can only be used when a date value is expected. For example:
+You can also use the format `yyyymmdd` to represent a date value. This special format can only be used when a date value is expected. For example:
 ```altro
 d6: date = 19691031;    // d6 gets a date value in Oct 31, 1969
 d7 := 6691031;          // d7 gets an integer 6691031, not a date
 d8 := date::6691031;    // d8 gets a date value in Oct 31, 1969
 ```
-Also in the format of  `yyyymmdd-hh`, you need to remove all leading zeros unless you use the type qualifier. Otherwise, the integer will be read as an octal number. For example,
+Also in the format of `yyyymmdd-hh`, you need to remove all leading zeros unless you use the type qualifier. Otherwise, the integer will be read as an octal number. For example,
 ```altro
 d9: date = 06691031;     // Error: Invalid octal digit
-d10 := date::06691031;   // Okay, d10 gets a d10 gets an date value in Oct 31, 669
+d10 := date::06691031;   // Okay, d10 gets an date value in Oct 31, 669
 ```
 
 * **`date()`** --
-    constructs the date value for today in the loacl time zone<br><pre>
+    constructs the date value for today in the local time zone<br><pre>
 d := date();
 println ([:t"%Lx %Z"], d);
 ────────────────────────────────────────────────
@@ -459,7 +459,7 @@ Monday, Oct 31, 04:00:00, 2022 GMT
 </pre>
 
 * **`meta func today(tz: string=null): date`** --
-    returns the the current date. `tz` gives the time zone identifier ([TZ Identifer](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)) such as `America/New_York`, `Asia/Tokyo`, and `GMT` etc, which is used to determine the date boundary. If the time zone is not given, the default time zone used in the system or set by the application is assumed. <br><pre>
+    returns the current date. `tz` gives the time zone identifier ([TZ Identifer](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)) such as `America/New_York`, `Asia/Tokyo`, and `GMT` etc, which is used to determine the date boundary. If the time zone is not given, the default time zone used in the system or set by the application is assumed. <br><pre>
 println ([:t"%Lx"], date.today());
 println ([:t"%Lx"], date.today("Asia/Tokyo"));
 ────────────────────────────────────────────────
@@ -481,7 +481,7 @@ Today is 738707 days after 'January 1, 1 AD'.
 </pre>
 
 * **`func start(tz: string=null): time`** --
-    returns the strting time (midnight) of the day. `tz` gives the time zone identifier used to determine the date boundary. If the time zone is not given, the default time zone used in the system or set by the application is assumed. <br><pre>
+    returns the starting time (midnight) of the day. `tz` gives the time zone identifier used to determine the date boundary. If the time zone is not given, the default time zone used in the system or set by the application is assumed. <br><pre>
 d := date::20230707;
 println([:t"%Lx"], d, " in local (US Central) started at ", [:t"%Lc%Z"], d.start());
 println([:t"%Lx"], d, " in Tokyo started at ", [:t"%Lc%Z"], d.start("Asia/Tokyo"));
@@ -528,3 +528,68 @@ There are 69 days from Thursday, Mar 23, 2023 to Wednesday, May 31, 2023
 d := date.today();
 d += 30;
 </pre>
+
+## Time Info Tuple
+
+The tuple type `timeinfo` gives detailed information about time:
+```altro
+type timeinfo = value tuple
+    ( sec, min, hour: tiny;
+      month, mday, wday: tiny;
+      isdst: bool;
+      yday:  short;
+      year:  short;
+      gmtoff: short;
+      zone: symbol8
+    );
+```
+The tuple contains 11 members, which are explained as below:
+
+| Member  | Type      | Meaning                            | Range       |
+|:------- |:--------- |:---------------------------------- |:----------- |
+| sec     | tiny int  | seconds after the minute           | 0-61        |
+| min     | tiny int  | minutes after the hour             | 0-59        |
+| hour    | tiny int  | hours since midnight               | 0-23        |
+| month   | tiny int  | months since January               | 0-11        |
+| mday    | tiny int  | day of the month                   | 1-31        |
+| wday    | tiny int  | days since Sunday                  | 0-6         |
+| isdst   | tiny int  | Daylight Saving Time flag          | 0, 1, or -1 |
+| yday    | short int | days since January 1               | 0-365       |
+| year    | short int | years since or before 1900         |             |
+| gmtoff  | short int | time zone offset to GMT in minites |             |
+| zone    | symbol8   | time zone code upto 8 characters   |             |
+
+The Daylight Saving Time flag (isdst) is 1 if Daylight Saving Time is in effect, 0 if Daylight Saving Time is not in effect, and -1 if the information is not available. The member `sec` is generally 0-59 and the extra range is to accommodate for leap seconds in certain systems.
+
+The [formatter for date and time](OutputFormatting.md) `:t`, if present, is used for printing `timeinfo` tuple. If the formatter for date and time is absent, then the [formatter for elements of containers](OutputFormatting.md), if any, is used. For example:
+For example:
+```altro
+tinfo: timeinfo = time.now().ti("Asia/Taipei");
+setlang("中文", "台灣");
+println("Time format in Chinese: ", [:t"%Lc%Z"], tinfo);
+println("Time into elements:\n", [:C1], tinfo);
+────────────────────────────────────────────────
+Output:
+Time format in Chinese: 二零二三年七月九日星期日零點十七分十三秒CST
+Time into element:
+sec = 13
+min = 17
+hour = 0
+month = 6
+mday = 9
+wday = 0
+isdst = false
+yday = 189
+year = 123
+gmtoff = 28800
+zone = CST
+```
+
+## Date and Time Tuple
+
+The tuple `datetime` is used to represent a time point in terms of date and duration since the midnight of the date. `datetime` can represent a range of time much more broader than the type `time`.
+```altro
+type datetime = value tuple (d: date; t: duration);
+```
+
+
