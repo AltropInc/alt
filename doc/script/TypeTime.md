@@ -407,6 +407,8 @@ value class date implements comparable, incrementable
     func -= (int): date;                         // subtract the offset by the duration from this time point
 }
 ```
+The class `date` implements the comparable and incrementable interfaces. Therefore, date values can be compared and can be modified by the incremental operators `++` and `--`.
+
 Note that the value for timezone in the Windows platform works only when it is "GMT" or is null for the local timezone, and all other timezone values are ignored so that the local timezone will be assumed. 
 
 You can constrcut a date value uing one of its constuctors or meta functions:
@@ -480,12 +482,15 @@ Today is 738707 days after 'January 1, 1 AD'.
 
 * **`func start(tz: string=null): time`** --
     returns the strting time (midnight) of the day. `tz` gives the time zone identifier used to determine the date boundary. If the time zone is not given, the default time zone used in the system or set by the application is assumed. <br><pre>
-println([:t"%Lc%Z"], date().start());
-println([:t"%Lc%Z"], date().start("Asia/Tokyo"));
+d := date::20230707;
+println([:t"%Lx"], d, " in local (US Central) started at ", [:t"%Lc%Z"], d.start());
+println([:t"%Lx"], d, " in Tokyo started at ", [:t"%Lc%Z"], d.start("Asia/Tokyo"));
+println([:t"%Lx"], d, " in Tokyo started at ", [:t"%Lc%Z"], d.start("Asia/Tokyo").ti("Asia/Tokyo"));
 ────────────────────────────────────────────────
 Output:
-Friday, Jul 7, 00:00:00, 2023 CDT
-Thursday, Jul 6, 10:00:00, 2023 CDT
+Sunday, Jul 7, 2023 in local (US Central) started at Friday, Jul 7, 00:00:00, 2023 CDT
+Sunday, Jul 7, 2023 in Tokyo started at Thursday, Jul 6, 10:00:00, 2023 CDT
+Sunday, Jul 7, 2023 in Tokyo started at Friday, Jul 7, 00:00:00, 2023 JST
 </pre>
 
 * **`const func ti(tz: string=null): timeinfo`** --
@@ -494,41 +499,6 @@ println([:t"%Lc%Z"], date().ti("Asia/Tokyo"))
 ────────────────────────────────────────────────
 Output:
 Monday, Oct 31, 19:15:45, 2022 JST
-</pre>
-
-* **`const func <=> (other: date): int;`**<br>
-**`const func <=> (other: datetime): int;`** --
- compares the time value with a date value or a datetime value. Local time zone is always assumed for date or datetime value. Because the `time` class implements the `comparable` interface, time values are already comparable values. These two functions are provided for comparing a time value with a value of different type. Here are some comparison examples <br><pre>
-t1 := time();
-t2 := time();
-midnight := time.today();
-println(t1 < t2);
-println(t1 > midnight);
-t3: time = 20221031-10:15:45;
-d1: date = 20221031;
-println(t3 > d1);
-────────────────────────────────────────────────
-Output:
-true
-true
-true
-</pre>To compare a time value with date or datetime in different time zone, you will need to convert the date or datetime value into time value. Consider:<br><pre>
-println([:t"Local timezone is: %Z"], time());
-t1 := time::20230629-11:32:00;
-d1 := date::20230630;
-println([:t"The t1 value in GMT: %Lc%Z"], t1.ti("GMT"));
-println([:t"The CDT midnight of 20230630 in GMT: %Lc%Z"], d1.time().ti("GMT"));
-println([:t"The JST midnight of 20230630 in GMT: %Lc%Z"], d1.time("Asia/Tokyo").ti("GMT"));
-println(t1 > d1);
-println(t1 > d1.time("Asia/Tokyo"));
-────────────────────────────────────────────────
-Output:
-Local timezone is: CDT
-The t1 value in GMT: Thursday, Jun 29, 16:32:00, 2023 GMT
-The CDT midnight of 20230630 in GMT: Friday, Jun 30, 05:00:00, 2023 GMT
-The JST midnight of 20230630 in GMT: Thursday, Jun 29, 15:00:00, 2023 GMT
-false
-true
 </pre>
 
 * **`const func + (int): date;`**<br>
@@ -552,10 +522,9 @@ Output:
 There are 69 days from Thursday, Mar 23, 2023 to Wednesday, May 31, 2023
 </pre>
 
-
-* **`func += (d: duration): time;`**<br>
-**`func -= (d: duration): time;`** --<br><pre>
-    applies the offset `d` to this time value and returns the modified time value<br><pre>
-t := time.today();
-t += duration::2 hours 30 minutes;
+* **`func += (d: int): date;`**<br>
+**`func -= (d: int): date;`** --<br><pre>
+    applies the offset `d`, as number of days, to this date value and returns the modified date value<br><pre>
+d := date.today();
+d += 30;
 </pre>
