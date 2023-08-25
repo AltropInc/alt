@@ -58,6 +58,13 @@ t8 := time::20221031-10:15:45;
 t9 := time::20221031;   // local midnight of Oct 31, 2022
 t10: time = 20221031-10:15:45.023173494;   // time stamp with nanoseconds
 ```
+To represent a time in a specific timezone, the timezone information can be attached at the end of the time format. The timezone information can be specified as a string for a full timezone name, such as `"America/New_York"` and `"Asia/Tokyo"`, or GMT offset such as `-05` and `+09`, GMT offset plus timezone code, for example, `+09JST`. Note that timezone code alone (execpt for `GMT`) cannot be used for timezone info because timezone code is not unique. Here are some example of time representations with timezone information:
+```altro
+20221031-10:15:45 GMT;
+20221031-10:15:45 "Asia/Tokyo";
+20221031-10:15:45+09;
+20221031-10:15:45+09 JST;
+```
 Note that the value for timezone on the Windows platform works only when it is "GMT" or is null for the local timezone, and all other timezone values are ignored so that the local timezone will be assumed. 
 
 * **`time()`** --
@@ -585,11 +592,27 @@ gmtoff = 28800
 zone = CST
 ```
 
-## Date and Time Tuple
+## Date and Time
 
-The tuple `datetime` is used to represent a time point in terms of date and duration since the midnight of the date. `datetime` can represent a range of time much more broader than the type `time`.
+The type `datetime` is used to represent a time point in terms of date, duration since the midnight of the date, and the time zone info for the date and time. `datetime` can represent a range of time much more broader than the type `time`, and it prereserves the timezone information.
 ```altro
-type datetime = value tuple (d: date; t: duration);
+value class datetime implements comparable
+{
+    datetime(tz:string=null);                      // constructs date time value of the current in the given timezone
+    datetime(t:time; tz:string=null);              // constructs date time value from the given timepoint and the timezone
+    datetime(d:date; t: duration; tz:string=null); // constructs date time value from the given date, time of day and the timezone
+    const func d(): date;                          // returns the date
+    const func t(): time;                          // returns the time value
+    const func tod(): duration;                    // returns the time of the day
+    const func ti(): timeinfo;                     // returns the time info
+    const func +(duration): datetime;              // returns the date and time after the given duration
+    const func -(duration): datetime;              // returns the date and time before the given duration
+    const func +=(duration): datetime;             // adds the offset by the duration to this date time and returns the result
+    const func -=(duration): datetime;             // subtracts the offset by the duration to this date time and returns the result
+    const func gmtoff(): int;                      // returns number of seconds for the GMT offset of the datetime value
+    const func tzname(): string;                   // returns the timezone name of the datetime value
+    const func tzcode(): string;                   // returns the timezone code of the datetime value
+}
 ```
 
 
