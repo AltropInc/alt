@@ -594,7 +594,7 @@ zone = CST
 
 ## Date and Time
 
-The type `datetime` is used to represent a time point in terms of date, duration since the midnight of the date, and the time zone info for the date and time. `datetime` can represent a range of time much more broader than the type `time`, and it prereserves the timezone information.
+The class `datetime` is used to represent a time point in terms of date, duration since the midnight of the date, and the time zone info for the date and time. `datetime` can represent a range of time much more broader than the type `time`, and it prereserves the timezone information.
 ```altro
 value class datetime implements comparable
 {
@@ -614,5 +614,38 @@ value class datetime implements comparable
     const func tzcode(): string;                   // returns the timezone code of the datetime value
 }
 ```
+The class `datetime` implements the comparable interfaces. Therefore, datetime values can be compared.
+```altro
+dt1 := datetime::20221101-00:15:45"Asia/Tokyo";
+dt2 := datetime::20221031-10:15:45"America/Chicago";
+dt3 := datetime::20221031-10:15:46"America/Chicago";
+println(dt1==dt2);
+println(dt1 < dt3);
+────────────────────────────────────────────────
+Output:
+true
+true
+```
+You can construct a datetime value using one of its constructors or meta functions:
+```altro
+d1 := datetime();              // current date and time in local timezone
+d2 := datetime("Asia/Tokyo");  // current date and time in Tokyo timezone
+d3 := datetime(time::now(), "Asia/Tokyo");            // current date and time in Tokyo timezone
+d4 := datetime(date::today()-1, duration::12:00:00);  // date and time of yesterday noon in local timezone
+```
+You can also use the time format `yyyymmdd` to represent a datetime value. For example:
+```altro
+d5 := datetime::20221031-10:15:45 GMT;
+d6 := datetime::20221031-10:15:45 "Asia/Tokyo";
+d7 := datetime::20221031-10:15:45-05;
+```
+* **`datetime(tz:string=null)`** --
+    constructs the datetime value for the current time in the local time zone<br><pre>
+dt := datetime("Asia/Tokyo");
+println([:t"%Lc%Z"], dt);
+────────────────────────────────────────────────
+Output:
+Friday, Jul 7, 2023 CDT
+</pre>
 
 
