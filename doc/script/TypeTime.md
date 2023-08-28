@@ -602,8 +602,8 @@ value class datetime implements comparable
     datetime(t:time; tz:string=null);              // constructs date time value from the given timepoint and the timezone
     datetime(d:date; t: duration; tz:string=null); // constructs date time value from the given date, time of day and the timezone
     const func d(): date;                          // returns the date
-    const func t(): time;                          // returns the time value
     const func tod(): duration;                    // returns the time of the day
+    const func t(): time;                          // returns the time value
     const func ti(): timeinfo;                     // returns the time info
     const func +(duration): datetime;              // returns the date and time after the given duration
     const func -(duration): datetime;              // returns the date and time before the given duration
@@ -640,12 +640,61 @@ d6 := datetime::20221031-10:15:45 "Asia/Tokyo";
 d7 := datetime::20221031-10:15:45-05;
 ```
 * **`datetime(tz:string=null)`** --
-    constructs the datetime value for the current time in the local time zone<br><pre>
+    constructs the datetime value for the current time in the given time zone<br><pre>
 dt := datetime("Asia/Tokyo");
 println([:t"%Lc%Z"], dt);
 ────────────────────────────────────────────────
 Output:
-Friday, Jul 7, 2023 CDT
+Sunday, Aug 27, 13:00:14, 2023 JST
 </pre>
-
-
+* **`datetime(t:time; tz:string=null)`** --
+    constructs the datetime value for the given epoch time in the given time zone<br><pre>
+dt := datetime(time::20230826-11:10:45 GMT, "Asia/Tokyo");
+println([:t"%Lc%Z"], dt);
+────────────────────────────────────────────────
+Output:
+Sunday, Aug 27, 13:00:14, 2023 JST
+</pre>
+* **`datetime(d:date; t: duration; tz:string=null)`** --
+    constructs the datetime value for the given epoch time in the given time zone<br><pre>
+dt := datetime(date::20230827, duration::13:00:14, "Asia/Tokyo");
+println([:t"%Lc%Z"], dt);
+────────────────────────────────────────────────
+Output:
+Sunday, Aug 27, 13:00:14, 2023 JST
+</pre>
+* **`const func d(): date`** --
+    returns the date of the datetime value<br><pre>
+println([:t"%Lc%Z"], datetime("Asia/Tokyo").d());
+println([:t"%Lc%Z"], datetime("GMT").d());
+────────────────────────────────────────────────
+Output:
+Saturday, Aug 26, 2023
+Sunday, Aug 27, 2023
+</pre>* **`const func tod(): duration`** --
+    returns the time of the day of the datetime value<br><pre>
+println(datetime("Asia/Tokyo").tod());
+println(datetime("GMT").tod());
+────────────────────────────────────────────────
+Output:
+20:18:55.72878585
+11:18:55.72977905
+</pre>
+* **`const func t(): time`** --
+    converts this datetime value to epoch time.<br><pre>
+println([:t"%Lc%Z"], "The current datetime in local timezone: ", datetime("Asia/Tokyo").t());
+println([:t"%Lc%Z"], "The current datetime in local timezone: ", datetime("GMT").t());
+────────────────────────────────────────────────
+Output:
+The current datetime in local timezone: Saturday, Aug 26, 06:13:39, 2023 CDT
+The current datetime in local timezone: Saturday, Aug 26, 06:13:39, 2023 CDT
+</pre>
+* **`const func + (duration): datetime;`**<br>
+**`const func - (duration): datetime;`** --<br><pre>
+    returns the datetime after or before this date by the given duration<br><pre>
+d := datetime::20221031-15:45:30 + duration::10 hours 30 minutes;;
+println(d);
+────────────────────────────────────────────────
+Output:
+20221101-02:15:30.000000
+</pre>
