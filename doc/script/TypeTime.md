@@ -672,7 +672,7 @@ Output:
 Saturday, Aug 26, 2023
 Sunday, Aug 27, 2023
 </pre>* **`const func tod(): duration`** --
-    returns the time of the day of the datetime value<br><pre>
+    returns the time of the day in terms of duration since midnight<br><pre>
 println(datetime("Asia/Tokyo").tod());
 println(datetime("GMT").tod());
 ────────────────────────────────────────────────
@@ -700,7 +700,7 @@ Output:
 </pre>
 * **`func += (d: duration): datetime;`**<br>
 **`func -= (d: duration): datetime;`** --<br><pre>
-    applies the offset `d` in duration, to this datetime value and returns the modified datetime value<br><pre>
+    applies the offset `d` in duration to this datetime value and returns the modified datetime value<br><pre>
 d := datetime();
 d += duration::30 days;
 println("set d to 30 days after the time of today: ", d);
