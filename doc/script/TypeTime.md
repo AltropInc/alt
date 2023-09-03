@@ -647,6 +647,7 @@ println([:t"%Lc%Z"], dt);
 Output:
 Sunday, Aug 27, 13:00:14, 2023 JST
 </pre>
+
 * **`datetime(t:time; tz:string=null)`** --
     constructs the datetime value for the given epoch time in the given time zone<br><pre>
 dt := datetime(time::20230826-11:10:45 GMT, "Asia/Tokyo");
@@ -655,6 +656,7 @@ println([:t"%Lc%Z"], dt);
 Output:
 Sunday, Aug 27, 13:00:14, 2023 JST
 </pre>
+
 * **`datetime(d:date; t: duration; tz:string=null)`** --
     constructs the datetime value for the given epoch time in the given time zone<br><pre>
 dt := datetime(date::20230827, duration::13:00:14, "Asia/Tokyo");
@@ -663,6 +665,7 @@ println([:t"%Lc%Z"], dt);
 Output:
 Sunday, Aug 27, 13:00:14, 2023 JST
 </pre>
+
 * **`const func d(): date`** --
     returns the date of the datetime value<br><pre>
 println([:t"%Lc%Z"], datetime("Asia/Tokyo").d());
@@ -671,7 +674,9 @@ println([:t"%Lc%Z"], datetime("GMT").d());
 Output:
 Saturday, Aug 26, 2023
 Sunday, Aug 27, 2023
-</pre>* **`const func tod(): duration`** --
+</pre>
+
+* **`const func tod(): duration`** --
     returns the time of the day in terms of duration since midnight<br><pre>
 println(datetime("Asia/Tokyo").tod());
 println(datetime("GMT").tod());
@@ -680,6 +685,7 @@ Output:
 20:18:55.72878585
 11:18:55.72977905
 </pre>
+
 * **`const func t(): time`** --
     converts this datetime value to epoch time.<br><pre>
 println([:t"%Lc%Z"], "The current datetime in local timezone: ", datetime("Asia/Tokyo").t());
@@ -689,6 +695,7 @@ Output:
 The current datetime in local timezone: Saturday, Aug 26, 06:13:39, 2023 CDT
 The current datetime in local timezone: Saturday, Aug 26, 06:13:39, 2023 CDT
 </pre>
+
 * **`const func + (duration): datetime;`**<br>
 **`const func - (duration): datetime;`** --
     returns the datetime after or before this date by the given duration<br><pre>
@@ -698,6 +705,7 @@ println(d);
 Output:
 20221101-02:15:30.000000
 </pre>
+
 * **`func += (d: duration): datetime;`**<br>
 **`func -= (d: duration): datetime;`** --<br><pre>
     applies the offset `d` in duration to this datetime value and returns the modified datetime value<br><pre>
@@ -708,6 +716,7 @@ println("set d to 30 days after the time of today: ", d);
 Output:
 set d to 30 days after the time of today: 20230927-08:20:20.953611200
 </pre>
+
 * **`const func gmtoff(): int`** --
     returns GMT offset in number of minutes for this datetime value.<br><pre>
 d := datetime("Asia/Tokyo");
@@ -716,6 +725,7 @@ println(d.gmtoff());
 Output:
 540
 </pre>
+
 * **`const func tzname(): string`** --
     returns the timezone name of the datetime value.<br><pre>
 d := datetime("Asia/Tokyo");
@@ -724,6 +734,7 @@ println(d.tzname());
 Output:
 Asia/Tokyo
 </pre>
+
 * **`const func tzcode(): string`** --
     returns the timezone code of the datetime value.<br><pre>
 d := datetime("Asia/Tokyo");
